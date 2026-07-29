@@ -40,13 +40,28 @@ width: 100%; }
 .btn-add-p { background-color: var(--secondary); } .btn-add-stepdown { background-color: #6f42c1; }
 .auto-badge { background: #e2e3e5; color: #383d41; padding: 3px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; float: right; }
 
-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-th, td { padding: 9px 8px; border: none; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table { width: 100%; min-width: 1100px; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+th, td { padding: 9px 8px; border: none; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; white-space: nowrap; }
 th { background-color: var(--secondary); color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
 tbody tr:last-child td { border-bottom: none; }
 tr:nth-child(even) { background-color: #F6FAFC; }
-.btn-danger-action { background-color: var(--danger); color: white; border: none; border-radius: 7px; cursor: pointer; font-weight: bold; }
-.btn-edit-action { background-color: var(--secondary); color: white; border: none; border-radius: 7px; cursor: pointer; font-weight: bold; }
+.btn-danger-action, .btn-edit-action { border: none; border-radius: 7px; cursor: pointer; font-weight: bold; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.btn-danger-action { background-color: var(--danger); color: white; }
+.btn-edit-action { background-color: var(--secondary); color: white; }
+
+/* Mobile — fuel fill rows (built in JS with inline flex styles) stack to
+   a single column under 600px; align-items needs !important since the
+   inline style sets it, flex-direction/child widths don't so plain
+   rules apply. */
+@media (max-width: 600px) {
+  .fuel-fill-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  .fuel-fill-row > div {
+    width: 100%;
+  }
+}
 
 .watermark-footer { text-align: center; font-size: 11px; color: #888; margin-top: 20px; padding-bottom: 20px; line-height: 1.5; font-weight: 500; }
 
@@ -253,7 +268,7 @@ body { pointer-events: auto !important; }
 <p style="font-size: 12px; color: gray; margin-top:-5px; margin-bottom: 15px;">Semak semula rekod anda di bawah.
 Jika terdapat kesilapan data, sila tekan butang <strong>Padam</strong> dan isikan semula rekod yang betul.
 Anda hanya boleh menyemak rekod bulan semasa dan satu bulan lepas.</p>
-<div style="overflow-x: auto; max-height: clamp(420px, 65vh, 650px);">
+<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: clamp(420px, 65vh, 650px);">
 <table id="mainDataTable">
 <thead style="position: sticky; top:0; z-index: 51;">
 <tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th style="background:var(--secondary); text-align: center;">Tindakan</th></tr>
@@ -541,7 +556,7 @@ window.createFuelFillRow = function () {
   row.style.cssText = 'display:flex; align-items:flex-end; gap:10px; margin-bottom:10px; flex-wrap:wrap;';
   row.innerHTML = `
 <div><label>Liter (L)</label><input type="number" step="0.001" class="fuelFillLiter" placeholder="Cth: 35.500" required></div>
-<div><label>Resit (Pilihan)</label><input type="file" accept="image/*" class="fuelFillResit" onchange="window.previewFuelFillReceipt(this)"></div>
+<div><label>Resit (Pilihan)</label><input type="file" accept="image/*" capture="environment" class="fuelFillResit" onchange="window.previewFuelFillReceipt(this)"></div>
 <img class="fuelFillPreview" style="display:none; max-width: 80px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;"/>
 <button type="button" class="btnRemoveFuelFill" onclick="window.removeFuelFillRow(this)" style="background:none; border:none; color:#dc3545; font-size:16px; cursor:pointer;" title="Buang pengisian ini">✕</button>`;
   return row;
