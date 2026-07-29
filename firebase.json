@@ -1,0 +1,14 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "VELOS_REVAMP_BRIEF.md",
+      "CLAUDE.md"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  }
+}

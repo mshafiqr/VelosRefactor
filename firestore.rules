@@ -1,0 +1,141 @@
+rules_version = '2';
+
+// ============================================================================
+// VELOS — REVAMP
+// Firebase project: Velos-Revamp
+//
+// Account model: one shared role account per portal. No individual users,
+// no staff emails stored. The "email" is a username, not a mailbox.
+//
+// BEFORE DEPLOYING:
+//   1. Create the six accounts in Firebase Console -> Authentication
+//   2. Copy each account's UID from the Users tab
+//   3. Paste them into the placeholders below
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Account UIDs ------------------------------------------------------
+    function uidAdmin()     { return 'C9b8wUiNz7Z2zTnBMd8QBZlSJC33'; }
+    function uidDriver()    { return '8xdF5F6v2Ggs9ekLyo7DNwnmbUC3'; }
+    function uidUser()      { return '74UrpMh3v8X87x9qP1PP1pbV18c2'; }
+    function uidVccC()      { return 'LZiT3i8OsMUy23vX5a1CAubpuDw2'; }
+    function uidVccM()      { return 'y4WorrRkS2f0vWP9bOZCsXAwFF23'; }
+    function uidKenderaan() { return 'xUiId6yJRFMsEvZxVz8iLw8Znud2'; }
+
+    // ---- Role helpers ------------------------------------------------------
+    function signedIn()    { return request.auth != null; }
+    function isAdmin()     { return signedIn() && request.auth.uid == uidAdmin(); }
+    function isDriver()    { return signedIn() && request.auth.uid == uidDriver(); }
+    function isUser()      { return signedIn() && request.auth.uid == uidUser(); }
+    function isVccC()      { return signedIn() && request.auth.uid == uidVccC(); }
+    function isVccM()      { return signedIn() && request.auth.uid == uidVccM(); }
+    function isVcc()       { return isVccC() || isVccM(); }
+    function isKenderaan() { return signedIn() && request.auth.uid == uidKenderaan(); }
+
+    // ---- logPergerakan -----------------------------------------------------
+    // Driver log. Reads are unscoped because odometer chain validation
+    // compares across all drivers and both fetched months.
+    match /logPergerakan/{id} {
+      allow read:   if isDriver() || isAdmin() || isKenderaan();
+      allow create: if isDriver() || isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- logBahanApi -------------------------------------------------------
+    match /logBahanApi/{id} {
+      allow read:   if isDriver() || isAdmin();
+      allow create: if isDriver() || isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- resitBahanApi -----------------------------------------------------
+    // Receipt images, base64, one doc per fuel record ID. Mirrors logBahanApi:
+    // the driver creates the receipt first, then the fuel record, so create
+    // must be open to the driver or the whole fuel save fails.
+    //
+    // Deletes are admin-only because deleteFuelEntry(id) removes the
+    // logBahanApi doc and this one together.
+    //
+    // Rules cannot stop a bulk read of this collection -- that discipline
+    // lives in the client (single getDoc only, never onSnapshot, never
+    // getDocs). See Section 7 of the brief.
+    match /resitBahanApi/{id} {
+      allow read:   if isDriver() || isAdmin();
+      allow create: if isDriver() || isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- permohonanVCC -----------------------------------------------------
+    // Queue type is carried by the ID suffix only: C = Klinikal, M = Jabatan.
+    // Writes are scoped by suffix. Reads are NOT scoped between the two VCC
+    // accounts -- see note at the bottom of this file.
+    match /permohonanVCC/{id} {
+      allow read:   if isUser() || isVcc() || isAdmin();
+      allow create: if isUser() || isAdmin();
+
+      allow update: if isAdmin()
+                    || (isVccC() && id.matches('.*C$'))
+                    || (isVccM() && id.matches('.*M$'));
+
+      // Requester may withdraw only while the request is still untouched.
+      allow delete: if isAdmin()
+                    || (isUser() && resource.data.status == 'Menunggu')
+                    || (isVccC() && id.matches('.*C$'))
+                    || (isVccM() && id.matches('.*M$'));
+    }
+
+    // ---- kapasitiKenderaan -------------------------------------------------
+    // Read by driver (liter validation) and borang. Admin-only writes.
+    match /kapasitiKenderaan/{plat} {
+      allow read:  if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---- sistemMeta --------------------------------------------------------
+    match /sistemMeta/{docId} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ---- Portal Kenderaan --------------------------------------------------
+    // Placeholder. Portal Kenderaan is on hold until the VELOS revamp lands,
+    // so its collections do not exist yet. Add the match block here when the
+    // schema is decided -- kenderaan@pitas.velos already has its UID above.
+    //
+    // match /checklistKenderaan/{id} {
+    //   allow read:   if isKenderaan() || isAdmin();
+    //   allow create: if isKenderaan() || isAdmin();
+    //   allow update: if isAdmin();
+    //   allow delete: if isAdmin();
+    // }
+
+    // ---- Default deny ------------------------------------------------------
+    // Anything not matched above is closed. Do not remove this block.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// ============================================================================
+// NOTE ON VCC READ SCOPING
+//
+// Both VCC accounts can READ every request; only writes are split by suffix.
+// This is deliberate, not an oversight.
+//
+// Firestore rules cannot filter a query -- they reject it outright if any
+// document in the result would fail the rule. A rule of the form
+// "Klinikal may read only IDs ending in C" would break every collection
+// query in dispatch.html, because the queue type lives in the ID and there
+// is no field to constrain the query on.
+//
+// If read separation is ever wanted, the fix is to add a jenisVCC field
+// ('K' / 'J') to each request and have dispatch query on it. That is a
+// schema change, not a rules change, and the ID suffix convention stays
+// untouched either way.
+// ============================================================================
