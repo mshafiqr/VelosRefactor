@@ -89,6 +89,14 @@ body { pointer-events: auto !important; }
 
 /* Login view — new in the revamp, live GAS had no client-side auth gate. */
 .login-card { max-width: 380px; margin: 60px auto; }
+.login-letterhead { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
+.login-letterhead img { height: 65px; width: auto; }
+.login-letterhead img:first-child { justify-self: start; }
+.login-letterhead img:last-child { justify-self: end; }
+.login-letterhead-text { text-align: center; }
+.login-card h2, .login-card label { text-align: center; }
+.login-letterhead-text .lh-title { font-weight: 800; font-size: 15px; color: var(--primary); letter-spacing: 0.3px; }
+.login-letterhead-text .lh-subtitle { font-weight: 400; font-size: 11px; color: var(--text-soft); margin-top: 2px; }
 .login-error { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
 .logout-bar { max-width: 800px; margin: 0 auto 10px; display: flex; justify-content: flex-end; }
 .btn-logout { background-color: var(--danger); color: white; border: none; border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
@@ -97,8 +105,16 @@ body { pointer-events: auto !important; }
 <body>
 
 <div id="loginView" class="container">
-<div class="form-title">Portal Pemandu</div>
+<div class="form-title">Log Pemandu</div>
 <div class="card login-card">
+<div class="login-letterhead">
+<img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
+<div class="login-letterhead-text">
+<div class="lh-title">HOSPITAL PITAS</div>
+<div class="lh-subtitle">KEMENTERIAN KESIHATAN MALAYSIA</div>
+</div>
+<img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Logo Hospital Pitas">
+</div>
 <h2>Log Masuk</h2>
 <form id="loginForm" novalidate>
 <div class="form-group">
@@ -281,8 +297,9 @@ Anda hanya boleh menyemak rekod bulan semasa dan satu bulan lepas.</p>
 </div>
 
 <div class="watermark-footer">
-&copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>VELOS — Rebuild<br>
-<span style="opacity: 0.8;">VELOS Revamp (FIRESTORE), Versi 1.0 (Modul Log Pemandu)</span>
+&copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>
+Vehicle Logistics And Operations System (VELOS)<br>
+<span style="opacity: 0.8;">VELOS Edisi 4 (Firestore), Versi 1.0 (Modul Log Pemandu) &middot; Dikemaskini 01/08/2026</span>
 </div>
 </div>
 
