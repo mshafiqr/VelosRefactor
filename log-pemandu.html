@@ -1,25 +1,1081 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VELOS — Log Pemandu</title>
-  <style>
-    :root {
-      --primary: #0F2A4A;
-      --secondary: #147D82;
-      --bg-color: #E9F1F6;
-      --card-bg: #ffffff;
-      --text-color: #1C2530;
-      --text-soft: #5B6774;
-      --success: #1E8E5A;
-      --danger: #C62828;
-    }
-    body {
-      font-family: 'Public Sans', sans-serif;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<title>VELOS — Log Pemandu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #0F2A4A; --secondary: #147D82; --bg-color: #E9F1F6; --card-bg: #ffffff;
+  --text-color: #1C2530; --text-soft: #5B6774; --success: #1E8E5A; --danger: #C62828; --warning: #C98A2E;
+  --line: #DCE6ED; --radius: 12px; --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
+}
+body { font-family: 'Public Sans', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; -webkit-font-smoothing: antialiased; }
+.form-title { text-align: center; padding: 14px 10px 20px; font-size: 19px; font-weight: 800; color: var(--primary); letter-spacing: 0.3px; text-transform: uppercase; }
+.container { max-width: 800px; margin: auto; display: block; }
+.card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; }
+h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; }
+h3 { font-size: 14px; color: #555; margin-top: 20px; margin-bottom: 10px; background: #e9ecef; padding: 10px; border-radius: 4px; }
+.form-group { margin-bottom: 15px; }
+label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+input, select { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE; }
+.time-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.patient-block { background: #fdfdfd; border: 1px dashed #b5b5b5; padding: 12px; border-radius: 6px; margin-bottom: 10px; }
+.fuel-block { background: #fffdf5; border: 1px dashed #ffc107; padding: 15px; border-radius: 6px; margin-bottom: 20px; margin-top: 25px; }
+.odo-block { background: #f1f9f1; border: 1px dashed #28a745; padding: 15px; border-radius: 6px; margin-bottom: 20px; margin-top: 25px; }
+.patient-row-inputs { display: flex; flex-direction: column; gap: 10px; }
+.fuel-row-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+@media (max-width: 500px) { .fuel-row-inputs { grid-template-columns: 1fr; } }
+.btn-remove-patient { background: var(--danger); color: white; border: none; padding: 8px 10px; font-size: 12px; border-radius: 7px; cursor: pointer; margin-top: 10px;
+width: 100%; font-weight: bold; }
+button.btn-main { background-color: var(--primary); color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 15px;
+font-weight: bold; position: sticky; bottom: 15px; z-index: 10; box-shadow: 0 4px 6px rgba(0,86,179,0.3);}
+.btn-add-p, .btn-add-stepdown { color: white; border: none; padding: 12px; border-radius: 7px; cursor: pointer; font-size: 13px; margin-bottom: 15px; font-weight: bold;
+width: 100%; }
+.btn-add-p { background-color: var(--secondary); } .btn-add-stepdown { background-color: #6f42c1; }
+.auto-badge { background: #e2e3e5; color: #383d41; padding: 3px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; float: right; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+th, td { padding: 9px 8px; border: none; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background-color: var(--secondary); color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+tbody tr:last-child td { border-bottom: none; }
+tr:nth-child(even) { background-color: #F6FAFC; }
+.btn-danger-action { background-color: var(--danger); color: white; border: none; border-radius: 7px; cursor: pointer; font-weight: bold; }
+.btn-edit-action { background-color: var(--secondary); color: white; border: none; border-radius: 7px; cursor: pointer; font-weight: bold; }
+
+.watermark-footer { text-align: center; font-size: 11px; color: #888; margin-top: 20px; padding-bottom: 20px; line-height: 1.5; font-weight: 500; }
+
+button, select, .btn-main, .btn-add, .btn-remove, .btn-status-check,
+.btn-add-p, .btn-add-stepdown, .btn-remove-patient, .btn-lulus, .btn-tolak,
+.swal2-confirm, .swal2-cancel {
+touch-action: manipulation !important;
+-webkit-tap-highlight-color: transparent !important;
+position: relative !important;
+z-index: 50 !important;
+cursor: pointer !important;
+pointer-events: auto !important;
+user-select: none !important;
+}
+body.swal2-height-auto { height: 100vh !important; }
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) { overflow: auto !important; }
+body { pointer-events: auto !important; }
+
+.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
+.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
+.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
+.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
+.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+
+/* Login view — new in the revamp, live GAS had no client-side auth gate. */
+.login-card { max-width: 380px; margin: 60px auto; }
+.login-error { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+.logout-bar { max-width: 800px; margin: 0 auto 10px; display: flex; justify-content: flex-end; }
+.btn-logout { background-color: var(--danger); color: white; border: none; border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
+</style>
 </head>
 <body>
+
+<div id="loginView" class="container">
+<div class="form-title">Portal Pemandu</div>
+<div class="card login-card">
+<h2>Log Masuk</h2>
+<form id="loginForm" novalidate>
+<div class="form-group">
+<label>Kata Laluan</label>
+<input type="password" id="loginPassword" required placeholder="Masukkan kata laluan...">
+</div>
+<button type="submit" class="btn-main" id="btnLogin">Log Masuk</button>
+</form>
+<p id="loginError" class="login-error"></p>
+</div>
+</div>
+
+<div id="portalView" class="container" style="display:none;">
+<div class="logout-bar"><button type="button" id="btnLogout" class="btn-logout">Log Keluar</button></div>
+<div class="form-title">Borang Maklumat Pergerakan</div>
+<div class="card">
+<h2 id="formHeader">Butiran Pergerakan</h2>
+<form id="logForm" novalidate>
+<div class="form-group"><label>Tarikh</label><input type="date" id="tarikh" required></div>
+<div class="form-group">
+<label>Masa Perjalanan (Mulai - Hingga)</label>
+<div class="time-group">
+<input type="time" id="masaMula" required>
+<input type="time" id="masaTamat" required>
+</div>
+</div>
+<div class="form-group">
+<label>Syif / Waktu <span id="syifBadge" class="auto-badge">Auto</span></label>
+<select id="syif" required style="background-color: #e9ecef;">
+<option value="Pagi">Pagi (0700 - 1359)</option><option value="Petang">Petang (1400 - 2059)</option><option value="Malam">Malam (2100 - 0659)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Kenderaan Digunakan</label>
+<select id="kenderaan" required>
+<option value="" disabled selected>Pilih Kenderaan...</option>
+<optgroup label="Ambulans">
+<option value="BNU 9974">BNU 9974</option>
+<option value="BPL 7944">BPL 7944</option>
+<option value="BPP 4693">BPP 4693</option>
+<option value="Lain-lain (Ambulans)">Lain-lain</option>
+</optgroup>
+<optgroup label="Kenderaan Jabatan">
+<option value="SYJ 7904">SYJ 7904</option>
+<option value="SAA 8110 K">SAA 8110 K</option>
+<option value="VFP 2850">VFP 2850</option>
+<option value="SAC 7316 C">SAC 7316 C</option>
+<option value="WLL 1078">WLL 1078</option>
+<option value="SAA 5285 N">SAA 5285 N</option>
+<option value="SAA 2680 W">SAA 2680 W</option>
+<option value="Lain-lain (Kenderaan Jabatan)">Lain-lain</option>
+</optgroup>
+</select>
+</div>
+<div class="form-group" id="manualKenderaanGroup" style="display: none;">
+<label>No. Plat Kenderaan Baharu</label><input type="text" id="kenderaanManual" placeholder="Taip no. plat...">
+</div>
+<div class="form-group">
+<label>Nama Pemandu</label>
+<select id="namaPemandu" required>
+<option value="" disabled selected>Pilih Pemandu...</option>
+<option value="Ahmad Agar">Ahmad Agar</option><option value="Masnin">Masnin</option><option value="Rafaie">Rafaie</option><option value="Jilie">Jilie</option><option value="Mazni">Mazni</option><option value="Nurikram">Nurikram</option><option value="Rosley">Rosley</option><option value="Affendy">Affendy</option><option value="SN Reno">SN Reno</option><option value="PPK Franli">PPK Franli</option><option value="PKA Fikri">PKA Fikri</option><option value="PPK Shan">PPK Shan</option><option value="PPK Armay">PPK Armay</option><option value="PPK James">PPK James</option><option value="CC Dell">CC Dell</option><option value="PPP Shafiq">PPP Shafiq</option><option value="Lain-lain">Lain-lain</option>
+</select>
+</div>
+<div class="form-group" id="manualPemanduGroup" style="display: none;">
+<label>Nama Pemandu Baharu</label><input type="text" id="namaPemanduManual" placeholder="Taip nama pemandu...">
+</div>
+<button type="button" id="btnToggleMorePemandu" class="btn-add-p" style="margin-top: 8px;">➕ Tambah Pemandu</button>
+<div id="morePemanduGroup" style="display: none; margin-top: 10px;">
+<div class="form-group">
+<label>Nama Pemandu 2 (Jika Ada)</label>
+<select id="namaPemandu2">
+<option value="" selected>Pilih Pemandu 2 (jika ada)...</option>
+<option value="Ahmad Agar">Ahmad Agar</option><option value="Masnin">Masnin</option><option value="Rafaie">Rafaie</option><option value="Jilie">Jilie</option><option value="Mazni">Mazni</option><option value="Nurikram">Nurikram</option><option value="Rosley">Rosley</option><option value="Affendy">Affendy</option><option value="SN Reno">SN Reno</option><option value="PPK Franli">PPK Franli</option><option value="PKA Fikri">PKA Fikri</option><option value="PPK Shan">PPK Shan</option><option value="PPK Armay">PPK Armay</option><option value="PPK James">PPK James</option><option value="CC Dell">CC Dell</option><option value="PPP Shafiq">PPP Shafiq</option><option value="Lain-lain">Lain-lain</option>
+</select>
+</div>
+<div class="form-group" id="manualPemandu2Group" style="display: none;">
+<label>Nama Pemandu 2 Baharu</label><input type="text" id="namaPemandu2Manual" placeholder="Taip nama pemandu...">
+</div>
+</div>
+<div class="form-group">
+<label>Nama Pengiring</label>
+<input list="senaraiPengiring" id="namaPengiringInput" placeholder="Taip atau pilih nama pengiring..." required>
+<datalist id="senaraiPengiring">
+<option value="Tiada Pengiring"></option>
+<option value="Shafiq Raffi"></option>
+<option value="Difliks Mintu"></option>
+<option value="Sean Sarto"></option>
+<option value="Zaini Kahar"></option>
+<option value="Maixol Malintang"></option>
+<option value="Hartono Ensiew"></option>
+<option value="Nurfauzie Nordin"></option>
+<option value="Amirul Shafiq"></option>
+<option value="Nor Afeeza Singgan"></option>
+<option value="Christyal Doikin"></option>
+<option value="Yonathan Ah Gau"></option>
+<option value="Norhashima Ali Aspar"></option>
+<option value="Felona Domadul"></option>
+<option value="Sherenie Azryin"></option>
+<option value="Saidah Bedin"></option>
+<option value="Yanti Yabin"></option>
+<option value="Kelly Chai"></option>
+<option value="Rhona A/K David"></option>
+<option value="Ellista Timin"></option>
+<option value="Norsiah Kasah"></option>
+<option value="Jenny Ruminggon"></option>
+<option value="Rishkahzie Simon"></option>
+</datalist>
+<button type="button" id="btnToggleMorePengiring" class="btn-add-p" style="margin-top: 8px;">➕ Tambah Pengiring</button>
+<div id="morePengiringGroup" style="display: none; margin-top: 10px;">
+<div style="margin-bottom: 10px;"><label>Nama Pengiring 2</label><input list="senaraiPengiring" id="namaPengiring2" placeholder="Taip atau pilih nama pengiring..."></div>
+<div><label>Nama Pengiring 3</label><input list="senaraiPengiring" id="namaPengiring3" placeholder="Taip atau pilih nama pengiring..."></div>
+</div>
+</div>
+<div class="form-group">
+<label>Tujuan</label>
+<select id="nota">
+<option value="" selected>Pilih Tujuan...</option>
+<option value="Menghantar Pesakit">Menghantar Pesakit</option><option value="Bengkel">Bengkel</option><option value="Pengisian Bahan Api">Pengisian Bahan Api</option><option value="Ambulance Call">Ambulance Call</option><option value="Retrieval">Retrieval</option><option value="Medical Team Standby">Medical Team Standby</option><option value="Menghantar sampel / ubat / dokumen">Menghantar sampel / ubat / dokumen</option><option value="Menghantar Kakitangan">Menghantar Kakitangan</option><option value="Mobile Blood Bank">Mobile Blood Bank</option><option value="Lain-lain">Lain-lain</option>
+</select>
+</div>
+<div class="form-group" id="manualNotaGroup" style="display: none;">
+<label>Tujuan Lain</label><input type="text" id="notaManual" placeholder="Taip catatan tugas...">
+</div>
+<p style="font-size:12px; color:gray; margin-top:-10px;">Panduan : Sila klik butang merah "Padam Kes" sekiranya perjalanan tidak melibatkan penghantaran pesakit. Sekiranya mengambil pesakit, sila klik pada butang ungu "Tambah Pesakit Stepdown/Retrieval".</p>
+<h3>Senarai Pesakit Dihantar</h3>
+<div id="patientsContainer"></div>
+<button type="button" id="btnAddPatient" class="btn-add-p">+ Tambah Pesakit Ke Dalam Kenderaan</button>
+<h3 style="background-color: #d1ecf1; color: #0c5460;">Senarai Pesakit Diambil (Stepdown)</h3>
+<div id="stepdownPatientsContainer"></div>
+<button type="button" id="btnAddStepdownPatient" class="btn-add-stepdown">+ Tambah Pesakit Stepdown / Retrieval</button>
+<div class="odo-block">
+<h3 style="background-color: #d4edda; color: #155724; margin-top: 0; padding: 10px; border-radius: 4px;">Bacaan Odometer (Km)</h3>
+<div class="fuel-row-inputs">
+<div><label>Odometer Awal</label><input type="number" id="odoAwal" placeholder="Cth: 150000" required></div>
+<div><label>Odometer Akhir</label><input type="number" id="odoAkhir" placeholder="Cth: 150300" required></div>
+</div>
+</div>
+<div class="fuel-block">
+<h3 style="background-color: #fff3cd; color: #856404; margin-top: 0; padding: 10px; border-radius: 4px;"> ⛽  Butiran Pengisian Bahan Api</h3>
+<div class="form-group" style="margin-bottom: 0;">
+<label>Adakah kenderaan ini mengisi bahan api (minyak) semasa pergerakan ini?</label>
+<select id="isRefueled" style="border-color: #ffc107; background-color: #ffffff;">
+<option value="Ya" selected>Ya, ada pengisian bahan api.</option>
+<option value="Tidak">Tidak, tiada pengisian.</option>
+</select>
+</div>
+<div id="fuelSection" style="display: block; padding-top: 15px; margin-top: 15px; border-top: 1px dashed #ffc107;">
+<p style="font-size: 11px; color: gray; margin-top: -5px; margin-bottom: 15px;">Panduan : Sekiranya terdapat dua atau lebih pengisian minyak pada satu perjalanan yang sama, sila klik butang hijau "Tambah Pengisian" dan sila isikan jumlah liter yang diisi untuk pengisian berikutnya. (Sila isikan Jumlah Liter SAHAJA)</p>
+<div class="fuel-row-inputs">
+<div><label>Odometer Semasa Pengisian (Pilihan)</label><input type="number" id="odoPengisian" placeholder="Cth: 150150"></div>
+</div>
+<div id="fuelFillsContainer" style="margin-top: 15px;"></div>
+<button type="button" id="btnAddFuelFill" class="btn-add-p" style="margin-top: 5px;">➕ Tambah Pengisian</button>
+</div>
+</div>
+<button type="button" id="btnSimpanLog" class="btn-main">Simpan Rekod Perjalanan</button>
+<button type="button" id="btnCancelEdit" class="btn-add-p" style="display:none; background-color:#6c757d; margin-top:8px;">Batal Kemaskini</button>
+</form>
+</div>
+<div class="card" style="border-top: 3px solid var(--secondary);">
+<h2 style="color: var(--secondary); border-bottom-color: var(--secondary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+<span>Laporan Log Pergerakan Kenderaan</span>
+<select id="userMonthFilter" style="padding: 5px 8px; border-radius: 4px; border: 2px solid var(--secondary); font-weight: bold; font-size: 13px; cursor: pointer; outline: none;">
+</select>
+</h2>
+<p style="font-size: 12px; color: gray; margin-top:-5px; margin-bottom: 15px;">Semak semula rekod anda di bawah.
+Jika terdapat kesilapan data, sila tekan butang <strong>Padam</strong> dan isikan semula rekod yang betul.
+Anda hanya boleh menyemak rekod bulan semasa dan satu bulan lepas.</p>
+<div style="overflow-x: auto; max-height: clamp(420px, 65vh, 650px);">
+<table id="mainDataTable">
+<thead style="position: sticky; top:0; z-index: 51;">
+<tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th style="background:var(--secondary); text-align: center;">Tindakan</th></tr>
+</thead>
+<tbody id="dataTableBody">
+<tr><td colspan="14" style="text-align:center; color:gray;">Memuat turun data awan...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="watermark-footer">
+&copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>VELOS — Rebuild<br>
+<span style="opacity: 0.8;">VELOS Revamp (FIRESTORE), Versi 1.0 (Modul Log Pemandu)</span>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const DRIVER_EMAIL = "driver@pitas.velos";
+
+/* ---------------------------------------------------------------------
+   AUTH GATE — no session -> login form. On success -> portal. Sign-out
+   returns to login view. No redirect: same page, view toggle only.
+--------------------------------------------------------------------- */
+const loginView = document.getElementById('loginView');
+const portalView = document.getElementById('portalView');
+const loginForm = document.getElementById('loginForm');
+const loginPassword = document.getElementById('loginPassword');
+const loginError = document.getElementById('loginError');
+const btnLogin = document.getElementById('btnLogin');
+const btnLogout = document.getElementById('btnLogout');
+
+loginForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  btnLogin.disabled = true;
+  btnLogin.innerText = 'Log Masuk...';
+  signInWithEmailAndPassword(auth, DRIVER_EMAIL, loginPassword.value)
+    .catch(function () {
+      loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';
+      loginError.style.display = 'block';
+    })
+    .finally(function () {
+      btnLogin.disabled = false;
+      btnLogin.innerText = 'Log Masuk';
+      loginPassword.value = '';
+    });
+});
+
+btnLogout.addEventListener('click', function () {
+  signOut(auth);
+});
+
+let unsubscribeLogPergerakan = null;
+let portalInitialized = false;
+
+onAuthStateChanged(auth, function (user) {
+  if (user) {
+    loginView.style.display = 'none';
+    portalView.style.display = 'block';
+    initPortal();
+  } else {
+    portalView.style.display = 'none';
+    loginView.style.display = 'block';
+    portalInitialized = false;
+    if (unsubscribeLogPergerakan) {
+      unsubscribeLogPergerakan();
+      unsubscribeLogPergerakan = null;
+    }
+  }
+});
+
+function initPortal() {
+  if (portalInitialized) return;
+  portalInitialized = true;
+
+  // Load kapasitiKenderaan even if the collection is empty -- tangkiCap
+  // simply stays {} and liter validation falls back to 150L.
+  getDocs(collection(db, 'kapasitiKenderaan')).then(function (snap) {
+    tangkiCap = {};
+    snap.forEach(function (d) { tangkiCap[d.id] = d.data().kapasiti; });
+  }).catch(function () { tangkiCap = {}; });
+
+  // Real-time trip log. Never poll.
+  unsubscribeLogPergerakan = onSnapshot(collection(db, 'logPergerakan'), function (snapshot) {
+    ambulanceData = snapshot.docs.map(function (d) { return d.data(); });
+    window.updateUserTable();
+  }, function (err) {
+    console.error('Ralat langganan logPergerakan:', err);
+  });
+}
+
+/* ---------------------------------------------------------------------
+   DATE / ID HELPERS — local date parts only, never toISOString(),
+   never new Date() on a dd/MM/yyyy string. tarikh is yyyy-MM-dd from
+   the native <input type="date">; timestamp is built the same way.
+--------------------------------------------------------------------- */
+function pad2(n) { return String(n).padStart(2, '0'); }
+function buildTimestamp() {
+  const d = new Date();
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' +
+    pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
+}
+
+/* ---------------------------------------------------------------------
+   STATE + STATIC DATA (ported from live Log_Pemandu)
+--------------------------------------------------------------------- */
+let ambulanceData = [];
+const ambulansList = ['BNU 9974', 'BPL 7944', 'BPP 4693'];
+let tangkiCap = {};
+
+// Edit mode -- set by window.editEntry, cleared by exitEditMode. Tracks
+// which trip is being edited and which logBahanApi fill docs existed
+// before this edit began (so removed fills can be cascade-deleted on save).
+let editMode = false;
+let editTripId = null;
+let editExistingFillIds = [];
+
+let targetedMonth = '';
+const malayMonths = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+
+function setupMonthFilter() {
+  const d = new Date();
+  const currentMonthStr = d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+  const curMonthName = malayMonths[d.getMonth()] + ' ' + d.getFullYear();
+  const prevD = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+  const prevMonthStr = prevD.getFullYear() + '-' + pad2(prevD.getMonth() + 1);
+  const prevMonthName = malayMonths[prevD.getMonth()] + ' ' + prevD.getFullYear();
+  const monthFilter = document.getElementById('userMonthFilter');
+  if (monthFilter) {
+    monthFilter.innerHTML =
+      '<option value="' + currentMonthStr + '">' + curMonthName + ' (Semasa)</option>' +
+      '<option value="' + prevMonthStr + '">' + prevMonthName + ' (Bulan Lepas)</option>';
+    targetedMonth = currentMonthStr;
+    monthFilter.addEventListener('change', function () {
+      targetedMonth = this.value;
+      window.updateUserTable();
+    });
+  }
+}
+
+setupMonthFilter();
+const dTarikh = new Date();
+document.getElementById('tarikh').value = dTarikh.getFullYear() + '-' + pad2(dTarikh.getMonth() + 1) + '-' + pad2(dTarikh.getDate());
+
+const WAD_OPTIONS = `<option value="Unit Kecemasan & Trauma (ETU)">ETU</option><option value="Wad Lelaki (MW)">MW</option><option value="Wad Perempuan (FW)">FW</option><option value="Wad Kanak-Kanak (CW)">CW</option><option value="Wad Bersalin (LR)">LR</option><option value="Unit Pesakit Luar (OPD)">OPD</option><option value="Unit Hemodialisis (HDU)">HDU</option><option value="Unit Thalasemia Daycare (TDC)">TDC</option><option value="Lain-lain">Lain-lain</option>`;
+const DEST_OPTIONS = `<option value="QEH">QEH</option><option value="QEH 2">QEH 2</option><option value="SWACH">SWACH</option><option value="HKM">HKM</option><option value="HMBP">HMBP</option><option value="Lain-lain">Lain-lain</option>`;
+
+// Known fixed option values, for edit-mode "is this a known option or a
+// manually-typed one" detection when pre-populating the form.
+const KENDERAAN_VALUES = ['BNU 9974', 'BPL 7944', 'BPP 4693', 'SYJ 7904', 'SAA 8110 K', 'VFP 2850', 'SAC 7316 C', 'WLL 1078', 'SAA 5285 N', 'SAA 2680 W'];
+const PEMANDU_VALUES = ['Ahmad Agar', 'Masnin', 'Rafaie', 'Jilie', 'Mazni', 'Nurikram', 'Rosley', 'Affendy', 'SN Reno', 'PPK Franli', 'PKA Fikri', 'PPK Shan', 'PPK Armay', 'PPK James', 'CC Dell', 'PPP Shafiq'];
+const NOTA_VALUES = ['Menghantar Pesakit', 'Bengkel', 'Pengisian Bahan Api', 'Ambulance Call', 'Retrieval', 'Medical Team Standby', 'Menghantar sampel / ubat / dokumen', 'Menghantar Kakitangan', 'Mobile Blood Bank'];
+const WAD_VALUES = ['Unit Kecemasan & Trauma (ETU)', 'Wad Lelaki (MW)', 'Wad Perempuan (FW)', 'Wad Kanak-Kanak (CW)', 'Wad Bersalin (LR)', 'Unit Pesakit Luar (OPD)', 'Unit Hemodialisis (HDU)', 'Unit Thalasemia Daycare (TDC)'];
+const DEST_VALUES = ['QEH', 'QEH 2', 'SWACH', 'HKM', 'HMBP'];
+
+function setSelectOrManualOnEl(selectEl, manualGroupEl, manualInputEl, value, knownValues, otherOptionValue) {
+  if (knownValues.indexOf(value) !== -1) {
+    selectEl.value = value;
+    manualGroupEl.style.display = 'none';
+    manualInputEl.removeAttribute('required');
+    manualInputEl.value = '';
+  } else {
+    selectEl.value = otherOptionValue;
+    manualGroupEl.style.display = 'block';
+    manualInputEl.setAttribute('required', 'required');
+    manualInputEl.value = value || '';
+  }
+}
+function setSelectOrManual(selectId, manualGroupId, manualInputId, value, knownValues, otherOptionValue) {
+  setSelectOrManualOnEl(document.getElementById(selectId), document.getElementById(manualGroupId), document.getElementById(manualInputId), value, knownValues, otherOptionValue);
+}
+
+window.savePatientPref = function (e, key) { localStorage.setItem('v2_' + key, e.value); };
+window.addPatientRow = function () {
+  const pContainer = document.getElementById('patientsContainer');
+  if (!pContainer) return;
+  const div = document.createElement('div'); div.className = 'patient-block';
+  div.innerHTML = `
+<div class="patient-row-inputs">
+<div><label>Wad Asal</label><select class="p-wad" required onchange="window.savePatientPref(this, 'saved_p_wad'); window.toggleManual(this, 'manual-wad-group', 'p-wad-manual')">${WAD_OPTIONS}</select><div class="manual-wad-group" style="display: none; margin-top: 5px;"><input type="text" class="p-wad-manual" placeholder="Wad"></div></div>
+<div><label>Destinasi</label><select class="p-destinasi" required onchange="window.savePatientPref(this, 'saved_p_destinasi'); window.toggleManual(this, 'manual-destinasi-group', 'p-destinasi-manual')">${DEST_OPTIONS}</select><div class="manual-destinasi-group" style="display: none; margin-top: 5px;"><input type="text" class="p-destinasi-manual" placeholder="Destinasi"></div></div>
+<div><label>Kategori</label><select class="p-jenisKes" required><option value="Rujukan Biasa">Rujukan Biasa</option><option value="Rujukan Kecemasan">Rujukan Kecemasan</option><option value="Temujanji">Temujanji</option></select></div>
+</div><button type="button" class="btn-remove-patient" onclick="this.parentElement.remove()">Padam Kes</button>`;
+  pContainer.appendChild(div);
+
+  const savedWad = localStorage.getItem('v2_saved_p_wad'); if (savedWad) { div.querySelector('.p-wad').value = savedWad; window.toggleManual(div.querySelector('.p-wad'), 'manual-wad-group', 'p-wad-manual'); }
+  const savedDest = localStorage.getItem('v2_saved_p_destinasi');
+  if (savedDest) { div.querySelector('.p-destinasi').value = savedDest; window.toggleManual(div.querySelector('.p-destinasi'), 'manual-destinasi-group', 'p-destinasi-manual'); }
+};
+window.addStepdownRow = function () {
+  const pContainer = document.getElementById('stepdownPatientsContainer');
+  if (!pContainer) return;
+  const div = document.createElement('div'); div.className = 'patient-block'; div.style.borderColor = '#6f42c1'; div.style.backgroundColor = '#fcf8ff';
+  div.innerHTML = `
+<div class="patient-row-inputs">
+<div><label>Fasiliti Luar</label><select class="p-wad" required onchange="window.savePatientPref(this, 'saved_stepdown_wad'); window.toggleManual(this, 'manual-wad-group', 'p-wad-manual')">${DEST_OPTIONS}</select><div class="manual-wad-group" style="display: none; margin-top: 5px;"><input type="text" class="p-wad-manual" placeholder="Fasiliti"></div></div>
+</div><button type="button" class="btn-remove-patient" onclick="this.parentElement.remove()">Padam Kes</button>`;
+  pContainer.appendChild(div);
+  const savedStepWad = localStorage.getItem('v2_saved_stepdown_wad'); if (savedStepWad) { div.querySelector('.p-wad').value = savedStepWad; window.toggleManual(div.querySelector('.p-wad'), 'manual-wad-group', 'p-wad-manual'); }
+};
+window.toggleManual = function (selectEl, groupCls, inputCls) {
+  const group = selectEl.parentElement.querySelector('.' + groupCls);
+  const input = selectEl.parentElement.querySelector('.' + inputCls);
+  if (selectEl.value === 'Lain-lain') { group.style.display = 'block'; input.setAttribute('required', 'required'); }
+  else { group.style.display = 'none'; input.removeAttribute('required'); input.value = ''; }
+};
+document.getElementById('btnAddPatient').addEventListener('click', window.addPatientRow);
+document.getElementById('btnAddStepdownPatient').addEventListener('click', window.addStepdownRow);
+document.getElementById('masaMula').addEventListener('change', function () {
+  if (!this.value) return;
+  const p = this.value.split(':');
+  const m = (parseInt(p[0]) * 60) + parseInt(p[1]);
+  const syif = (m >= 420 && m < 840) ? 'Pagi' : (m >= 840 && m < 1260) ? 'Petang' : 'Malam';
+  document.getElementById('syif').value = syif;
+  const b = document.getElementById('syifBadge'); b.innerText = 'Auto: ' + syif;
+  b.style.backgroundColor = syif === 'Pagi' ? '#28a745' : (syif === 'Petang' ? '#ffc107' : '#dc3545');
+  b.style.color = syif === 'Petang' ? '#333' : '#fff';
+});
+document.getElementById('isRefueled').addEventListener('change', function () {
+  const fuelSec = document.getElementById('fuelSection');
+  if (this.value === 'Ya') {
+    fuelSec.style.display = 'block';
+  } else {
+    fuelSec.style.display = 'none';
+    document.getElementById('odoPengisian').value = '';
+    window.resetFuelFillRows();
+  }
+});
+
+/* ---------------------------------------------------------------------
+   RECEIPT COMPRESSION — Section 7: canvas JPEG, ~1000px long edge, q0.7
+--------------------------------------------------------------------- */
+function compressReceiptImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      const MAX_EDGE = 1000;
+      let width = img.width, height = img.height;
+      if (width >= height && width > MAX_EDGE) {
+        height = Math.round(height * (MAX_EDGE / width));
+        width = MAX_EDGE;
+      } else if (height > width && height > MAX_EDGE) {
+        width = Math.round(width * (MAX_EDGE / height));
+        height = MAX_EDGE;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+window.createFuelFillRow = function () {
+  const row = document.createElement('div');
+  row.className = 'fuel-fill-row';
+  row.style.cssText = 'display:flex; align-items:flex-end; gap:10px; margin-bottom:10px; flex-wrap:wrap;';
+  row.innerHTML = `
+<div><label>Liter (L)</label><input type="number" step="0.001" class="fuelFillLiter" placeholder="Cth: 35.500" required></div>
+<div><label>Resit (Pilihan)</label><input type="file" accept="image/*" class="fuelFillResit" onchange="window.previewFuelFillReceipt(this)"></div>
+<img class="fuelFillPreview" style="display:none; max-width: 80px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;"/>
+<button type="button" class="btnRemoveFuelFill" onclick="window.removeFuelFillRow(this)" style="background:none; border:none; color:#dc3545; font-size:16px; cursor:pointer;" title="Buang pengisian ini">✕</button>`;
+  return row;
+};
+window.addFuelFillRow = function () {
+  document.getElementById('fuelFillsContainer').appendChild(window.createFuelFillRow());
+  window.updateFuelFillRemoveButtons();
+};
+window.removeFuelFillRow = function (btn) {
+  const container = document.getElementById('fuelFillsContainer');
+  if (container.querySelectorAll('.fuel-fill-row').length <= 1) return;
+  btn.closest('.fuel-fill-row').remove();
+  window.updateFuelFillRemoveButtons();
+};
+window.updateFuelFillRemoveButtons = function () {
+  const rows = document.getElementById('fuelFillsContainer').querySelectorAll('.fuel-fill-row');
+  rows.forEach(function (r) { r.querySelector('.btnRemoveFuelFill').style.visibility = rows.length > 1 ? 'visible' : 'hidden'; });
+};
+window.resetFuelFillRows = function () {
+  const container = document.getElementById('fuelFillsContainer');
+  container.innerHTML = '';
+  container.appendChild(window.createFuelFillRow());
+  window.updateFuelFillRemoveButtons();
+};
+
+// Rule 5: size-check after compression, fail loudly, never silently.
+window.previewFuelFillReceipt = function (input) {
+  const row = input.closest('.fuel-fill-row');
+  const preview = row.querySelector('.fuelFillPreview');
+  if (!input.files || !input.files[0]) return;
+  compressReceiptImage(input.files[0], function (dataUrl) {
+    if (dataUrl.length > 900000) {
+      Swal.fire('Resit Terlalu Besar', 'Gambar resit ini masih terlalu besar selepas dimampatkan. Sila ambil gambar semula (elakkan resolusi terlalu tinggi) dan muat naik semula.', 'error');
+      input.value = '';
+      delete input.dataset.base64;
+      preview.style.display = 'none';
+      return;
+    }
+    preview.src = dataUrl; preview.style.display = 'block';
+    input.dataset.base64 = dataUrl;
+  });
+};
+document.getElementById('btnAddFuelFill').addEventListener('click', window.addFuelFillRow);
+
+function formatTitleCase(str) {
+  if (!str) return "";
+  return str.toLowerCase().replace(/\b\w/g, function (s) { return s.toUpperCase(); });
+}
+
+/* ---------------------------------------------------------------------
+   SAVE
+--------------------------------------------------------------------- */
+document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
+  e.preventDefault();
+  const form = document.getElementById('logForm');
+  let isValid = true;
+  let firstInvalid = null;
+
+  form.querySelectorAll(':required').forEach(function (input) {
+    if (input.offsetParent !== null) {
+      if (!input.value.trim()) {
+        isValid = false;
+        if (!firstInvalid) firstInvalid = input;
+        input.style.border = '2px solid red';
+      } else {
+        input.style.border = '1px solid #ccc';
+      }
+    }
+  });
+
+  if (!isValid) {
+    let labelText = firstInvalid.previousElementSibling ? firstInvalid.previousElementSibling.innerText : 'Kotak Wajib';
+    Swal.fire('Maklumat Tidak Lengkap', 'Sila isikan ruangan: ' + labelText, 'warning');
+    setTimeout(function () { firstInvalid.focus(); }, 300);
+    return;
+  }
+
+  const isRefueled = document.getElementById('isRefueled').value === 'Ya';
+  let fillPayloads = [];
+  let literAmaran = '';
+  const unifiedID = editMode ? editTripId : Date.now();
+  const tarikhM = document.getElementById('tarikh').value;
+  const k = document.getElementById('kenderaan').value;
+  const finalK = k.startsWith('Lain-lain') ? document.getElementById('kenderaanManual').value : k;
+
+  const oAwal = parseFloat(document.getElementById('odoAwal').value);
+  const oAkhir = parseFloat(document.getElementById('odoAkhir').value);
+
+  if (oAkhir <= oAwal) {
+    Swal.fire('Ralat Odometer', 'Odometer Akhir mesti lebih besar dari Odometer Awal.', 'error');
+    return;
+  }
+
+  if (isRefueled) {
+    const oPengisianRaw = document.getElementById('odoPengisian').value;
+    const oPengisian = oPengisianRaw.trim() !== '' ? parseFloat(oPengisianRaw) : null;
+
+    const fills = [];
+    let hasInvalidFill = false;
+    document.getElementById('fuelFillsContainer').querySelectorAll('.fuel-fill-row').forEach(function (row) {
+      const litVal = parseFloat(row.querySelector('.fuelFillLiter').value);
+      if (!(litVal > 0)) hasInvalidFill = true;
+      fills.push({ liter: litVal, resit: row.querySelector('.fuelFillResit').dataset.base64 || "", existingFillId: row.dataset.fillId || null });
+    });
+
+    if (fills.length === 0 || hasInvalidFill) {
+      Swal.fire('Ralat Pengisian Bahan Api', 'Nilai Liter tidak sah.', 'error');
+      return;
+    }
+
+    // Hard block: liter > 1000 almost certainly means an odometer
+    // reading was typed into the liter field.
+    const overLimitFill = fills.find(function (f) { return f.liter > 1000; });
+    if (overLimitFill) {
+      Swal.fire({ title: 'Ralat Nilai Liter', text: 'Nilai Liter (' + overLimitFill.liter + 'L) terlalu besar — adakah anda tersalah masukkan bacaan ODOMETER ke dalam ruangan Liter? Sila semak semula.', icon: 'error' });
+      return;
+    }
+    // Soft warning: over vehicle tank capacity (fallback 150L), per fill.
+    const capTangki = parseFloat(tangkiCap[finalK]) || 150;
+    const overCapFill = fills.find(function (f) { return f.liter > capTangki; });
+    if (overCapFill) literAmaran = ' PERHATIAN: Isian ' + overCapFill.liter + 'L melebihi kapasiti tangki ' + finalK + ' (' + capTangki + 'L). Pasti nilai ini betul?';
+
+    // Each fill becomes its own logBahanApi document with its own ID,
+    // and its own resitBahanApi slot if a receipt was attached -- no
+    // shared fuel record with a nested fills[] array (that was a
+    // GAS/Drive-era limitation this schema does not have).
+    //
+    // ID rules: a fill carried over from an existing edit keeps its own
+    // doc ID (existingFillId) so the save updates it in place. A brand
+    // new fill created in plain create mode gets the usual sequential
+    // {tripId}-f{n} suffix. A brand new fill added DURING an edit gets a
+    // millisecond-timestamp suffix instead -- sequential indexing there
+    // could collide with a sibling fill's real ID if earlier fills were
+    // removed from the form before save (shifting index alignment).
+    fillPayloads = fills.map(function (f, idx) {
+      let fillId;
+      if (f.existingFillId) {
+        fillId = f.existingFillId;
+      } else if (editMode) {
+        fillId = unifiedID + '-f' + Date.now() + '-' + idx;
+      } else {
+        fillId = unifiedID + '-f' + (idx + 1);
+      }
+      return {
+        id: fillId,
+        logId: unifiedID,
+        tarikh: tarikhM,
+        kenderaan: finalK,
+        odoPengisian: oPengisian,
+        liter: f.liter,
+        resit: f.resit,
+        timestamp: buildTimestamp(),
+        isExisting: !!f.existingFillId
+      };
+    });
+  }
+
+  // Fills that existed before this edit began but are no longer present
+  // in the form (removed by the driver, or the whole fuel section was
+  // toggled off) get cascade-deleted on save rather than left orphaned.
+  const presentExistingIds = fillPayloads.filter(function (f) { return f.isExisting; }).map(function (f) { return String(f.id); });
+  const removedFillIds = editMode ? editExistingFillIds.filter(function (fid) { return presentExistingIds.indexOf(String(fid)) === -1; }) : [];
+
+  Swal.fire({ title: 'SISTEM LOG KENDERAAN', text: 'Pasti untuk menghantar semua rekod ini?' + literAmaran, icon: literAmaran ? 'warning' : 'question', showCancelButton: true, confirmButtonColor: '#0056b3', confirmButtonText: 'Ya', cancelButtonText: 'Batal' })
+    .then(function (res) {
+      if (!res.isConfirmed) return;
+
+      const pList = [], sList = [];
+      document.getElementById('patientsContainer').querySelectorAll('.patient-block').forEach(function (b) {
+        const w = b.querySelector('.p-wad').value === 'Lain-lain' ? b.querySelector('.p-wad-manual').value : b.querySelector('.p-wad').value;
+        const d = b.querySelector('.p-destinasi').value === 'Lain-lain' ? b.querySelector('.p-destinasi-manual').value : b.querySelector('.p-destinasi').value;
+        pList.push({ wad: w, destinasi: d, jenisKes: b.querySelector('.p-jenisKes').value });
+      });
+      document.getElementById('stepdownPatientsContainer').querySelectorAll('.patient-block').forEach(function (b) {
+        const w = b.querySelector('.p-wad').value === 'Lain-lain' ? b.querySelector('.p-wad-manual').value : b.querySelector('.p-wad').value;
+        sList.push({ wad: w, destinasi: "N/A", jenisKes: "Stepdown" });
+      });
+      const d = document.getElementById('namaPemandu').value;
+      const finalD = d === 'Lain-lain' ? document.getElementById('namaPemanduManual').value : d;
+      const d2 = document.getElementById('namaPemandu2').value;
+      const finalD2 = d2 === 'Lain-lain' ? document.getElementById('namaPemandu2Manual').value : d2;
+      const pengiringList = [
+        document.getElementById('namaPengiringInput').value,
+        document.getElementById('namaPengiring2').value,
+        document.getElementById('namaPengiring3').value
+      ].map(function (x) { return (x || '').trim(); }).filter(function (x) { return x && x !== 'Tiada Pengiring'; }).map(formatTitleCase);
+      const finalEsc = pengiringList.length ? pengiringList.join(', ') : 'Tiada Pengiring';
+      const n = document.getElementById('nota').value;
+      const finalN = n === 'Lain-lain' ? document.getElementById('notaManual').value : n;
+      const payload = {
+        id: unifiedID, tarikh: tarikhM, masa: document.getElementById('masaMula').value + " - " + document.getElementById('masaTamat').value,
+        syif: document.getElementById('syif').value, kenderaan: finalK,
+        kategoriKenderaan: (k === 'Lain-lain (Ambulans)' || ambulansList.includes(k)) ? 'Ambulans' : 'Kenderaan Jabatan',
+        odoAwal: oAwal, odoAkhir: oAkhir,
+        pemandu: finalD, pemandu2: finalD2, pengiring: finalEsc, pengiringList: pengiringList,
+        pesakitList: pList, stepdownList: sList, nota: finalN || "Tiada Tujuan",
+        timestamp: buildTimestamp()
+      };
+
+      const btn = document.querySelector('.btn-main');
+      const wasEditMode = editMode;
+      btn.innerText = wasEditMode ? "Mengemaskini..." : "Menyimpan ke Awan..."; btn.disabled = true;
+
+      const tripDocRef = doc(db, 'logPergerakan', String(unifiedID));
+      const tripWrite = wasEditMode ? updateDoc(tripDocRef, payload) : setDoc(tripDocRef, payload);
+
+      tripWrite
+        .then(function () { return saveFuelFills(fillPayloads, removedFillIds); })
+        .then(function () {
+          const msg = wasEditMode
+            ? 'Rekod berjaya dikemaskini!'
+            : (isRefueled ? 'Rekod pergerakan dan bahan api berjaya disimpan di awan!' : 'Rekod pergerakan berjaya disimpan di awan!');
+          Swal.fire('Berjaya!', msg, 'success');
+          exitEditMode();
+          resetFormFields();
+          btn.innerText = "Simpan Rekod Perjalanan"; btn.disabled = false;
+        })
+        .catch(function (err) {
+          Swal.fire('Ralat Menyimpan', err.message || String(err), 'error');
+          btn.innerText = wasEditMode ? "Kemaskini Rekod Perjalanan" : "Simpan Rekod Perjalanan"; btn.disabled = false;
+        });
+    });
+});
+
+// Section 7, rule 6, applied per fill: write that fill's receipt first,
+// then that fill's own fuel record. Rule 1: base64 never touches
+// logBahanApi -- resit is stripped from fuelDoc before that write.
+// Existing fills (isExisting, from edit mode) are updated in place via
+// updateDoc; brand new fills are created via setDoc. removedFillIds are
+// fills that existed before this edit but are no longer in the form --
+// cascade-deleted so nothing is left orphaned.
+async function saveFuelFills(fillPayloads, removedFillIds) {
+  for (const fill of fillPayloads) {
+    const fillIdStr = String(fill.id);
+    if (fill.resit && fill.resit.indexOf('data:image') === 0) {
+      await setDoc(doc(db, 'resitBahanApi', fillIdStr), { resit: fill.resit });
+    }
+    const fuelDoc = Object.assign({}, fill);
+    delete fuelDoc.resit;
+    delete fuelDoc.isExisting;
+    if (fill.isExisting) {
+      await updateDoc(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
+    } else {
+      await setDoc(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
+    }
+  }
+  for (const removedId of (removedFillIds || [])) {
+    await deleteDoc(doc(db, 'logBahanApi', String(removedId)));
+    await deleteDoc(doc(db, 'resitBahanApi', String(removedId)));
+  }
+}
+
+function resetFormFields() {
+  document.getElementById('patientsContainer').innerHTML = '';
+  document.getElementById('stepdownPatientsContainer').innerHTML = '';
+  ['nota', 'kenderaan', 'namaPemandu', 'namaPemandu2', 'namaPengiringInput', 'namaPengiring2', 'namaPengiring3', 'masaMula', 'masaTamat', 'odoAwal', 'odoAkhir', 'odoPengisian'].forEach(function (id) {
+    document.getElementById(id).value = ''; document.getElementById(id).dispatchEvent(new Event('change'));
+  });
+  document.getElementById('isRefueled').value = 'Ya';
+  document.getElementById('isRefueled').dispatchEvent(new Event('change'));
+  window.resetFuelFillRows();
+  window.addPatientRow(); document.getElementById('masaMula').focus();
+}
+
+/* ---------------------------------------------------------------------
+   TABLE RENDER + ODOMETER MISMATCH — pure client-side, unchanged from
+   live. Fed by the onSnapshot-populated ambulanceData array.
+--------------------------------------------------------------------- */
+function computeOdometerMismatches(data) {
+  const mismatches = new Map();
+  const byVehicle = {};
+  data.forEach(function (item) {
+    if (!item.kenderaan || typeof item.odoAwal !== 'number' || typeof item.odoAkhir !== 'number') return;
+    (byVehicle[item.kenderaan] = byVehicle[item.kenderaan] || []).push(item);
+  });
+  Object.values(byVehicle).forEach(function (list) {
+    list.sort(function (a, b) { return (a.tarikh + 'T' + (a.masa || '').split(' - ')[0]).localeCompare(b.tarikh + 'T' + (b.masa || '').split(' - ')[0]); });
+    for (let i = 1; i < list.length; i++) {
+      const prev = list[i - 1], curr = list[i];
+      if (curr.odoAwal !== prev.odoAkhir) {
+        mismatches.set(curr.id, { prevAkhir: prev.odoAkhir, thisAwal: curr.odoAwal });
+      }
+    }
+  });
+  return mismatches;
+}
+
+window.updateUserTable = function () {
+  const tbody = document.getElementById('dataTableBody');
+  if (!tbody) return; tbody.innerHTML = '';
+
+  let filteredData = ambulanceData.filter(function (item) { return item.tarikh && item.tarikh.startsWith(targetedMonth); }).sort(function (a, b) {
+    if (a.tarikh !== b.tarikh) return new Date(b.tarikh) - new Date(a.tarikh);
+    return (b.masa || "").localeCompare(a.masa || "");
+  });
+  if (filteredData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; color:gray;">Tiada rekod untuk bulan ini.</td></tr>';
+    return;
+  }
+  const odometerMismatches = computeOdometerMismatches(ambulanceData);
+  filteredData.forEach(function (item) {
+    const cPax = (item.pesakitList ? item.pesakitList.length : 0);
+    const cStep = (item.stepdownList ? item.stepdownList.length : 0);
+
+    let wadHTML = '', destHTML = '', kesHTML = '';
+    if (cPax > 0 || cStep > 0) {
+      if (cPax > 0) item.pesakitList.forEach(function (p) { wadHTML += '<div>[H] ' + p.wad + '</div>'; destHTML += '<div>[H] ' + p.destinasi + '</div>'; kesHTML += '<div>' + p.jenisKes + '</div>'; });
+      if (cStep > 0) item.stepdownList.forEach(function (p) { wadHTML += '<div>[A] ' + p.wad + '</div>'; destHTML += '<div>[A] Pitas</div>'; kesHTML += '<div>Stepdown</div>'; });
+    } else { wadHTML = destHTML = kesHTML = '<span style="color:gray;">Tiada</span>'; }
+    const dispEsc = (item.pengiring && item.pengiring !== "Tiada Pengiring") ? '<strong>' + item.pengiring + '</strong>' : '<span style="color:gray;">Tiada</span>';
+    const dispPemandu = '<strong>' + item.pemandu + '</strong>' + (item.pemandu2 ? '<br><small style="color:#555;">+ ' + item.pemandu2 + '</small>' : '');
+    const mismatch = odometerMismatches.get(item.id);
+    const odoBadge = mismatch ? ' <span style="color:red; font-weight:bold; cursor:help;" title="Jurang odometer: trip lepas tamat di ' + mismatch.prevAkhir + ', trip ini mula di ' + mismatch.thisAwal + ' (beza ' + (mismatch.thisAwal - mismatch.prevAkhir) + ' km) — semak trip tak direkod atau odometer tersalah taip.">⚠️</span>' : '';
+
+    tbody.innerHTML += '<tr><td>' + item.tarikh + '</td><td>' + item.masa + '</td><td>' + item.syif + '</td><td style="background-color:#e6f2ff;"><strong>' + item.kenderaan + '</strong>' + odoBadge + '</td><td>' + item.odoAwal + '</td><td>' + item.odoAkhir + '</td><td>' + dispPemandu + '</td><td>' + dispEsc + '</td><td>' + wadHTML + '</td><td>' + destHTML + '</td><td>' + kesHTML + '</td><td style="text-align:center; font-weight:bold;">H:' + cPax + '<br>A:' + cStep + '</td><td><strong>' + item.nota + '</strong></td><td style="text-align:center; white-space:nowrap;"><button type="button" class="btn-edit-action" style="padding: 4px 8px; font-size:11px; margin-right:4px;" onclick="window.editEntry(' + item.id + ')">Kemaskini</button><button type="button" class="btn-danger-action" style="padding: 4px 8px; font-size:11px;" onclick="window.deleteEntry(' + item.id + ')">Padam</button></td></tr>';
+  });
+};
+
+/* ---------------------------------------------------------------------
+   DELETE — cascades to every logBahanApi fill of this trip and each
+   fill's own resitBahanApi doc. Matches live "Padam" behaviour.
+
+   NOTE: firestore.rules currently restricts delete on logPergerakan,
+   logBahanApi, and resitBahanApi to isAdmin() only. This button will
+   return permission-denied for driver@pitas.velos until a dedicated
+   rules-only session widens delete to isAdmin() || isDriver() on all
+   three collections. Built now, matching live UI/behaviour exactly,
+   per explicit instruction -- not skipped.
+--------------------------------------------------------------------- */
+window.deleteEntry = function (id) {
+  Swal.fire({ title: 'Padam Rekod?', text: "Jika anda tersalah isi, padam rekod ini dan isikan semula data yang betul.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Padam', cancelButtonText: 'Batal' })
+    .then(function (result) {
+      if (!result.isConfirmed) return;
+      Swal.fire({ title: 'Memproses Pemadaman...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+      const strId = String(id);
+      const numId = Number(id);
+
+      deleteDoc(doc(db, 'logPergerakan', strId))
+        .then(function () {
+          return getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', numId)));
+        })
+        .then(function (fuelSnap) {
+          const cascadeDeletes = [];
+          fuelSnap.forEach(function (fuelDoc) {
+            cascadeDeletes.push(deleteDoc(doc(db, 'logBahanApi', fuelDoc.id)));
+            cascadeDeletes.push(deleteDoc(doc(db, 'resitBahanApi', fuelDoc.id)));
+          });
+          return Promise.all(cascadeDeletes);
+        })
+        .then(function () {
+          Swal.fire('Terpadam!', 'Rekod telah dipadam dari pangkalan awan.', 'success');
+        })
+        .catch(function (err) {
+          Swal.fire('Ralat Pelayan', 'Tidak dapat memadam rekod: ' + (err.message || err), 'error');
+        });
+    });
+};
+
+/* ---------------------------------------------------------------------
+   EDIT — pre-populates the form from an existing trip + its fuel fills,
+   switches the form into edit mode. Save (above) branches to updateDoc
+   when editMode is set; Cancel restores blank create mode untouched.
+--------------------------------------------------------------------- */
+function exitEditMode() {
+  editMode = false;
+  editTripId = null;
+  editExistingFillIds = [];
+  document.getElementById('formHeader').innerText = 'Butiran Pergerakan';
+  document.getElementById('btnSimpanLog').innerText = 'Simpan Rekod Perjalanan';
+  document.getElementById('btnCancelEdit').style.display = 'none';
+}
+
+document.getElementById('btnCancelEdit').addEventListener('click', function () {
+  exitEditMode();
+  resetFormFields();
+});
+
+window.editEntry = function (id) {
+  const item = ambulanceData.find(function (r) { return String(r.id) === String(id); });
+  if (!item) {
+    Swal.fire('Ralat', 'Rekod tidak dijumpai.', 'error');
+    return;
+  }
+
+  editMode = true;
+  editTripId = item.id;
+  editExistingFillIds = [];
+
+  document.getElementById('formHeader').innerText = 'Kemaskini Rekod Pergerakan';
+  document.getElementById('btnSimpanLog').innerText = 'Kemaskini Rekod Perjalanan';
+  document.getElementById('btnCancelEdit').style.display = 'block';
+
+  document.getElementById('tarikh').value = item.tarikh;
+  const masaParts = (item.masa || '').split(' - ');
+  document.getElementById('masaMula').value = masaParts[0] || '';
+  document.getElementById('masaTamat').value = masaParts[1] || '';
+  document.getElementById('syif').value = item.syif;
+  const syifBadge = document.getElementById('syifBadge');
+  syifBadge.innerText = 'Auto: ' + item.syif;
+  syifBadge.style.backgroundColor = item.syif === 'Pagi' ? '#28a745' : (item.syif === 'Petang' ? '#ffc107' : '#dc3545');
+  syifBadge.style.color = item.syif === 'Petang' ? '#333' : '#fff';
+
+  setSelectOrManual('kenderaan', 'manualKenderaanGroup', 'kenderaanManual', item.kenderaan, KENDERAAN_VALUES,
+    item.kategoriKenderaan === 'Ambulans' ? 'Lain-lain (Ambulans)' : 'Lain-lain (Kenderaan Jabatan)');
+
+  setSelectOrManual('namaPemandu', 'manualPemanduGroup', 'namaPemanduManual', item.pemandu, PEMANDU_VALUES, 'Lain-lain');
+
+  if (item.pemandu2) {
+    document.getElementById('morePemanduGroup').style.display = 'block';
+    document.getElementById('btnToggleMorePemandu').innerText = '➖ Sembunyikan Pemandu 2';
+    setSelectOrManual('namaPemandu2', 'manualPemandu2Group', 'namaPemandu2Manual', item.pemandu2, PEMANDU_VALUES, 'Lain-lain');
+  } else {
+    document.getElementById('namaPemandu2').value = '';
+    document.getElementById('manualPemandu2Group').style.display = 'none';
+    document.getElementById('namaPemandu2Manual').value = '';
+  }
+
+  const pengList = item.pengiringList || [];
+  document.getElementById('namaPengiringInput').value = pengList[0] || 'Tiada Pengiring';
+  document.getElementById('namaPengiring2').value = pengList[1] || '';
+  document.getElementById('namaPengiring3').value = pengList[2] || '';
+  if (pengList.length > 1) {
+    document.getElementById('morePengiringGroup').style.display = 'block';
+    document.getElementById('btnToggleMorePengiring').innerText = '➖ Sembunyikan Pengiring';
+  } else {
+    document.getElementById('morePengiringGroup').style.display = 'none';
+    document.getElementById('btnToggleMorePengiring').innerText = '➕ Tambah Pengiring';
+  }
+
+  if (item.nota === 'Tiada Tujuan') {
+    document.getElementById('nota').value = '';
+    document.getElementById('manualNotaGroup').style.display = 'none';
+    document.getElementById('notaManual').value = '';
+  } else {
+    setSelectOrManual('nota', 'manualNotaGroup', 'notaManual', item.nota, NOTA_VALUES, 'Lain-lain');
+  }
+
+  document.getElementById('odoAwal').value = item.odoAwal;
+  document.getElementById('odoAkhir').value = item.odoAkhir;
+
+  document.getElementById('patientsContainer').innerHTML = '';
+  (item.pesakitList || []).forEach(function (p) {
+    window.addPatientRow();
+    const row = document.getElementById('patientsContainer').lastElementChild;
+    setSelectOrManualOnEl(row.querySelector('.p-wad'), row.querySelector('.manual-wad-group'), row.querySelector('.p-wad-manual'), p.wad, WAD_VALUES, 'Lain-lain');
+    setSelectOrManualOnEl(row.querySelector('.p-destinasi'), row.querySelector('.manual-destinasi-group'), row.querySelector('.p-destinasi-manual'), p.destinasi, DEST_VALUES, 'Lain-lain');
+    row.querySelector('.p-jenisKes').value = p.jenisKes;
+  });
+  if ((item.pesakitList || []).length === 0) window.addPatientRow();
+
+  document.getElementById('stepdownPatientsContainer').innerHTML = '';
+  (item.stepdownList || []).forEach(function (p) {
+    window.addStepdownRow();
+    const row = document.getElementById('stepdownPatientsContainer').lastElementChild;
+    setSelectOrManualOnEl(row.querySelector('.p-wad'), row.querySelector('.manual-wad-group'), row.querySelector('.p-wad-manual'), p.wad, DEST_VALUES, 'Lain-lain');
+  });
+
+  // Fuel fills aren't on the trip doc -- fetch this trip's existing
+  // logBahanApi docs (same where('logId','==', tripId) pattern as the
+  // delete cascade) and populate one fuel-fill-row per existing fill.
+  // Receipts are never pre-loaded into the file input: an untouched row
+  // sends no resit on save, so resitBahanApi is correctly left alone
+  // unless the driver actively picks a new photo.
+  document.getElementById('fuelFillsContainer').innerHTML = '<p style="font-size:12px; color:gray;">Memuat data bahan api...</p>';
+  document.getElementById('isRefueled').value = 'Tidak';
+  document.getElementById('fuelSection').style.display = 'none';
+
+  getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', Number(item.id)))).then(function (snap) {
+    const fillsDocs = [];
+    snap.forEach(function (d) { fillsDocs.push(Object.assign({ docId: d.id }, d.data())); });
+    const container = document.getElementById('fuelFillsContainer');
+    container.innerHTML = '';
+    if (fillsDocs.length > 0) {
+      document.getElementById('isRefueled').value = 'Ya';
+      document.getElementById('fuelSection').style.display = 'block';
+      const firstOdoPengisian = fillsDocs[0].odoPengisian;
+      document.getElementById('odoPengisian').value = (firstOdoPengisian !== null && firstOdoPengisian !== undefined) ? firstOdoPengisian : '';
+      fillsDocs.forEach(function (f) {
+        editExistingFillIds.push(f.docId);
+        const row = window.createFuelFillRow();
+        row.dataset.fillId = f.docId;
+        row.querySelector('.fuelFillLiter').value = f.liter;
+        container.appendChild(row);
+      });
+    } else {
+      container.appendChild(window.createFuelFillRow());
+    }
+    window.updateFuelFillRemoveButtons();
+  }).catch(function () {
+    const container = document.getElementById('fuelFillsContainer');
+    container.innerHTML = '';
+    container.appendChild(window.createFuelFillRow());
+    window.updateFuelFillRemoveButtons();
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+/* ---------------------------------------------------------------------
+   FIELD TOGGLES + INIT — unchanged from live
+--------------------------------------------------------------------- */
+const toggleMain = function (s, g, i) {
+  document.getElementById(s).addEventListener('change', function () {
+    const grp = document.getElementById(g), inp = document.getElementById(i);
+    if (this.value.startsWith('Lain-lain')) { grp.style.display = 'block'; inp.setAttribute('required', ''); } else { grp.style.display = 'none'; inp.removeAttribute('required'); }
+  });
+};
+
+toggleMain('namaPemandu', 'manualPemanduGroup', 'namaPemanduManual');
+toggleMain('namaPemandu2', 'manualPemandu2Group', 'namaPemandu2Manual');
+toggleMain('nota', 'manualNotaGroup', 'notaManual'); toggleMain('kenderaan', 'manualKenderaanGroup', 'kenderaanManual');
+document.getElementById('btnToggleMorePengiring').addEventListener('click', function () {
+  const grp = document.getElementById('morePengiringGroup');
+  const isHidden = grp.style.display === 'none';
+  grp.style.display = isHidden ? 'block' : 'none';
+  this.innerText = isHidden ? '➖ Sembunyikan Pengiring' : '➕ Tambah Pengiring';
+});
+document.getElementById('btnToggleMorePemandu').addEventListener('click', function () {
+  const grp = document.getElementById('morePemanduGroup');
+  const isHidden = grp.style.display === 'none';
+  grp.style.display = isHidden ? 'block' : 'none';
+  this.innerText = isHidden ? '➖ Sembunyikan Pemandu 2' : '➕ Tambah Pemandu';
+});
+window.addPatientRow();
+window.resetFuelFillRows();
+
+['kenderaan', 'namaPemandu', 'namaPengiringInput'].forEach(function (id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', function () { localStorage.setItem('v2_saved_' + id, this.value); });
+    const v = localStorage.getItem('v2_saved_' + id); if (v) { el.value = v; el.dispatchEvent(new Event('change')); }
+  }
+});
+</script>
 </body>
 </html>

@@ -40,16 +40,16 @@ service cloud.firestore {
     match /logPergerakan/{id} {
       allow read:   if isDriver() || isAdmin() || isKenderaan();
       allow create: if isDriver() || isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow update: if isAdmin() || isDriver();
+      allow delete: if isAdmin() || isDriver();
     }
 
     // ---- logBahanApi -------------------------------------------------------
     match /logBahanApi/{id} {
       allow read:   if isDriver() || isAdmin();
       allow create: if isDriver() || isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow update: if isAdmin() || isDriver();
+      allow delete: if isAdmin() || isDriver();
     }
 
     // ---- resitBahanApi -----------------------------------------------------
@@ -57,8 +57,9 @@ service cloud.firestore {
     // the driver creates the receipt first, then the fuel record, so create
     // must be open to the driver or the whole fuel save fails.
     //
-    // Deletes are admin-only because deleteFuelEntry(id) removes the
-    // logBahanApi doc and this one together.
+    // Driver may delete because the driver-facing Padam button in
+    // log-pemandu.html cascades trip -> every logBahanApi fill -> this
+    // collection, matching live's delete-your-own-entry behaviour.
     //
     // Rules cannot stop a bulk read of this collection -- that discipline
     // lives in the client (single getDoc only, never onSnapshot, never
@@ -66,8 +67,8 @@ service cloud.firestore {
     match /resitBahanApi/{id} {
       allow read:   if isDriver() || isAdmin();
       allow create: if isDriver() || isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow update: if isAdmin() || isDriver();
+      allow delete: if isAdmin() || isDriver();
     }
 
     // ---- permohonanVCC -----------------------------------------------------
