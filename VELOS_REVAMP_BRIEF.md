@@ -177,7 +177,7 @@ Canvas-based JPEG. Target ~1000px on the long edge, quality ~0.7. Typical receip
 | `tindakanLainPermohonan(...)` | `updateDoc` with namaTindakan, catatanTindakan, masaTindakanLain |
 | `getPermohonanAktif(vccType)` | `getDocs` where `status in ['Menunggu','Diproses']` |
 | `getAllVccRecords(vccType)` | `getDocs` with date filter on ID prefix |
-| `forceDeletePermohonan(id,...)` | `deleteDoc`, admin account only |
+| `forceDeletePermohonan(id,...)` | `deleteDoc` — each VCC account deletes only its own queue's history (`C` deletes `C`, `M` deletes `M`); admin can delete any |
 | `getLiveStatuses(idArray)` | `getDoc` per ID |
 
 ---
@@ -225,7 +225,7 @@ No automated trigger. Admin dashboard CSV export buttons only — keep and impro
 7. **Character-level bugs:** trace exact literal strings before assuming logic errors. Stray braces, capitalisation in `.includes()`, and single-symbol typos have caused major issues.
 8. **VCC 7-day window:** `Menunggu`/`Diproses` requests are NEVER date-limited. Only the read-only Rekod view is. A stuck request must never silently vanish.
 9. **Tugasan Akan Datang:** `Diluluskan` requests with `tarikh >= today` come from a full-collection status read, NOT the windowed history query.
-10. **Print templates:** `borang-permohonan.html` print/slip templates are permanently untouchable. Do not refactor, restructure, or alter them. Ever.
+10. **Print templates:** `borang-permohonan.html` print/slip templates — preserve structure and layout exactly. Flag anything broken or improvable rather than silently copying it forward.
 11. **Base64 receipts:** all six rules in Section 7 are mandatory.
 12. **Auth is rules, not UI:** a login form with permissive Security Rules protects nothing. Rules are the enforcement.
 
@@ -244,6 +244,8 @@ No automated trigger. Admin dashboard CSV export buttons only — keep and impro
 ---
 
 ## 14. FIRST SESSION — SCAFFOLD ONLY
+
+**Historical.** This section describes the initial scaffold session, completed in commit `456d04d`. It is a record of what was done then, not an active instruction — the repo has moved well past this point (all 4 portals and the admin dashboard are now fully built). Note also that `auth.js`, listed in the file tree below as originally scaffolded, was later removed as dead code (commit `53b1ac4`): each portal ended up wiring its own inline Firebase Auth instead of sharing a helper.
 
 No feature code. Structure and configuration only.
 
@@ -290,7 +292,7 @@ Steps:
 - Do not use `toISOString()` for any date string in an ID or filename
 - Do not use `new Date()` directly on `dd/MM/yyyy` strings
 - Do not propose ISO date migration — permanent decision, never revisit
-- Do not touch print/slip templates
+- Print/slip templates: preserve structure and layout exactly — flag anything broken or improvable rather than silently copying it forward
 - Do not write any password into any file in this repo
 - Do not put base64 image data anywhere except `resitBahanApi`
 

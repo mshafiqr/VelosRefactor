@@ -20,7 +20,7 @@ Rebuild of VELOS (Vehicle Logistics and Operations System), Hospital Pitas, from
 | `borang-permohonan.html` | `Borang_Permohonan.html` | VCC request form (user-facing) |
 | `dispatch.html` | `Dispatch.html` | VCC dispatch officer dashboard |
 
-`auth.js` — shared sign-in + auth-guard helper. `firebase-config.js` — public Firebase client config, intentionally not gitignored.
+`firebase-config.js` — public Firebase client config, intentionally not gitignored. Each portal wires its own Firebase Auth (init, sign-in, `onAuthStateChanged`) inline; there is no shared `auth.js` helper.
 
 ## Firestore schema
 
@@ -85,7 +85,7 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 7. **Character-level bugs:** trace exact literal strings before assuming logic errors. Stray braces, capitalisation in `.includes()`, and single-symbol typos have caused major issues.
 8. **VCC 7-day window:** `Menunggu`/`Diproses` requests are NEVER date-limited. Only the read-only Rekod view is. A stuck request must never silently vanish.
 9. **Tugasan Akan Datang:** `Diluluskan` requests with `tarikh >= today` come from a full-collection status read, NOT the windowed history query.
-10. **Print templates:** `borang-permohonan.html` print/slip templates are permanently untouchable. Do not refactor, restructure, or alter them. Ever.
+10. **Print templates:** `borang-permohonan.html` print/slip templates — preserve structure and layout exactly. Flag anything broken or improvable rather than silently copying it forward.
 11. **Base64 receipts:** all six rules above (Section 7 of the brief) are mandatory.
 12. **Auth is rules, not UI:** a login form with permissive Security Rules protects nothing. Rules are the enforcement.
 
@@ -110,6 +110,6 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 - Do not use `toISOString()` for any date string in an ID or filename.
 - Do not use `new Date()` directly on `dd/MM/yyyy` strings.
 - Do not propose ISO date migration — permanent decision, never revisit.
-- Do not touch print/slip templates.
+- Print/slip templates: preserve structure and layout exactly — flag anything broken or improvable rather than silently copying it forward.
 - Do not write any password into any file in this repo.
 - Do not put base64 image data anywhere except `resitBahanApi`.
