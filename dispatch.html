@@ -1,25 +1,1195 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VELOS — Dispatch</title>
-  <style>
-    :root {
-      --primary: #0F2A4A;
-      --secondary: #147D82;
-      --bg-color: #E9F1F6;
-      --card-bg: #ffffff;
-      --text-color: #1C2530;
-      --text-soft: #5B6774;
-      --success: #1E8E5A;
-      --danger: #C62828;
-    }
-    body {
-      font-family: 'Public Sans', sans-serif;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<title>VELOS — Dispatch VCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #0F2A4A; --primary-deep: #081A2E; --secondary: #147D82;
+  --bg-color: #E9F1F6; --card-bg: #ffffff; --text-color: #1C2530; --text-soft: #5B6774;
+  --success: #1E8E5A; --danger: #C62828; --amber: #C98A2E; --clear: #6C7A89;
+  --line: #DCE6ED; --radius: 12px; --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
+}
+body { font-family: 'Public Sans', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; -webkit-font-smoothing: antialiased; }
+
+.container { max-width: 1200px; margin: auto; display: block; }
+.card { background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; }
+
+.form-group { margin-bottom: 15px; }
+label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE; }
+
+button.btn-main { background-color: var(--primary); color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 15px;
+font-weight: bold; box-shadow: 0 4px 6px rgba(0,86,179,0.3);}
+button.btn-lulus { background-color: var(--success); color: white; border: none; padding: 9px 12px; border-radius: 7px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; min-height: 44px;}
+button.btn-tolak { background-color: var(--danger); color: white; border: none; padding: 9px 12px; border-radius: 7px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; min-height: 44px;}
+button.btn-lain { background-color: #6c757d; color: white; border: none; padding: 9px 12px; border-radius: 7px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; min-height: 44px;}
+button.btn-action-sm { padding: 5px 10px; color: white; border: none; border-radius: 7px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 3px; width:100%; min-height: 44px; }
+
+table { width: 100%; min-width: 1100px; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+th, td { padding: 12px 10px; border: none; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; white-space: nowrap; }
+th { background-color: var(--secondary); color: white; font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.3px; }
+tbody tr:last-child td { border-bottom: none; }
+tr:nth-child(even) { background-color: #F6FAFC; }
+.badge-info { background-color: #e2e3e5; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+
+.watermark-footer { text-align: center; font-size: 11px; color: #888; margin-top: 20px; padding-bottom: 20px; line-height: 1.5; font-weight: 500; }
+
+@media screen {
+.print-only { display: none !important; }
+}
+@media print {
+@page { size: A4 portrait; margin: 15mm; }
+body * { visibility: hidden; }
+body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: white; }
+.header-logos-inline { display: none !important; }
+#cetakArea, #cetakArea * { visibility: visible; }
+#cetakArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; border: none; display: block !important; }
+.no-print { display: none !important; }
+.print-receipt-header { text-align: center !important; border-bottom: 3px double #333; padding-bottom: 15px; margin-bottom: 20px; }
+}
+
+/* TAJUK VCC — teks penuh dinamik mengikut jenis (Klinikal/Jabatan) */
+.vcc-title { text-align: center; padding: 16px 10px 22px; font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: 0.3px; line-height: 1.3; }
+
+/* NAVIGASI MENU */
+.view { display: none; }
+.view.active { display: block; }
+
+.menu-btn { width: 100%; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius);
+box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 12px; text-align: left; cursor: pointer;
+display: flex; align-items: center; gap: 14px; font-family: inherit; min-height: 44px; }
+.menu-btn .menu-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: white; font-weight: 700; }
+.menu-btn .menu-icon.navy { background: var(--primary); } .menu-btn .menu-icon.teal { background: var(--secondary); } .menu-btn .menu-icon.grey { background: var(--clear); }
+.menu-btn .menu-body { flex: 1; }
+.menu-btn .menu-title { font-size: 14.5px; font-weight: 700; color: var(--text-color); margin-bottom: 2px; }
+.menu-btn .menu-sub { font-size: 12px; color: var(--text-soft); }
+.menu-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.menu-badge.pending { background: var(--danger); color: white; }
+.menu-badge.clear { background: #E6F4EC; color: var(--success); }
+.menu-chev { color: var(--text-soft); font-size: 16px; flex-shrink: 0; }
+
+.back-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer;
+font-family: inherit; font-size: 16px; font-weight: 600; color: var(--primary); padding: 8px 0; margin-bottom: 8px; min-height: 44px; }
+
+.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
+.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
+.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
+.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
+.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+
+/* ======================================================== */
+/* PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)                 */
+/* ======================================================== */
+button, select, .btn-action-sm, .btn-lain, .btn-lulus, .btn-tolak {
+touch-action: manipulation !important;
+-webkit-tap-highlight-color: transparent !important;
+position: relative !important;
+z-index: 50 !important;
+cursor: pointer !important;
+pointer-events: auto !important;
+user-select: none !important;
+}
+
+/* Login view — full-page auth gate card, per auth-gate-layout spec. */
+#loginView { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; }
+.auth-card { max-width: 420px; width: 100%; box-sizing: border-box; margin: 0 16px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); padding: 30px; border-top: 4px solid var(--primary); }
+.auth-logo-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 15px; }
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
+input[type="password"].auth-input,
+select.auth-select {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+select.auth-select { font-weight: bold; background-color: #f8f9fa; }
+.auth-input, .auth-select { display: block; margin-left: auto; margin-right: auto; }
+.auth-submit-btn { width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
+.logout-bar { max-width: 1200px; margin: 0 auto 10px; display: flex; justify-content: flex-end; }
+.btn-logout { background-color: var(--danger); color: white; border: none; border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; min-height: 44px; }
+</style>
 </head>
 <body>
+
+<div id="loginView">
+<div class="auth-card">
+<div class="auth-logo-row">
+<div class="auth-logo-left"><img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara"></div>
+<div class="auth-logo-center">
+<div class="auth-org-line1">Hospital Pitas, Sabah</div>
+<div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
+</div>
+<div class="auth-logo-right"><img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas"></div>
+</div>
+<div class="auth-brand">
+<div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+<div class="auth-brand-line2">(VELOS)</div>
+</div>
+<p class="auth-portal-label">Sila pilih unit anda dan masukkan kata laluan penyelaras.</p>
+<form id="loginForm" novalidate>
+<select id="vccTypeSelection" class="auth-select">
+<option value="Klinikal">VCC : Clinical (Unit Kecemasan)</option>
+<option value="Jabatan">VCC : Management (Pegawai Kenderaan)</option>
+</select>
+<input type="password" id="loginPassword" class="auth-input" required placeholder="Kata Laluan" autocomplete="current-password">
+<button type="submit" class="auth-submit-btn" id="btnLogin">Buka Papan Pemuka</button>
+<p id="loginError" class="auth-error"></p>
+</form>
+</div>
+</div>
+
+<div id="secureDashboardWrapper" class="container" style="display:none;">
+<div class="logout-bar"><button type="button" id="btnLogout" class="btn-logout">Log Keluar</button></div>
+<div class="vcc-title" id="vccTitleDisplay"></div>
+
+<!-- MENU VIEW -->
+<div class="view active" id="view-menu">
+<button class="menu-btn" onclick="goTo('fasa1')">
+<div class="menu-icon navy">1</div>
+<div class="menu-body"><div class="menu-title">Fasa 1 : Penerimaan &amp; Triage</div><div class="menu-sub">Permohonan baharu menunggu diterima</div></div>
+<div class="menu-badge clear" id="menuBadge1">0</div>
+<div class="menu-chev">›</div>
+</button>
+<button class="menu-btn" onclick="goTo('fasa2')">
+<div class="menu-icon teal">2</div>
+<div class="menu-body"><div class="menu-title">Fasa 2 : Koordinasi</div><div class="menu-sub">Pemandu, kenderaan &amp; keputusan</div></div>
+<div class="menu-badge clear" id="menuBadge2">0</div>
+<div class="menu-chev">›</div>
+</button>
+<button class="menu-btn" onclick="goTo('akandatang')">
+<div class="menu-icon teal">➜</div>
+<div class="menu-body"><div class="menu-title">Tugasan Akan Datang</div><div class="menu-sub">Diluluskan &amp; belum bergerak</div></div>
+<div class="menu-badge clear" id="menuBadge3">0</div>
+<div class="menu-chev">›</div>
+</button>
+<button class="menu-btn" onclick="goTo('rekod')">
+<div class="menu-icon grey">☰</div>
+<div class="menu-body"><div class="menu-title">Rekod Permohonan Kenderaan</div><div class="menu-sub">Rekod penuh, langsung</div></div>
+<div class="menu-chev">›</div>
+</button>
+</div>
+
+<!-- FASA 1 DETAIL VIEW -->
+<div class="view" id="view-fasa1">
+<button class="back-btn" onclick="goTo('menu')">‹ Kembali ke Menu</button>
+<div id="fasaCard1" class="card no-print" style="border-top: 3px solid var(--secondary);">
+<h2 style="display: flex; justify-content: space-between; align-items: center; border-bottom-color: var(--secondary); color: var(--secondary); flex-wrap: wrap; gap: 10px;">
+<span>Fasa 1 : Penerimaan Dan Triage Permohonan</span>
+<button onclick="segerakSemua()" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold; min-height:44px;"> 🔄  Sync Data</button>
+</h2>
+<p id="fasa1HelperText" style="font-size: 12px; color: gray; margin-top:-10px;"></p>
+<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: clamp(420px, 65vh, 650px);">
+<table>
+<thead id="theadTier1" style="position: sticky; top: 0; z-index: 51;">
+<tr>
+<th style="min-width: 120px;">Tarikh & Masa Gerak</th>
+<th style="min-width: 150px;">Maklumat Pemohon</th>
+<th style="min-width: 280px;">Maklumat Pesakit & Destinasi</th>
+<th style="min-width: 140px; text-align: center;">Tindakan</th>
+</tr>
+</thead>
+<tbody id="tableBodyTier1">
+<tr><td colspan="4" style="text-align: center; color: gray; padding: 20px;">Sila tunggu, sedang memuat turun data dari pelayan awan...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- FASA 2 DETAIL VIEW -->
+<div class="view" id="view-fasa2">
+<button class="back-btn" onclick="goTo('menu')">‹ Kembali ke Menu</button>
+<div id="fasaCard2" class="card no-print" style="border-top: 3px solid #6f42c1;">
+<h2 style="display: flex; justify-content: space-between; align-items: center; border-bottom-color: #6f42c1; color: #6f42c1; flex-wrap: wrap; gap: 10px;">
+<span>Fasa 2 : Proses Koordinasi Permohonan</span>
+</h2>
+<p id="fasa2HelperText" style="font-size: 12px; color: gray; margin-top:-10px;"></p>
+<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: clamp(420px, 65vh, 650px);">
+<table>
+<thead id="theadTier2" style="position: sticky; top: 0; z-index: 51;">
+<tr>
+<th style="min-width: 120px;">Tarikh & Masa Gerak</th>
+<th style="min-width: 150px;">Maklumat Pemohon</th>
+<th style="min-width: 280px;">Maklumat Pesakit & Destinasi</th>
+<th style="min-width: 160px; text-align: center;">Tindakan</th>
+</tr>
+</thead>
+<tbody id="tableBodyTier2">
+<tr><td colspan="4" style="text-align: center; color: gray; padding: 20px;">Sila tunggu, sedang memuat turun data dari pelayan awan...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TUGASAN AKAN DATANG VIEW -->
+<div class="view" id="view-akandatang">
+<button class="back-btn" onclick="goTo('menu')">‹ Kembali ke Menu</button>
+<div class="card no-print" style="border-top: 3px solid var(--secondary);">
+<h2 style="display: flex; justify-content: space-between; align-items: center; border-bottom-color: var(--secondary); color: var(--secondary); flex-wrap: wrap; gap: 10px;">
+<span>Tugasan Akan Datang (Diluluskan — Belum Bergerak)</span>
+</h2>
+<p id="akanDatangHelperText" style="font-size: 12px; color: gray; margin-top:-10px;"></p>
+<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: clamp(420px, 65vh, 650px);">
+<table>
+<thead id="theadAkanDatang" style="position: sticky; top: 0; z-index: 51;">
+<tr>
+<th style="min-width: 120px;">Tarikh & Masa Bertolak</th>
+<th style="min-width: 150px;">Pemohon & Unit</th>
+<th style="min-width: 220px;">Destinasi & Tujuan</th>
+<th style="min-width: 150px;">Kenderaan / Pemandu</th>
+<th style="min-width: 150px;">Diluluskan oleh</th>
+</tr>
+</thead>
+<tbody id="tableBodyAkanDatang">
+<tr><td colspan="5" style="text-align: center; color: gray; padding: 20px;">Sila tunggu, sedang memuat turun data dari pelayan awan...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- REKOD DETAIL VIEW -->
+<div class="view" id="view-rekod">
+<button class="back-btn" onclick="goTo('menu')">‹ Kembali ke Menu</button>
+<div class="card no-print" style="border-top: 3px solid #6c757d;">
+<h2 style="display: flex; justify-content: space-between; align-items: center; border-bottom-color: #6c757d; color: #495057;">
+<span>Rekod Permohonan Kenderaan (<span id="historyTitleType"></span>)</span>
+</h2>
+<p id="fasa3HelperTextVCC" style="font-size: 12px; color: gray; margin-top:-10px;"></p>
+<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: clamp(420px, 65vh, 650px);">
+<table>
+<thead id="historyTableHead" style="position: sticky; top: 0; z-index: 51;">
+<tr>
+<th style="background-color: #6c757d;">Tarikh & Masa Permohonan</th>
+<th style="background-color: #6c757d;">Pemohon & Unit</th>
+<th style="background-color: #6c757d;">Destinasi & Kategori</th>
+<th style="background-color: #6c757d;">Tarikh & Masa Bertolak</th>
+<th style="background-color: #6c757d; text-align: center;">Status Kelulusan</th>
+<th style="background-color: #6c757d;">Kenderaan / Pemandu</th>
+<th style="background-color: #6c757d; text-align: center;">Tindakan</th>
+</tr>
+</thead>
+<tbody id="historyTableBody">
+<tr><td colspan="7" style="text-align: center; color: gray; padding: 20px;">Memuatkan data sejarah...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="watermark-footer no-print">
+&copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>
+Vehicle Logistics And Operations System (VELOS)<br>
+<span style="opacity: 0.8;">VELOS Edisi 4 (Firestore), Versi 1.0 (Modul VCC) &middot; Dikemaskini 01/08/2026</span>
+</div>
+</div>
+
+<div id="cetakArea" class="print-only"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const VCC_ACCOUNTS = { 'vccc@pitas.velos': 'Klinikal', 'vccm@pitas.velos': 'Jabatan' };
+
+/* ---------------------------------------------------------------------
+   AUTH GATE — two accounts share this portal. vccTypeSelection picks
+   which account signs in; the queue type is read back from the
+   authenticated account's own email rather than tracked separately
+   client-side.
+--------------------------------------------------------------------- */
+const loginView = document.getElementById('loginView');
+const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
+const loginForm = document.getElementById('loginForm');
+const vccTypeSelection = document.getElementById('vccTypeSelection');
+const loginPassword = document.getElementById('loginPassword');
+const loginError = document.getElementById('loginError');
+const btnLogin = document.getElementById('btnLogin');
+const btnLogout = document.getElementById('btnLogout');
+
+loginForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  btnLogin.disabled = true;
+  btnLogin.innerText = 'Mengesahkan...';
+  const email = vccTypeSelection.value === 'Klinikal' ? 'vccc@pitas.velos' : 'vccm@pitas.velos';
+  try {
+    await signInWithEmailAndPassword(auth, email, loginPassword.value);
+  } catch (err) {
+    loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';
+    loginError.style.display = 'block';
+  }
+  btnLogin.disabled = false;
+  btnLogin.innerText = 'Buka Papan Pemuka';
+  loginPassword.value = '';
+});
+
+btnLogout.addEventListener('click', function () {
+  signOut(auth);
+});
+
+let currentVccType = '';
+let allPermohonanRaw = [];
+let unsubscribePermohonan = null;
+let portalInitialized = false;
+
+const VCC_TITLE_MAP = {
+  'Klinikal': 'VEHICLE COORDINATION CENTRE<br>(CLINICAL)',
+  'Jabatan': 'VEHICLE COORDINATION CENTRE<br>(PEGAWAI KENDERAAN)'
+};
+
+onAuthStateChanged(auth, function (user) {
+  if (user && VCC_ACCOUNTS[user.email]) {
+    currentVccType = VCC_ACCOUNTS[user.email];
+    loginView.style.display = 'none';
+    secureDashboardWrapper.style.display = 'block';
+    document.getElementById('vccTitleDisplay').innerHTML = VCC_TITLE_MAP[currentVccType] || currentVccType.toUpperCase();
+    document.getElementById('historyTitleType').innerText = currentVccType.toUpperCase();
+    renderHistoryHeader();
+    renderAktifHeaders();
+    renderFasaHelperTexts();
+    window.goTo('menu');
+    initPortal();
+  } else if (user) {
+    // Signed in with an account this portal doesn't recognise -- fail
+    // safe rather than show a blank/broken dashboard.
+    signOut(auth);
+  } else {
+    secureDashboardWrapper.style.display = 'none';
+    loginView.style.display = 'flex';
+    portalInitialized = false;
+    currentVccType = '';
+    if (unsubscribePermohonan) {
+      unsubscribePermohonan();
+      unsubscribePermohonan = null;
+    }
+  }
+});
+
+function initPortal() {
+  if (portalInitialized) return;
+  portalInitialized = true;
+  // Full-collection, real-time, no query filter -- lets the active
+  // queue (computeAktifData) and the windowed history (computeRekodData)
+  // both derive from one always-current source. Never poll.
+  unsubscribePermohonan = onSnapshot(collection(db, 'permohonanVCC'), function (snapshot) {
+    allPermohonanRaw = snapshot.docs.map(function (d) { return d.data(); });
+    refreshAllViews();
+  }, function (err) {
+    console.error('Ralat langganan permohonanVCC:', err);
+  });
+}
+
+/* ---------------------------------------------------------------------
+   DATE / ID HELPERS — local date parts only, never toISOString().
+--------------------------------------------------------------------- */
+function pad2(n) { return String(n).padStart(2, '0'); }
+function buildTimestampDMY() {
+  const d = new Date();
+  return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function buildTodayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+function buildCutoffYYMMDD() {
+  const d = new Date();
+  d.setDate(d.getDate() - 7);
+  return String(d.getFullYear()).slice(2) + pad2(d.getMonth() + 1) + pad2(d.getDate());
+}
+// PEMBAIKAN: penghurai eksplisit untuk format "dd/MM/yyyy HH:mm" - new Date() bawaan
+// membaca rentetan bertitik bawah sebagai MM/dd/yyyy, menyebabkan tarikh > 12hb tersalah susun.
+function parseTarikhMasaVELOS(str) {
+  if (!str) return new Date(0);
+  const [datePart, timePart] = str.split(' ');
+  const [d, m, y] = datePart.split('/').map(Number);
+  const [h, min] = (timePart || "00:00").split(':').map(Number);
+  return new Date(y, m - 1, d, h, min);
+}
+
+/* ---------------------------------------------------------------------
+   VIEW-MODEL BUILDERS — reconstruct the shapes the old GAS server built
+   (getPermohonanAktif / getAllVccRecords) so the render functions below
+   stay byte-for-byte identical to the live file's field references.
+--------------------------------------------------------------------- */
+function toAktifEntry(raw, isKlinikal, isAkanDatang) {
+  const entry = {
+    rowIdx: raw.id,
+    status: raw.status,
+    tarikhMohon: raw.timestamp,
+    tarikhGerak: raw.tarikh,
+    masa: isKlinikal ? raw.masaMula : (raw.masaMula + " - " + raw.masaTamat),
+    nama: raw.nama,
+    jabatan: raw.jabatan,
+    telefon: raw.telefon,
+    tujuan: raw.tujuan,
+    destinasi: raw.destinasi,
+    penumpang: raw.penumpang || "-",
+    catatan: raw.catatan || "-",
+    namaTindakan: raw.namaTindakan || "",
+    catatanTindakan: raw.catatanTindakan || ""
+  };
+  if (isKlinikal) {
+    entry.kategoriKes = raw.kategoriKes || "-";
+    entry.senaraiPesakitData = raw.senaraiPesakitData || [];
+  } else {
+    entry.kategoriPermohonan = raw.kategoriPermohonan || "-";
+  }
+  if (isAkanDatang) {
+    entry.kenderaan = raw.kenderaan;
+    entry.pemandu = raw.pemandu;
+    entry.pelulus = raw.pelulus || "-";
+    entry.catatanLulus = raw.catatanLulus || "-";
+    entry.masaKeputusan = raw.masaKeputusan || "";
+  }
+  return entry;
+}
+
+function toRekodEntry(raw, isKlinikal) {
+  return {
+    rowIdx: raw.id,
+    timestamp: raw.timestamp,
+    id: raw.id,
+    nama: raw.nama,
+    jabatan: raw.jabatan,
+    tarikhGerak: raw.tarikh,
+    masa: isKlinikal ? raw.masaMula : (raw.masaMula + " - " + raw.masaTamat),
+    tujuan: raw.tujuan,
+    destinasi: raw.destinasi,
+    status: raw.status,
+    pemandu: raw.pemandu,
+    kenderaan: raw.kenderaan,
+    json: raw
+  };
+}
+
+// Mirrors getPermohonanAktif exactly: unwindowed by date, full-collection
+// status read. A stuck Menunggu/Diproses request never disappears here
+// regardless of age (CRITICAL QUEUE RULES).
+function computeAktifData(vccType) {
+  const isKlinikal = vccType === 'Klinikal';
+  const hariIni = buildTodayISO();
+  const result = [];
+  allPermohonanRaw.forEach(function (raw) {
+    const isC = raw.id.endsWith('C');
+    const matchesType = (vccType === 'Klinikal' && isC) || (vccType === 'Jabatan' && !isC);
+    if (!matchesType) return;
+    const isAktif = raw.status === 'Menunggu' || raw.status === 'Diproses';
+    const isAkanDatang = raw.status === 'Diluluskan' && raw.tarikh && raw.tarikh >= hariIni;
+    if (isAktif || isAkanDatang) {
+      result.push(toAktifEntry(raw, isKlinikal, isAkanDatang));
+    }
+  });
+  return result;
+}
+
+// Mirrors getAllVccRecords exactly: 7-day window by the ID's embedded
+// creation date, applied unconditionally to all statuses. This is the
+// separate read-only history view -- active requests stay fully visible
+// via computeAktifData above regardless of what's trimmed here.
+function computeRekodData(vccType) {
+  const isKlinikal = vccType === 'Klinikal';
+  const cutoff = buildCutoffYYMMDD();
+  const result = [];
+  allPermohonanRaw.forEach(function (raw) {
+    const isC = raw.id.endsWith('C');
+    const matchesType = (vccType === 'Klinikal' && isC) || (vccType === 'Jabatan' && !isC);
+    if (!matchesType) return;
+    const idDatePart = raw.id.split('-')[1] || '';
+    if (idDatePart < cutoff) return;
+    result.push(toRekodEntry(raw, isKlinikal));
+  });
+  return result.reverse();
+}
+
+function refreshAllViews() {
+  const aktif = computeAktifData(currentVccType);
+  const dataMenunggu = aktif.filter(function (i) { return i.status === 'Menunggu'; });
+  const dataDiproses = aktif.filter(function (i) { return i.status === 'Diproses'; });
+  const dataAkanDatang = aktif.filter(function (i) { return i.status === 'Diluluskan'; });
+  binaJadualTier1({ success: true, data: dataMenunggu });
+  binaJadualTier2({ success: true, data: dataDiproses });
+  binaJadualAkanDatang({ success: true, data: dataAkanDatang });
+  updateMenuBadges(dataMenunggu.length, dataDiproses.length, dataAkanDatang.length);
+  binaJadualSejarah({ success: true, data: computeRekodData(currentVccType) });
+}
+
+// Sync button — data is already always-live via onSnapshot, so this
+// just re-renders and confirms, rather than live's poll-refresh.
+window.segerakSemua = function () {
+  refreshAllViews();
+  Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Data Dikemaskini', showConfirmButton: false, timer: 1500 });
+};
+
+/* NAVIGASI MENU */
+window.goTo = function (name) {
+  document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+  document.getElementById('view-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+function updateMenuBadges(bilMenunggu, bilDiproses, bilAkanDatang) {
+  const b1 = document.getElementById('menuBadge1');
+  const b2 = document.getElementById('menuBadge2');
+  const b3 = document.getElementById('menuBadge3');
+  if (b1) { b1.textContent = bilMenunggu; b1.className = 'menu-badge ' + (bilMenunggu > 0 ? 'pending' : 'clear'); }
+  if (b2) { b2.textContent = bilDiproses; b2.className = 'menu-badge ' + (bilDiproses > 0 ? 'pending' : 'clear'); }
+  if (b3) { b3.textContent = bilAkanDatang || 0; b3.className = 'menu-badge ' + (bilAkanDatang > 0 ? 'pending' : 'clear'); }
+}
+
+function renderHistoryHeader() {
+  let thead = document.getElementById('historyTableHead');
+  if (!thead) return;
+  let kolomTiga = currentVccType === 'Klinikal' ? 'Maklumat Pesakit & Destinasi' : 'Destinasi & Kategori Permohonan';
+  thead.innerHTML = `<tr>
+<th style="background-color: #6c757d;">Tarikh & Masa Permohonan</th>
+<th style="background-color: #6c757d;">Pemohon & Unit</th>
+<th style="background-color: #6c757d;">${kolomTiga}</th>
+<th style="background-color: #6c757d;">Tarikh & Masa Bertolak</th>
+<th style="background-color: #6c757d; text-align: center;">Status Kelulusan</th>
+<th style="background-color: #6c757d;">Kenderaan / Pemandu</th>
+<th style="background-color: #6c757d; text-align: center;">Tindakan</th>
+</tr>`;
+}
+
+function renderAktifHeaders() {
+  const isKlinikal = currentVccType === 'Klinikal';
+  const colLabel = isKlinikal ? 'Maklumat Pesakit & Destinasi' : 'Tujuan, Destinasi & Catatan';
+  ['theadTier1', 'theadTier2'].forEach(function (theadId) {
+    const thead = document.getElementById(theadId);
+    if (!thead) return;
+    const ths = thead.querySelectorAll('th');
+    if (ths[2]) ths[2].textContent = colLabel;
+  });
+}
+
+function renderFasaHelperTexts() {
+  const isKlinikal = currentVccType === 'Klinikal';
+  const kategoriLabel = isKlinikal ? 'kategori kes' : 'kategori permohonan';
+  const kategoriParen = isKlinikal ? '(Kecemasan/Biasa/Temujanji)' : '(Segera/Biasa)';
+  document.getElementById('fasa1HelperText').innerHTML = `Fasa 1 : Penerimaan dan triage permohonan. Setiap permohonan baharu akan melalui Fasa 1 untuk proses penerimaan dan akan di-triage mengikut ${kategoriLabel} ${kategoriParen}.`;
+  document.getElementById('fasa2HelperText').innerHTML = `Fasa 2 : Proses koordinasi permohonan merupakan fasa koordinasi yang akan dilakukan oleh Admin VCC (${currentVccType}) untuk: 1. Proses penyelarasan pemandu dan kenderaan. 2. Menentukan status permohonan (Diluluskan/Ditolak/Lain-lain).`;
+  document.getElementById('fasa3HelperTextVCC').innerHTML = 'Fasa 3 : Jadual ini memaparkan rekod keseluruhan permohonan (Menunggu/Diproses/Diluluskan/Ditolak) secara langsung. Sebarang tindakan (Terima/Koordinasi) hanya boleh dilakukan melalui ruang Fasa 1 dan Fasa 2 di atas — jadual ini adalah rekod sahaja.';
+  document.getElementById('akanDatangHelperText').innerHTML = 'Tugasan Akan Datang : Senarai permohonan yang telah Diluluskan tetapi belum bertolak (tarikh gerak hari ini atau akan datang). VCC bertugas perlu memastikan pemandu dan kenderaan yang ditetapkan dimaklumkan dan bersedia untuk tugasan. Baris akan hilang secara automatik sehari selepas tarikh bertolak — jadual ini adalah paparan sahaja, tiada tindakan diperlukan di sini.';
+}
+
+function sortAktifByUrgency(data, isKlinikal) {
+  const urgencyRank = isKlinikal
+    ? { 'Rujukan Kecemasan': 0, 'Rujukan Biasa': 1, 'Temujanji': 2 }
+    : { 'Segera': 0, 'Biasa': 1 };
+  return data.slice().sort(function (a, b) {
+    const aKat = isKlinikal ? a.kategoriKes : a.kategoriPermohonan;
+    const bKat = isKlinikal ? b.kategoriKes : b.kategoriPermohonan;
+    const aRank = urgencyRank[aKat] !== undefined ? urgencyRank[aKat] : 99;
+    const bRank = urgencyRank[bKat] !== undefined ? urgencyRank[bKat] : 99;
+    if (aRank !== bRank) return aRank - bRank;
+    if (a.tarikhGerak !== b.tarikhGerak) return String(a.tarikhGerak).localeCompare(String(b.tarikhGerak));
+    return parseTarikhMasaVELOS(b.tarikhMohon) - parseTarikhMasaVELOS(a.tarikhMohon);
+  });
+}
+
+// Baris dikongsi Fasa 1 & Fasa 2 — Klinikal papar satu lajur gabungan Maklumat
+// Pesakit & Destinasi per-pesakit (nama tidak berulang); Jabatan kekal templat asal.
+function bentukBarisAktif(item, isKlinikal, extraCol) {
+  extraCol = extraCol || '';
+  let kategoriVal = isKlinikal ? item.kategoriKes : item.kategoriPermohonan;
+  let isTopUrgency = isKlinikal ? (kategoriVal === 'Rujukan Kecemasan') : (kategoriVal === 'Segera');
+  let rowStyle = isTopUrgency ? ' style="background-color:#FDECEC;"' : '';
+  let firstCellStyle = isTopUrgency ? ' style="border-left:4px solid #C62828;"' : '';
+
+  let colGabungan;
+  if (isKlinikal) {
+    colGabungan = (item.senaraiPesakitData || []).map(function (p) {
+      return `Nama: <strong>${p.nama}</strong> (RN: ${p.rn})<br><small>Dx: ${p.diagnosis} | <strong style="font-size:13px;">Kes: ${p.kes}</strong> | Keadaan: ${p.keadaan}</small><br><strong style="font-size:13px;">Destinasi: ${p.destinasi}</strong> | Tujuan: ${p.tujuan}${p.waris !== 'Tiada' ? `<br><small>Waris: ${p.waris}</small>` : ''}`;
+    }).join('<hr style="margin:6px 0; border-color:#eee;">');
+  } else {
+    colGabungan = `<strong>Tujuan:</strong> ${item.tujuan}<br><strong>Destinasi:</strong> ${item.destinasi}<br><strong>Penumpang:</strong> ${item.penumpang}<br><br><small>${item.catatan.replace(/\n/g, '<br>')}</small>`;
+  }
+  colGabungan += extraCol;
+
+  return {
+    rowStyle: rowStyle,
+    cellsHtml: `<td${firstCellStyle}><strong>${item.tarikhGerak}</strong><br><span style="color:#0F2A4A;">Masa: ${item.masa}</span><br><br><span class="badge-info">Mohon: ${item.tarikhMohon}</span></td>
+            <td><strong>${item.jabatan}</strong><br><small>${item.nama}</small><br><span style="color:#555;">📞 ${item.telefon}</span></td>
+            <td>${colGabungan}</td>`
+  };
+}
+
+function binaJadualTier1(res) {
+  let tbody = document.getElementById('tableBodyTier1');
+  if (!res.success) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Ralat: ${res.message}</td></tr>`;
+    return;
+  }
+  const isKlinikal = currentVccType === 'Klinikal';
+  let data = sortAktifByUrgency(res.data, isKlinikal);
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; font-weight:bold; padding:20px; color:#1E8E5A;">✨ Tiada permohonan baharu buat masa ini.</td></tr>`;
+    return;
+  }
+  let html = '';
+  data.forEach(function (item) {
+    let baris = bentukBarisAktif(item, isKlinikal);
+    html += `
+        <tr${baris.rowStyle}>
+            ${baris.cellsHtml}
+            <td style="text-align: center;">
+                <button class="btn-lulus" onclick="terimaPermohonan('${item.rowIdx}')">✅ Terima Permohonan</button>
+            </td>
+        </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function binaJadualTier2(res) {
+  let tbody = document.getElementById('tableBodyTier2');
+  if (!res.success) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Ralat: ${res.message}</td></tr>`;
+    return;
+  }
+  const isKlinikal = currentVccType === 'Klinikal';
+  let data = sortAktifByUrgency(res.data, isKlinikal);
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; font-weight:bold; padding:20px; color:#1E8E5A;">✨ Tiada permohonan dalam proses koordinasi buat masa ini.</td></tr>`;
+    return;
+  }
+  let html = '';
+  data.forEach(function (item) {
+    let catatanTindakanHTML = item.catatanTindakan
+      ? `<br><div style="margin-top:6px; padding:6px; background:#FBF1E1; border-left:3px solid #C98A2E; font-size:11px;"><strong>⚠️ Catatan (${item.namaTindakan || '-'}):</strong> ${item.catatanTindakan}</div>`
+      : '';
+    let baris = bentukBarisAktif(item, isKlinikal, catatanTindakanHTML);
+    html += `
+        <tr${baris.rowStyle}>
+            ${baris.cellsHtml}
+            <td style="text-align: center;">
+                <button class="btn-lulus" onclick="promptLulus('${item.rowIdx}')">✅ Lulus</button>
+                <button class="btn-tolak" onclick="promptTolak('${item.rowIdx}')">❌ Tolak</button>
+                <button class="btn-lain" onclick="promptLainLain('${item.rowIdx}')">➰ Lain-lain</button>
+            </td>
+        </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function binaJadualAkanDatang(res) {
+  let tbody = document.getElementById('tableBodyAkanDatang');
+  if (!res.success) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Ralat: ${res.message}</td></tr>`;
+    return;
+  }
+  const isKlinikal = currentVccType === 'Klinikal';
+  let data = res.data.slice().sort(function (a, b) {
+    if (a.tarikhGerak !== b.tarikhGerak) return String(a.tarikhGerak).localeCompare(String(b.tarikhGerak));
+    return String(a.masa).localeCompare(String(b.masa));
+  });
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; font-weight:bold; padding:20px; color:#1E8E5A;">✨ Tiada tugasan akan datang.</td></tr>`;
+    return;
+  }
+  let html = '';
+  data.forEach(function (item) {
+    let colDestinasi;
+    if (isKlinikal && (item.senaraiPesakitData || []).length > 0) {
+      colDestinasi = item.senaraiPesakitData.map(function (p) {
+        return `<strong>Destinasi: ${p.destinasi}</strong> | Tujuan: ${p.tujuan}`;
+      }).join('<hr style="margin:6px 0; border-color:#eee;">');
+    } else {
+      colDestinasi = `<strong>Destinasi:</strong> ${item.destinasi}<br><strong>Tujuan:</strong> ${item.tujuan}`;
+    }
+    html += `
+        <tr>
+            <td><strong>${item.tarikhGerak}</strong><br><span style="color:#0F2A4A;">Masa: ${item.masa}</span></td>
+            <td><strong>${item.jabatan}</strong><br><small>${item.nama}</small><br><span style="color:#555;">📞 ${item.telefon}</span></td>
+            <td>${colDestinasi}</td>
+            <td><strong>${item.kenderaan || '-'}</strong><br><small>${item.pemandu || '-'}</small></td>
+            <td>${item.pelulus || '-'}<br><small>${item.masaKeputusan || ''}</small></td>
+        </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function binaJadualSejarah(res) {
+  let tbody = document.getElementById('historyTableBody');
+  if (!res.success) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Ralat: ${res.message}</td></tr>`;
+    return;
+  }
+  let data = res.data.slice().sort(function (a, b) { return parseTarikhMasaVELOS(b.timestamp) - parseTarikhMasaVELOS(a.timestamp); });
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:gray; padding:20px;">Tiada sejarah rekod permohonan ditemui.</td></tr>`;
+    return;
+  }
+  const isKlinikal = currentVccType === 'Klinikal';
+  let html = '';
+  data.forEach(function (item) {
+    let isApproved = item.status && (item.status.toLowerCase() === 'diluluskan' || item.status.toLowerCase() === 'selesai');
+    let isRejected = item.status && (item.status.toLowerCase().includes('tolak') || item.status.toLowerCase().includes('batal'));
+    let isProcessing = item.status && item.status.toLowerCase() === 'diproses';
+    let statusColor = isApproved ? '#1E8E5A' : (isRejected ? '#C62828' : (isProcessing ? '#147D82' : '#C98A2E'));
+    let txtColor = (item.status && item.status.toLowerCase().includes('menunggu')) ? '#000' : '#fff';
+
+    let jsonStr = encodeURIComponent(JSON.stringify(item));
+
+    let namaRaw = item.json ? (item.json.namaRaw || item.nama) : item.nama;
+    let esc = item.json ? item.json.pengiring : '';
+    let infoPengiring = (isKlinikal && esc && esc !== '') ? `<br><small style="color:#888; font-style:italic; font-size:11px;">🛡️ Pengiring: ${esc}</small>` : '';
+    let colPemohon = isKlinikal
+      ? `<strong>${item.jabatan}</strong><br><small>${namaRaw}</small>${infoPengiring}`
+      : `<strong>${item.jabatan}</strong><br><small>${namaRaw}</small>`;
+
+    let kategoriVal = isKlinikal ? (item.json ? item.json.kategoriKes : null) : (item.json ? item.json.kategoriPermohonan : null);
+    let isTopUrgency = isKlinikal ? (kategoriVal === 'Rujukan Kecemasan') : (kategoriVal === 'Segera');
+    let kategoriBadgeHTML = kategoriVal
+      ? `<span style="background:${isTopUrgency ? '#C62828' : '#E4ECF4'}; color:${isTopUrgency ? '#fff' : '#0F2A4A'}; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold; display:inline-block; margin-top:4px;">${kategoriVal}</span>`
+      : '';
+
+    // Klinikal: pecahan destinasi per-pesakit. Rekod lama tanpa senaraiPesakitData
+    // kembali kepada medan destinasi jambatan tunggal supaya tidak pecah/kosong.
+    let pesakitDestinasi = (item.json && item.json.senaraiPesakitData && item.json.senaraiPesakitData.length)
+      ? `<small>${item.json.senaraiPesakitData.map(function (p) { return `Nama: <strong>${p.nama}</strong> (RN: ${p.rn})<br>Dx: ${p.diagnosis} | <strong style="font-size:13px;">Kes: ${p.kes}</strong> | Keadaan: ${p.keadaan}<br><strong style="font-size:13px;">Destinasi: ${p.destinasi}</strong> | Tujuan: ${p.tujuan}${p.waris !== 'Tiada' ? `<br>Waris: ${p.waris}` : ''}`; }).join('<hr style="margin:6px 0; border-color:#eee;">')}</small>`
+      : `<strong>${item.destinasi}</strong>`;
+    let colDestinasiKategori = isKlinikal
+      ? `${pesakitDestinasi}${kategoriBadgeHTML}`
+      : `<strong>${item.destinasi}</strong><br>${kategoriBadgeHTML}<br><small>Tujuan: ${item.tujuan}</small><br><small>Penumpang: ${item.json.penumpang}</small>`;
+
+    let rowStyle = isTopUrgency ? ' style="background-color:#FDECEC;"' : '';
+    let firstCellStyle = isTopUrgency ? ' style="border-left:4px solid #C62828;"' : '';
+
+    let masaBertolak = item.json ? (item.json.masaMula || '') : '';
+
+    let infoPemanduText = `<strong>${item.kenderaan}</strong><br><small>${item.pemandu}</small>`;
+    if (item.json && item.json.pelulus && item.json.pelulus !== '-') {
+      infoPemanduText += `<br><small style="color:#1E8E5A; font-weight:bold;">🔑 Pelulus: ${item.json.pelulus}</small>`;
+    }
+
+    let masaKeputusan = item.json ? item.json.masaKeputusan : null;
+    let infoKeputusan = '';
+    if (masaKeputusan) {
+      let labelKeputusan = isApproved ? 'Tarikh & Masa Kelulusan' : (isRejected ? 'Tarikh & Masa Penolakan' : '');
+      if (labelKeputusan) infoKeputusan = `<br><small style="color:#555; font-size:11px;">${labelKeputusan}: ${masaKeputusan}</small>`;
+    }
+
+    let namaTolak = item.json ? item.json.namaTindakan : null;
+    let infoNamaTolak = (isRejected && namaTolak && namaTolak !== '-')
+      ? `<br><small style="color:#C62828; font-weight:bold; font-size:11px;">👤 Ditolak oleh: ${namaTolak}</small>`
+      : '';
+
+    let catatanTolak = item.json ? item.json.catatanTindakan : null;
+    let infoCatatanTolak = (isRejected && catatanTolak && catatanTolak !== '-')
+      ? `<br><small style="color:#C62828; font-size:11px; display:inline-block; max-width:220px; word-wrap:break-word; white-space:normal;">📝 Sebab: ${catatanTolak}</small>`
+      : '';
+
+    let catatanLulus = item.json ? item.json.catatanLulus : null;
+    let infoCatatanLulus = (isApproved && catatanLulus && catatanLulus !== '-')
+      ? `<br><small style="color:#1E8E5A; font-size:11px; display:inline-block; max-width:220px; word-wrap:break-word; white-space:normal;">📝 Catatan: ${catatanLulus}</small>`
+      : '';
+
+    let catatanLain = item.json ? item.json.catatanTindakan : null;
+    let infoCatatanLain = (isProcessing && catatanLain && catatanLain !== '-')
+      ? `<br><small style="color:#C98A2E; font-size:11px; display:inline-block; max-width:220px; word-wrap:break-word; white-space:normal;">📝 Catatan (Diproses): ${catatanLain}</small>`
+      : '';
+
+    html += `
+        <tr${rowStyle}>
+            <td${firstCellStyle}>${item.timestamp}</td>
+            <td>${colPemohon}</td>
+            <td>${colDestinasiKategori}</td>
+            <td>${item.tarikhGerak}${masaBertolak ? '<br><small>' + masaBertolak + '</small>' : ''}</td>
+            <td style="text-align: center;">
+                <span style="background:${statusColor}; color:${txtColor}; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:bold; display:inline-block;">${item.status}</span>
+                ${infoKeputusan}
+                ${infoNamaTolak}
+                ${infoCatatanTolak}
+                ${infoCatatanLulus}
+                ${infoCatatanLain}
+            </td>
+            <td>${infoPemanduText}</td>
+            <td style="text-align: center;">
+                <small style="display:block; margin-bottom:4px; color:#555; font-weight:bold;">${item.id}</small>
+                ${isApproved ? `<button class="btn-action-sm" style="background:#147D82;" onclick="cetakRekod('${jsonStr}')">🖨️ Cetak</button><br>` : ''}
+                <button class="btn-action-sm" style="background:#6c757d;" onclick="padamRekodHistory('${item.id}')">🗑️ Padam</button>
+            </td>
+        </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+/* ---------------------------------------------------------------------
+   ACTIONS — Section 8, rewired to Firestore. Firestore Security Rules
+   (not a per-call password) are the actual enforcement now, so
+   currentVccPass no longer needs to travel with every action.
+--------------------------------------------------------------------- */
+window.terimaPermohonan = function (rowIdx) {
+  Swal.fire({
+    title: 'Terima Permohonan?',
+    text: 'Permohonan ini akan dipindahkan ke Fasa 2 (Proses Koordinasi) untuk diuruskan.',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#28a745',
+    confirmButtonText: 'Ya, Terima',
+    cancelButtonText: 'Batal'
+  }).then(function (res) {
+    if (!res.isConfirmed) return;
+    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    const ref = doc(db, 'permohonanVCC', String(rowIdx));
+    // Transaction replicates live's status guard (only Menunggu ->
+    // Diproses) atomically, closing the read-then-write race live's own
+    // separate getFirebaseData/putFirebaseData calls were exposed to.
+    runTransaction(db, function (tx) {
+      return tx.get(ref).then(function (snap) {
+        if (!snap.exists()) throw new Error('Rekod tidak dijumpai.');
+        if (snap.data().status !== 'Menunggu') throw new Error('Permohonan ini telah diterima/diproses.');
+        tx.update(ref, { status: 'Diproses' });
+      });
+    }).then(function () {
+      Swal.fire('Diterima', 'Permohonan kini di Fasa 2 (Proses Koordinasi).', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', err.message || String(err), 'error');
+    });
+  });
+};
+
+window.promptLulus = function (rowIdx) {
+  let htmlOptions = `
+    <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Kenderaan:</div>
+    <select id="swalVeh" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+        <option value="" disabled selected>-- Kenderaan --</option>
+        <optgroup label="Ambulans">
+            <option value="BNU 9974">BNU 9974</option>
+            <option value="BPL 7944">BPL 7944</option>
+            <option value="BPP 4693">BPP 4693</option>
+        </optgroup>
+        <optgroup label="Kenderaan Jabatan">
+            <option value="SYJ 7904">SYJ 7904</option>
+            <option value="SAA 8110 K">SAA 8110 K</option>
+            <option value="VFP 2850">VFP 2850</option>
+            <option value="SAC 7316 C">SAC 7316 C</option>
+            <option value="WLL 1078">WLL 1078</option>
+            <option value="SAA 5285 N">SAA 5285 N</option>
+            <option value="SAA 2680 W">SAA 2680 W</option>
+        </optgroup>
+        <option value="Kenderaan Sewa / Lain">Lain-lain / Sewa Khas</option>
+    </select>
+
+    <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Pemandu 1:</div>
+    <select id="swalDrv" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+        <option value="" disabled selected>-- Pemandu Bertugas --</option>
+        <option value="Ahmad Agar">Ahmad Agar</option>
+        <option value="Masnin">Masnin</option>
+        <option value="Rafaie">Rafaie</option>
+        <option value="Jilie">Jilie</option>
+        <option value="Mazni">Mazni</option>
+        <option value="Nurikram">Nurikram</option>
+        <option value="Rosley">Rosley</option>
+        <option value="Affendy">Affendy</option>
+        <option value="SN Reno">SN Reno</option>
+        <option value="PPK Franli">PPK Franli</option>
+        <option value="PKA Fikri">PKA Fikri</option>
+        <option value="PPK Shan">PPK Shan</option>
+        <option value="PPK Armay">PPK Armay</option>
+        <option value="PPK James">PPK James</option>
+        <option value="CC Dell">CC Dell</option>
+        <option value="PPP Shafiq">PPP Shafiq</option>
+        <option value="Lain-lain">Lain-lain / Luar</option>
+    </select>
+
+    <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Pemandu 2 (Pilihan):</div>
+    <select id="swalDrv2" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+        <option value="-" selected>-- Tiada Pemandu Kedua --</option>
+        <option value="Ahmad Agar">Ahmad Agar</option>
+        <option value="Masnin">Masnin</option>
+        <option value="Rafaie">Rafaie</option>
+        <option value="Jilie">Jilie</option>
+        <option value="Mazni">Mazni</option>
+        <option value="Nurikram">Nurikram</option>
+        <option value="Rosley">Rosley</option>
+        <option value="Affendy">Affendy</option>
+        <option value="SN Reno">SN Reno</option>
+        <option value="PPK Franli">PPK Franli</option>
+        <option value="PKA Fikri">PKA Fikri</option>
+        <option value="PPK Shan">PPK Shan</option>
+        <option value="PPK Armay">PPK Armay</option>
+        <option value="PPK James">PPK James</option>
+        <option value="CC Dell">CC Dell</option>
+        <option value="PPP Shafiq">PPP Shafiq</option>
+        <option value="Lain-lain">Lain-lain / Luar</option>
+    </select>
+
+    <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Nama Pelulus VCC:</div>
+    <input type="text" id="swalPelulus" class="swal2-input" placeholder="Nama Pelulus VCC..." style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+
+    <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Catatan (Pilihan):</div>
+    <textarea id="swalCatatanLulus" class="swal2-textarea" placeholder="Cth: Pengiring perlu kutip pesakit kedua di Wad Lelaki..." style="width:100%; max-width:100%; font-size:14px; margin: 0;"></textarea>
+    `;
+
+  Swal.fire({
+    title: 'Tetapan Logistik VCC',
+    html: htmlOptions,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonColor: '#28a745',
+    confirmButtonText: 'Sahkan & Luluskan',
+    cancelButtonText: 'Batal',
+    preConfirm: function () {
+      let veh = document.getElementById('swalVeh').value;
+      let drv = document.getElementById('swalDrv').value;
+      let drv2 = document.getElementById('swalDrv2').value;
+      let pel = document.getElementById('swalPelulus').value;
+      let catatan = document.getElementById('swalCatatanLulus').value;
+      if (!veh || !drv || !pel) {
+        Swal.showValidationMessage('Sila pilih kenderaan, pemandu 1, dan nama pelulus!');
+        return false;
+      }
+      let finalPemandu = (drv2 && drv2 !== '-') ? `${drv} & ${drv2}` : drv;
+      return { veh: veh, drv: finalPemandu, pel: pel, catatan: catatan };
+    }
+  }).then(function (res) {
+    if (!res.isConfirmed) return;
+    Swal.fire({ title: 'Menyimpan ke Awan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    const ref = doc(db, 'permohonanVCC', String(rowIdx));
+    updateDoc(ref, {
+      status: 'Diluluskan',
+      kenderaan: res.value.veh,
+      pemandu: res.value.drv,
+      pelulus: res.value.pel,
+      catatanLulus: res.value.catatan || '-',
+      masaKeputusan: buildTimestampDMY()
+    }).then(function () {
+      Swal.fire('Selesai!', 'Permohonan diluluskan dan logistik ditetapkan.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', err.message || String(err), 'error');
+    });
+  });
+};
+
+window.promptTolak = function (rowIdx) {
+  Swal.fire({
+    title: 'Tolak Permohonan',
+    html: `
+        <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Nama Anda (Pegawai VCC):</div>
+        <input type="text" id="swalNamaTolak" class="swal2-input" placeholder="Nama pegawai yang menolak..." style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+        <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Sebab Penolakan (Wajib):</div>
+        <textarea id="swalCatatanTolak" class="swal2-textarea" placeholder="Cth: Tiada kenderaan/pemandu tersedia pada masa diminta..." style="width:100%; max-width:100%; font-size:14px; margin: 0;"></textarea>
+        `,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    confirmButtonText: 'Sahkan Tolak',
+    cancelButtonText: 'Batal',
+    preConfirm: function () {
+      let nama = document.getElementById('swalNamaTolak').value;
+      let catatan = document.getElementById('swalCatatanTolak').value;
+      if (!nama || !catatan) {
+        Swal.showValidationMessage('Sila isikan nama anda dan sebab penolakan!');
+        return false;
+      }
+      return { nama: nama, catatan: catatan };
+    }
+  }).then(function (res) {
+    if (!res.isConfirmed) return;
+    Swal.fire({ title: 'Mengemaskini Status...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    const ref = doc(db, 'permohonanVCC', String(rowIdx));
+    updateDoc(ref, {
+      status: 'Ditolak',
+      namaTindakan: res.value.nama,
+      catatanTindakan: res.value.catatan,
+      masaKeputusan: buildTimestampDMY()
+    }).then(function () {
+      Swal.fire('Ditolak', 'Permohonan telah ditandakan sebagai Ditolak.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', err.message || String(err), 'error');
+    });
+  });
+};
+
+window.promptLainLain = function (rowIdx) {
+  Swal.fire({
+    title: 'Tindakan Lain-lain',
+    html: `
+        <p style="font-size:12px; color:gray; text-align:left; margin-top:0;">Guna ruangan ini jika permohonan belum boleh diputuskan (Lulus/Tolak) sekarang — permohonan akan kekal di Fasa 2 dengan catatan ini.</p>
+        <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Nama Anda (Pegawai VCC):</div>
+        <input type="text" id="swalNamaLain" class="swal2-input" placeholder="Nama pegawai..." style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+        <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Catatan (Wajib):</div>
+        <textarea id="swalCatatanLain" class="swal2-textarea" placeholder="Cth: Menunggu pengesahan wad, akan disemak semula petang ini..." style="width:100%; max-width:100%; font-size:14px; margin: 0;"></textarea>
+        `,
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonColor: '#6c757d',
+    confirmButtonText: 'Simpan Catatan',
+    cancelButtonText: 'Batal',
+    preConfirm: function () {
+      let nama = document.getElementById('swalNamaLain').value;
+      let catatan = document.getElementById('swalCatatanLain').value;
+      if (!nama || !catatan) {
+        Swal.showValidationMessage('Sila isikan nama anda dan catatan!');
+        return false;
+      }
+      return { nama: nama, catatan: catatan };
+    }
+  }).then(function (res) {
+    if (!res.isConfirmed) return;
+    Swal.fire({ title: 'Menyimpan Catatan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    const ref = doc(db, 'permohonanVCC', String(rowIdx));
+    updateDoc(ref, {
+      namaTindakan: res.value.nama,
+      catatanTindakan: res.value.catatan,
+      masaTindakanLain: buildTimestampDMY()
+    }).then(function () {
+      Swal.fire('Disimpan', 'Catatan telah dilekatkan pada permohonan ini.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', err.message || String(err), 'error');
+    });
+  });
+};
+
+// Confirmed decision: matches current firestore.rules -- isVccC()/isVccM()
+// may delete their own-suffix records, same as live's per-operator
+// force-delete from the Rekod view. No admin gate.
+window.padamRekodHistory = function (id) {
+  Swal.fire({
+    title: 'Padam Sejarah?',
+    text: 'Rekod ini akan dipadam kekal dari pangkalan data permohonan awan.',
+    icon: 'error',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    confirmButtonText: 'Padam Kekal',
+    cancelButtonText: 'Batal'
+  }).then(function (res) {
+    if (!res.isConfirmed) return;
+    Swal.fire({ title: 'Memadam...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    deleteDoc(doc(db, 'permohonanVCC', String(id))).then(function () {
+      Swal.fire('Terpadam', 'Rekod berjaya dipadam.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', err.message || String(err), 'error');
+    });
+  });
+};
+
+// FUNGSI CETAK REKOD DARI SEJARAH VCC
+window.cetakRekod = function (encodedData) {
+  let item = JSON.parse(decodeURIComponent(encodedData));
+  let json = item.json;
+  if (!json) {
+    Swal.fire('Ralat', 'Data JSON korup atau lama. Tidak dapat mencetak.', 'error');
+    return;
+  }
+
+  let isKlinikal = item.id.endsWith('C');
+  let masaKeputusanRow = json.masaKeputusan ? `<tr><td style="padding:4px 0;">Tarikh & Masa Kelulusan</td><td style="padding:4px 0;">: <strong>${json.masaKeputusan}</strong></td></tr>` : '';
+
+  let html = `
+    <div class="print-receipt-header">
+    <h2 style="margin:0; font-size: 24px;">HOSPITAL PITAS, SABAH</h2>
+    <p style="margin: 8px 0 12px 0; font-size: 14px; font-weight: bold; color: #444;">KEMENTERIAN KESIHATAN MALAYSIA</p>
+    </div>
+    <h3 style="text-align:center; margin-top:0; font-size: 20px; text-decoration: underline; color:#28a745;">TIKET PERJALANAN VCC (LULUS)</h3>
+    <p style="text-align:center; margin:0; font-size: 13px; font-weight:bold;">VCC ID: ${item.id}</p>
+
+    <div style="border: 2px solid #28a745; background-color: #e9f7ef !important; color: #155724 !important; padding: 15px; border-radius: 6px; margin-top: 20px; margin-bottom: 25px; text-align:center; font-size:15px; font-weight:bold;">
+    KENDERAAN: ${item.kenderaan} &nbsp;|&nbsp; PEMANDU: ${item.pemandu}
+    </div>
+    `;
+
+  if (isKlinikal) {
+    html += `
+        <div style="margin-bottom: 15px; font-size: 13px;">
+        <strong style="display:block; margin-bottom:8px;">MAKLUMAT PERJALANAN & PEMOHON:</strong>
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr><td style="width:140px; padding:4px 0;">Tarikh & Masa Bertolak</td><td style="padding:4px 0;">: <strong>${json.tarikh}, ${json.masaMula}</strong></td></tr>
+        <tr><td style="padding:4px 0;">Pemohon / Unit</td><td style="padding:4px 0;">: ${json.namaRaw} (${json.jabatan})</td></tr>
+        <tr><td style="padding:4px 0;">No. Telefon</td><td style="padding:4px 0;">: ${json.telefon}</td></tr>
+        <tr><td style="padding:4px 0;">Pegawai Pengiring</td><td style="padding:4px 0;">: <strong>${json.pengiring || 'Tiada'}</strong></td></tr>
+        <tr><td style="padding:4px 0;">Pemandu Diperlukan</td><td style="padding:4px 0;">: <strong>${json.pemanduDiperlukan || '1'} Pemandu</strong></td></tr>
+        <tr><td style="padding:4px 0;">Pelulus VCC</td><td style="padding:4px 0;">: <strong>${json.pelulus || json.pelulusLive || item.pelulus || '-'}</strong></td></tr>
+        ${masaKeputusanRow}
+        </table>
+        </div>
+        <div style="margin-bottom: 15px; font-size: 13px;">
+        <strong style="display:block; margin-bottom:8px;">SENARAI PESAKIT:</strong>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px;">
+        <tr>
+        <th style="border: 1px solid #666; padding: 8px; background-color: #f0f0f0; width: 5%; text-align: center; color: #333;">No.</th>
+        <th style="border: 1px solid #666; padding: 8px; background-color: #f0f0f0; color: #333;">Maklumat Pesakit</th>
+        <th style="border: 1px solid #666; padding: 8px; background-color: #f0f0f0; color: #333;">Destinasi & Kategori Kes</th>
+        <th style="border: 1px solid #666; padding: 8px; background-color: #f0f0f0; color: #333;">Waris</th>
+        </tr>
+        ${json.senaraiPesakit || '<tr><td colspan="4">Tiada data paparan pesakit</td></tr>'}
+        </table>
+        </div>`;
+  } else {
+    html += `
+        <div style="margin-bottom: 15px; font-size: 13px;">
+        <strong style="display:block; margin-bottom:8px;">MAKLUMAT PERJALANAN & PEMOHON:</strong>
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr><td style="width:140px; padding:4px 0;">Pemohon / Unit</td><td style="padding:4px 0;">: ${json.namaRaw} (${json.jabatan})</td></tr>
+        <tr><td style="padding:4px 0;">No. Telefon</td><td style="padding:4px 0;">: ${json.telefon}</td></tr>
+        <tr><td style="padding:4px 0;">Tarikh & Masa Bertolak</td><td style="padding:4px 0;">: <strong>${json.tarikh}, ${json.masaMula}</strong></td></tr>
+        <tr><td style="padding:4px 0;">Tarikh & Masa Kembali</td><td style="padding:4px 0;">: <strong>${json.tarikhKembali || '-'}, ${json.masaTamat}</strong></td></tr>
+        <tr><td style="padding:4px 0;">Pemandu Diperlukan</td><td style="padding:4px 0;">: <strong>${json.pemanduDiperlukan || '1'} Pemandu</strong></td></tr>
+        <tr><td style="padding:4px 0;">Tujuan</td><td style="padding:4px 0;">: <strong>${json.tujuan}</strong></td></tr>
+        <tr><td style="padding:4px 0;">Destinasi</td><td style="padding:4px 0;">: <strong>${json.destinasi}</strong></td></tr>
+        <tr><td style="padding:4px 0; vertical-align:top;">Penumpang Lain</td><td style="padding:4px 0; vertical-align:top;">: ${json.penumpang}</td></tr>
+        <tr><td style="padding:4px 0; vertical-align:top;">Catatan</td><td style="padding:4px 0; vertical-align:top;">: ${json.catatanLain || '-'}</td></tr>
+        <tr><td style="padding:4px 0;">Pelulus VCC</td><td style="padding:4px 0;">: <strong>${json.pelulus || json.pelulusLive || item.pelulus || '-'}</strong></td></tr>
+        ${masaKeputusanRow}
+        </table>
+        </div>`;
+  }
+
+  html += `
+    <div style="margin-top: 30px; padding: 10px; border: 1px dashed #666; text-align: center; font-size: 12px; color: #555;">
+    Salinan Rasmi Papan Pemuka VCC. Cetakan pengesahan bagi kegunaan fail logistik.
+    </div>
+    <div style="margin-top:40px; text-align:center; font-size:10px; color:#888;">&copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>Vehicle Logistics And Operations System (VELOS)</div>
+    `;
+
+  document.getElementById('cetakArea').innerHTML = html;
+  setTimeout(function () { window.print(); }, 500);
+};
+</script>
 </body>
 </html>

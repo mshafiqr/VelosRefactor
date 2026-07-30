@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+  <link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
   <title>VELOS — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0F2A4A;
@@ -14,12 +18,213 @@
       --text-soft: #5B6774;
       --success: #1E8E5A;
       --danger: #C62828;
+      --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
     }
     body {
       font-family: 'Public Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    #loginView {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .auth-card {
+      max-width: 420px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0 16px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      border-top: 4px solid var(--primary);
+    }
+
+    .auth-logo-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #e9ecef;
+      padding-bottom: 15px;
+      margin-bottom: 15px;
+    }
+    .auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+    .auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+    .auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+    .auth-logo-center .auth-org-line1 {
+      font-size: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #2c3e50;
+      margin-bottom: 4px;
+    }
+    .auth-logo-center .auth-org-line2 {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7f8c8d;
+    }
+
+    .auth-brand {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .auth-brand .auth-brand-line1 {
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .auth-brand .auth-brand-line2 {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 3px;
+      margin-top: 2px;
+    }
+
+    .auth-portal-label {
+      font-size: 13px;
+      color: var(--text-soft);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .auth-password-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #DCE6ED;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    .auth-password-input:focus {
+      outline: none;
+      border-color: var(--secondary);
+    }
+
+    .auth-submit-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .auth-submit-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.75;
+    }
+
+    .auth-error {
+      display: none;
+      color: var(--danger);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    #secureDashboardWrapper {
+      display: none;
     }
   </style>
 </head>
 <body>
+
+  <div id="loginView">
+    <div class="auth-card">
+      <div class="auth-logo-row">
+        <div class="auth-logo-left">
+          <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara">
+        </div>
+        <div class="auth-logo-center">
+          <div class="auth-org-line1">Hospital Pitas, Sabah</div>
+          <div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
+        </div>
+        <div class="auth-logo-right">
+          <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas">
+        </div>
+      </div>
+
+      <div class="auth-brand">
+        <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+        <div class="auth-brand-line2">(VELOS)</div>
+      </div>
+
+      <p class="auth-portal-label">Admin Dashboard</p>
+
+      <form id="loginForm" novalidate>
+        <input type="password" id="passwordInput" class="auth-password-input" placeholder="Kata Laluan" autocomplete="current-password" required>
+        <button type="submit" id="loginSubmitBtn" class="auth-submit-btn">Log Masuk</button>
+        <p id="loginError" class="auth-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="secureDashboardWrapper"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const PORTAL_EMAIL = "admin@pitas.velos";
+
+    const loginView = document.getElementById('loginView');
+    const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
+    const loginForm = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    const loginError = document.getElementById('loginError');
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginView.style.display = 'none';
+        secureDashboardWrapper.style.display = 'block';
+      } else {
+        loginView.style.display = 'flex';
+        secureDashboardWrapper.style.display = 'none';
+      }
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.style.display = 'none';
+      loginError.textContent = '';
+
+      loginSubmitBtn.disabled = true;
+      loginSubmitBtn.textContent = 'Mengesahkan...';
+
+      try {
+        await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+      } catch (err) {
+        loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
+        loginError.style.display = 'block';
+      } finally {
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = 'Log Masuk';
+      }
+    });
+  </script>
+
 </body>
 </html>

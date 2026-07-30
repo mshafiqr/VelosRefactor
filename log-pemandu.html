@@ -87,47 +87,54 @@ body { pointer-events: auto !important; }
 .swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
 .swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
 
-/* Login view — new in the revamp, live GAS had no client-side auth gate. */
-.login-card { max-width: 380px; margin: 60px auto; }
-.login-letterhead { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
-.login-letterhead img { height: 65px; width: auto; }
-.login-letterhead img:first-child { justify-self: start; }
-.login-letterhead img:last-child { justify-self: end; }
-.login-letterhead-text { text-align: center; }
-.login-card h2, .login-card label { text-align: center; }
-.login-letterhead-text .lh-title { font-weight: 800; font-size: 15px; color: var(--primary); letter-spacing: 0.3px; }
-.login-letterhead-text .lh-subtitle { font-weight: 400; font-size: 11px; color: var(--text-soft); margin-top: 2px; }
-.login-error { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+/* Login view — full-page auth gate card, per auth-gate-layout spec. */
+#loginView { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; }
+.auth-card { max-width: 420px; width: 100%; box-sizing: border-box; margin: 0 16px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); padding: 30px; border-top: 4px solid var(--primary); }
+.auth-logo-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 15px; }
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
+.auth-password-input { width: 100%; padding: 10px 14px; border: 1.5px solid #DCE6ED; border-radius: 8px; font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px; }
+.auth-password-input:focus { outline: none; border-color: var(--secondary); }
+.auth-submit-btn { width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
 .logout-bar { max-width: 800px; margin: 0 auto 10px; display: flex; justify-content: flex-end; }
 .btn-logout { background-color: var(--danger); color: white; border: none; border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<div id="loginView" class="container">
-<div class="form-title">Log Pemandu</div>
-<div class="card login-card">
-<div class="login-letterhead">
-<img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
-<div class="login-letterhead-text">
-<div class="lh-title">HOSPITAL PITAS</div>
-<div class="lh-subtitle">KEMENTERIAN KESIHATAN MALAYSIA</div>
+<div id="loginView">
+<div class="auth-card">
+<div class="auth-logo-row">
+<div class="auth-logo-left"><img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara"></div>
+<div class="auth-logo-center">
+<div class="auth-org-line1">Hospital Pitas, Sabah</div>
+<div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
 </div>
-<img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Logo Hospital Pitas">
+<div class="auth-logo-right"><img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas"></div>
 </div>
-<h2>Log Masuk</h2>
+<div class="auth-brand">
+<div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+<div class="auth-brand-line2">(VELOS)</div>
+</div>
+<p class="auth-portal-label">Portal Pemandu</p>
 <form id="loginForm" novalidate>
-<div class="form-group">
-<label>Kata Laluan</label>
-<input type="password" id="loginPassword" required placeholder="Masukkan kata laluan...">
-</div>
-<button type="submit" class="btn-main" id="btnLogin">Log Masuk</button>
+<input type="password" id="loginPassword" class="auth-password-input" required placeholder="Kata Laluan" autocomplete="current-password">
+<button type="submit" class="auth-submit-btn" id="btnLogin">Log Masuk</button>
+<p id="loginError" class="auth-error"></p>
 </form>
-<p id="loginError" class="login-error"></p>
 </div>
 </div>
 
-<div id="portalView" class="container" style="display:none;">
+<div id="secureDashboardWrapper" class="container" style="display:none;">
 <div class="logout-bar"><button type="button" id="btnLogout" class="btn-logout">Log Keluar</button></div>
 <div class="form-title">Borang Maklumat Pergerakan</div>
 <div class="card">
@@ -335,7 +342,7 @@ const DRIVER_EMAIL = "driver@pitas.velos";
    returns to login view. No redirect: same page, view toggle only.
 --------------------------------------------------------------------- */
 const loginView = document.getElementById('loginView');
-const portalView = document.getElementById('portalView');
+const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
 const loginForm = document.getElementById('loginForm');
 const loginPassword = document.getElementById('loginPassword');
 const loginError = document.getElementById('loginError');
@@ -346,7 +353,7 @@ loginForm.addEventListener('submit', function (e) {
   e.preventDefault();
   loginError.style.display = 'none';
   btnLogin.disabled = true;
-  btnLogin.innerText = 'Log Masuk...';
+  btnLogin.innerText = 'Mengesahkan...';
   signInWithEmailAndPassword(auth, DRIVER_EMAIL, loginPassword.value)
     .catch(function () {
       loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';
@@ -369,11 +376,11 @@ let portalInitialized = false;
 onAuthStateChanged(auth, function (user) {
   if (user) {
     loginView.style.display = 'none';
-    portalView.style.display = 'block';
+    secureDashboardWrapper.style.display = 'block';
     initPortal();
   } else {
-    portalView.style.display = 'none';
-    loginView.style.display = 'block';
+    secureDashboardWrapper.style.display = 'none';
+    loginView.style.display = 'flex';
     portalInitialized = false;
     if (unsubscribeLogPergerakan) {
       unsubscribeLogPergerakan();
