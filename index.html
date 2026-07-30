@@ -1,230 +1,1265 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
-  <link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
-  <title>VELOS — Admin Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #0F2A4A;
-      --secondary: #147D82;
-      --bg-color: #E9F1F6;
-      --card-bg: #ffffff;
-      --text-color: #1C2530;
-      --text-soft: #5B6774;
-      --success: #1E8E5A;
-      --danger: #C62828;
-      --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
-    }
-    body {
-      font-family: 'Public Sans', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      min-height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<title>VELOS — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" integrity="sha384-M00GJNq2IplZCB3+JOJEl2H0un45ODvqJSSnIc4DvG8gPn8RX5ToITFXcv3AvOx5" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #0F2A4A; --secondary: #147D82; --bg-color: #E9F1F6; --card-bg: #ffffff;
+  --text-color: #1C2530; --text-soft: #5B6774; --success: #1E8E5A; --danger: #C62828;
+  --warning: #C98A2E; --line: #DCE6ED; --radius: 12px;
+  --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
+}
+body {
+  font-family: 'Public Sans', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  min-height: 100vh;
+}
 
-    #loginView {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+/* ==================== AUTH GATE ==================== */
+#loginView {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.auth-card {
+  max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 16px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+  border-top: 4px solid var(--primary);
+}
+.auth-logo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #e9ecef;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
+.auth-password-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #DCE6ED; border-radius: 8px;
+  font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px;
+}
+.auth-password-input:focus { outline: none; border-color: var(--secondary); }
+.auth-submit-btn {
+  width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
 
-    .auth-card {
-      max-width: 420px;
-      width: 100%;
-      box-sizing: border-box;
-      margin: 0 16px;
-      background: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      padding: 30px;
-      border-top: 4px solid var(--primary);
-    }
+/* ==================== DASHBOARD (ported from live Admin_Velos.html) ==================== */
+#secureDashboardWrapper { display: none; padding: 20px; }
+.kkm-corporate-header { text-align: center; background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px;
+border-top: 5px solid var(--primary); border-bottom: 3px solid var(--warning); position: relative;}
+.btn-refresh-top { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px;
+font-weight: bold; cursor: pointer; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
+.btn-refresh-top:active { background: #218838; }
+.btn-logout-top { position: absolute; top: 15px; right: 145px; background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 4px;
+font-weight: bold; cursor: pointer; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+.header-logos-inline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #e9ecef; }
+.logo-left img, .logo-right img { height: 60px; object-fit: contain; }
+.logo-right { display: flex; gap: 10px; }
 
-    .auth-logo-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px dashed #e9ecef;
-      padding-bottom: 15px;
-      margin-bottom: 15px;
-    }
-    .auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
-    .auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
-    .auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
-    .auth-logo-center .auth-org-line1 {
-      font-size: 14px;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: #2c3e50;
-      margin-bottom: 4px;
-    }
-    .auth-logo-center .auth-org-line2 {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #7f8c8d;
-    }
+.title-hosp { font-size: 26px; font-weight: 900; color: #2c3e50; margin-bottom: 5px; text-transform: uppercase; }
+.title-kkm { font-size: 16px; font-weight: 700; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px;}
 
-    .auth-brand {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .auth-brand .auth-brand-line1 {
-      color: var(--primary);
-      font-weight: 900;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-    }
-    .auth-brand .auth-brand-line2 {
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: 3px;
-      margin-top: 2px;
-    }
+.app-main-title { margin: 15px 0 20px 0; }
+.velos-subtitle { font-size: 22px; color: var(--primary); font-weight: 900; letter-spacing: 1px; margin-bottom: 2px;}
+.velos-title { font-size: 26px; color: var(--primary); font-weight: 700; letter-spacing: 3px; margin-top: 0;}
+.header-meta-container { display: flex; justify-content: space-between; align-items: center; text-align: left; font-size: 13px; color: #444; background: #f8f9fa; padding: 12px 20px;
+border-radius: 6px; border-left: 4px solid var(--secondary); }
+.header-meta-slot { line-height: 1.5; }
+.container { max-width: 1600px; margin: auto; display: block; }
 
-    .auth-portal-label {
-      font-size: 13px;
-      color: var(--text-soft);
-      text-align: center;
-      margin-bottom: 20px;
-    }
+.card { background: var(--card-bg); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px; }
+.dashboard-grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+.dashboard-grid-layout.uneven { grid-template-columns: 1.25fr 0.75fr; }
+.print-avoid-break { page-break-inside: avoid; }
 
-    .auth-password-input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid #DCE6ED;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-    }
-    .auth-password-input:focus {
-      outline: none;
-      border-color: var(--secondary);
-    }
+h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; display: flex; align-items: center; justify-content: space-between;
+flex-wrap: wrap; gap: 10px;}
+.h2-laporan-utama { font-size: 24px; border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
 
-    .auth-submit-btn {
-      width: 100%;
-      background: var(--primary);
-      color: #fff;
-      padding: 11px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-    }
-    .auth-submit-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.75;
-    }
+button.btn-table-download { background-color: #6c757d; color: white; border: none; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
+.btn-zip { background-color: #17a2b8; }
+.btn-danger-action { background-color: var(--danger); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+.btn-export, .btn-print { color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btn-export { background-color: var(--success); } .btn-print { background-color: #6f42c1; }
+.editable-month-input { border: 2px solid var(--primary); padding: 6px 12px; font-size: 15px; font-weight: bold; border-radius: 6px; width: auto; font-family: inherit;
+background-color: #fff; color: #333; cursor: pointer; outline: none; }
 
-    .auth-error {
-      display: none;
-      color: var(--danger);
-      font-size: 13px;
-      text-align: center;
-      margin-top: 8px;
-    }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+th, td { padding: 8px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background-color: var(--primary); color: white; }
+tr:nth-child(even) { background-color: #F6FAFC; }
+.chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center; }
 
-    #secureDashboardWrapper {
-      display: none;
-    }
-  </style>
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+.stat-box { background: #e9ecef; padding: 15px; border-radius: 6px; text-align: center; border-left: 5px solid var(--primary); }
+.stat-box h3 { margin: 0; font-size: 24px; color: var(--primary); }
+.stat-box p { margin: 5px 0 0; font-size: 13px; font-weight: bold; }
+
+.leaders-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+.leader-alert-box { padding: 12px; border-radius: 5px; font-weight: bold; text-align: center; font-size: 14px; display: none; }
+.alert-driver { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+.hide-print { display: table-cell; }
+.watermark-footer { text-align: center; font-size: 12px; color: #888; margin-top: 30px; padding-bottom: 10px; line-height: 1.4; font-weight: 500; }
+.print-footer-ref { display: none; }
+.signature-section { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 2px solid #333; page-break-inside: avoid; }
+.sig-box { width: 30%; text-align: center; }
+.sig-title { font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #2c3e50; }
+.sig-space { height: 80px; border-bottom: 1px dashed #666; margin: 10px auto; width: 80%; }
+.sig-name { font-size: 12px; color: #555; }
+.first-page-wrapper { page-break-after: always; }
+@media print {
+@page { size: A4 landscape; margin: 15mm 10mm 15mm 10mm; }
+html, body { background: white !important; padding: 0 !important; margin: 0 !important; color: #000 !important; -webkit-print-color-adjust: exact !important;
+print-color-adjust: exact !important; min-width: 1200px !important; }
+
+.log-pergerakan-section { display: none !important; }
+
+.print-footer-ref { display: block !important; position: fixed; bottom: 0px; left: 0; width: 100%; text-align: center; font-size: 9px; font-family: monospace;
+color: #333; border-top: 1px solid #ccc; padding-top: 5px; z-index: 9999; }
+.container { max-width: 1200px !important; width: 1200px !important; min-width: 1200px !important; margin: 0 auto !important; display: block; }
+.hide-print, .control-panel { display: none !important; }
+.card { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 25px !important; }
+.print-avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
+
+h2 { font-size: 16px !important; color: var(--primary) !important; border-bottom: 2px solid var(--primary) !important; padding-bottom: 5px; margin-top: 15px; page-break-after: avoid; }
+.h2-laporan-utama { font-size: 20px !important; border-bottom: 3px solid var(--primary) !important; page-break-before: avoid; margin-bottom: 15px; }
+
+.dashboard-grid-layout, .dashboard-grid-layout.uneven { display: block !important; width: 100% !important; }
+.dashboard-grid-layout > div { width: 100% !important; page-break-inside: avoid; margin-bottom: 25px; }
+
+table { font-size: 10px !important; width: 100% !important; border-collapse: collapse; table-layout: auto; }
+thead { display: table-header-group !important; position: static !important; }
+tr { page-break-inside: avoid !important; }
+th, td { border: 1px solid #ccc !important; padding: 5px !important; word-wrap: break-word; }
+th { background-color: var(--primary) !important; color: white !important; }
+
+div[style*="overflow"] { max-height: none !important; overflow: visible !important; }
+.chart-container { display: block !important; position: relative !important; height: 230px !important; min-height: 230px !important; width: 100% !important; margin-bottom: 15px !important;
+page-break-inside: avoid; }
+canvas { display: block !important; max-width: 100% !important; max-height: 230px !important; height: 100% !important; width: 100% !important; object-fit: contain; }
+
+.kkm-corporate-header { border-top: 5px solid var(--primary) !important; border-bottom: 3px solid var(--warning) !important; background: var(--card-bg) !important; box-shadow: none !important; margin-top: 0;
+padding: 15px !important; page-break-after: avoid; }
+}
+
+.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
+.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
+.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
+.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
+.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+
+/* ======================================================== */
+/* PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)                 */
+/* ======================================================== */
+button, select, .btn-danger-action, .btn-export, .btn-print, .btn-refresh-top, .btn-logout-top, .btn-table-download {
+touch-action: manipulation !important;
+-webkit-tap-highlight-color: transparent !important;
+position: relative !important;
+z-index: 50 !important;
+cursor: pointer !important;
+pointer-events: auto !important;
+user-select: none !important;
+min-height: 40px;
+}
+.btn-refresh-top, .btn-logout-top {
+position: absolute !important;
+top: 15px !important;
+}
+.btn-refresh-top { right: 15px !important; }
+.btn-logout-top { right: 145px !important; }
+
+/* ======================================================== */
+/* RESPONSIVE — same approach as log-pemandu.html: tables    */
+/* scroll horizontally rather than squish; grids stack.       */
+/* ======================================================== */
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  #secureDashboardWrapper { padding: 0; }
+  .kkm-corporate-header { padding: 60px 15px 15px; }
+  #btnRefreshTop, #btnLogout { position: static !important; display: inline-block; margin: 0 6px 10px 0; }
+  .header-logos-inline { flex-wrap: wrap; gap: 10px; }
+  .title-hosp { font-size: 18px; }
+  .title-kkm { font-size: 10px; }
+  .velos-subtitle { font-size: 16px; }
+  .velos-title { font-size: 20px; }
+  .header-meta-container { flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; }
+  .header-meta-container > div { text-align: left !important; }
+  .dashboard-grid-layout, .dashboard-grid-layout.uneven { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .control-panel { flex-direction: column; }
+  .control-panel button { width: 100%; margin-left: 0 !important; }
+  .signature-section { flex-direction: column; gap: 20px; }
+  .sig-box { width: 100%; }
+}
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+</style>
 </head>
 <body>
 
-  <div id="loginView">
-    <div class="auth-card">
-      <div class="auth-logo-row">
-        <div class="auth-logo-left">
-          <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara">
-        </div>
-        <div class="auth-logo-center">
-          <div class="auth-org-line1">Hospital Pitas, Sabah</div>
-          <div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
-        </div>
-        <div class="auth-logo-right">
-          <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas">
-        </div>
+<div id="loginView">
+  <div class="auth-card">
+    <div class="auth-logo-row">
+      <div class="auth-logo-left">
+        <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara">
       </div>
-
-      <div class="auth-brand">
-        <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
-        <div class="auth-brand-line2">(VELOS)</div>
+      <div class="auth-logo-center">
+        <div class="auth-org-line1">Hospital Pitas, Sabah</div>
+        <div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
       </div>
-
-      <p class="auth-portal-label">Admin Dashboard</p>
-
-      <form id="loginForm" novalidate>
-        <input type="password" id="passwordInput" class="auth-password-input" placeholder="Kata Laluan" autocomplete="current-password" required>
-        <button type="submit" id="loginSubmitBtn" class="auth-submit-btn">Log Masuk</button>
-        <p id="loginError" class="auth-error"></p>
-      </form>
+      <div class="auth-logo-right">
+        <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas">
+      </div>
     </div>
+
+    <div class="auth-brand">
+      <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+      <div class="auth-brand-line2">(VELOS)</div>
+    </div>
+
+    <p class="auth-portal-label">Admin Dashboard</p>
+
+    <form id="loginForm" novalidate>
+      <input type="password" id="passwordInput" class="auth-password-input" placeholder="Kata Laluan" autocomplete="current-password" required>
+      <button type="submit" id="loginSubmitBtn" class="auth-submit-btn">Log Masuk</button>
+      <p id="loginError" class="auth-error"></p>
+    </form>
   </div>
+</div>
 
-  <div id="secureDashboardWrapper"></div>
+<div id="secureDashboardWrapper">
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged }
-      from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { firebaseConfig } from "./firebase-config.js";
+<div class="first-page-wrapper">
+<div class="kkm-corporate-header">
+<button id="btnRefreshTop" onclick="window.refreshDataSilently()" class="btn-refresh-top hide-print"> 🔄  Sync Data</button>
+<button id="btnLogout" onclick="window.doLogout()" class="btn-logout-top hide-print">Log Keluar</button>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+<div class="header-logos-inline">
+<div class="logo-left"><img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara"></div>
+<div class="header-center-text" style="flex: 2; text-align: center; border: none; padding: 0; margin: 0;">
+<div class="title-hosp">HOSPITAL PITAS, SABAH</div>
+<div class="title-kkm">KEMENTERIAN KESIHATAN MALAYSIA</div>
+</div>
+<div class="logo-right">
+<img src="https://i.postimg.cc/hjq1fyd9/KKM.png" alt="KKM">
+<img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Pitas">
+</div>
+</div>
 
-    const PORTAL_EMAIL = "admin@pitas.velos";
+<div class="app-main-title">
+<div class="velos-subtitle">VEHICLE LOGISTICS AND OPERATIONS SYSTEM</div>
+<div class="velos-title">(VELOS)</div>
+</div>
 
-    const loginView = document.getElementById('loginView');
-    const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
-    const loginForm = document.getElementById('loginForm');
-    const passwordInput = document.getElementById('passwordInput');
-    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-    const loginError = document.getElementById('loginError');
+<div class="header-meta-container">
+<div class="header-meta-slot">
+<strong>Sistem Dibangunkan Oleh :</strong><br>
+Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
+</div>
+<div class="header-meta-slot" style="text-align: right;">
+<strong>VELOS</strong> Edisi 4 (Firestore), Versi 1.0 (Modul Admin)<br>
+<strong>Tarikh Dikemaskini :</strong> 01/08/2026
+</div>
+</div>
+</div>
+<div class="container">
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        loginView.style.display = 'none';
-        secureDashboardWrapper.style.display = 'block';
-      } else {
-        loginView.style.display = 'flex';
-        secureDashboardWrapper.style.display = 'none';
+<div class="control-panel hide-print" style="display: flex; gap: 10px; margin-bottom: 20px; background: #e9ecef; padding: 15px; border-radius: 6px; border-left: 5px solid var(--primary); flex-wrap: wrap;">
+<button class="btn-print" onclick="window.print()"> 🖨️  Cetak Laporan Bulanan (Statistik Sahaja)</button>
+<button class="btn-export" onclick="window.downloadMasterLogCSV()"> 📁  Muat Turun CSV (Penuh Log Pergerakan)</button>
+<button class="btn-danger-action" style="margin-left: auto;" onclick="window.clearData()"> ⚠️  Padam Pangkalan Data</button>
+</div>
+<div class="card log-pergerakan-section" style="border-top: 3px solid var(--success);">
+<h2 style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--success); border-bottom-color: var(--success);">
+<span>Log Pergerakan Kenderaan (Pemantauan Langsung)</span>
+<button id="btnToggleLog" class="hide-print" onclick="window.toggleLogView()" style="background:var(--success); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">Papar Semua Rekod</button>
+</h2>
+<p style="font-size: 12px; color: gray; margin-top:-10px;">Jadual ini memaparkan log mentah, dikemaskini secara langsung.
+Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak laporan penuh untuk menjimatkan kertas.</p>
+<div class="table-scroll" style="max-height: 500px;">
+<table id="mainDataTable">
+<thead style="position: sticky; top:0; z-index:51;">
+<tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th class="hide-print" style="background:var(--primary); text-align: center;">Tindakan</th></tr>
+</thead>
+<tbody id="dataTableBody"><tr><td colspan="14" style="text-align:center; color:gray;">Memuat turun data awan...</td></tr></tbody>
+</table>
+</div>
+</div>
+<div class="card section-stats">
+<h2 class="h2-laporan-utama">
+<span>Laporan Statistik Bulanan <span id="printMonthLabel" style="color: var(--danger);"></span></span>
+<input type="month" id="pilihanBulan" class="editable-month-input hide-print">
+</h2>
+
+<div class="stats-grid">
+<div class="stat-box"><h3 id="statTotalTrips">0</h3><p>Jumlah Pergerakan</p></div>
+<div class="stat-box"><h3 id="statTotalPatients">0</h3><p>Jumlah Pesakit Dihantar</p></div>
+<div class="stat-box" style="border-left: 5px solid #6f42c1;"><h3 id="statTotalStepdown">0</h3><p>Jumlah Pesakit Diambil</p></div>
+<div class="stat-box"><h3 id="statNoPatientTrips">0</h3><p>Pergerakan Tanpa Pesakit</p></div>
+</div>
+<div class="leaders-container">
+<div id="topDriverAlert" class="leader-alert-box alert-driver"></div>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="card section-stats print-avoid-break">
+<h2>
+<span>Data 1 : Pesakit Ke Fasiliti Luar</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('fasiliti_luar', this)"> ⬇️  CSV</button>
+</h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>Kenderaan</th><th>Syif</th><th>Rujukan Biasa</th><th>Rujukan Kecemasan</th><th>Temujanji</th><th style="background-color: #004494;">Jumlah Pesakit</th></tr></thead>
+<tbody>
+<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td><td>Pagi</td><td id="paxAmbPagiBiasa">0</td><td id="paxAmbPagiKecemasan">0</td><td id="paxAmbPagiFollowUp">0</td><td id="paxAmbPagiTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Petang</td><td id="paxAmbPetangBiasa">0</td><td id="paxAmbPetangKecemasan">0</td><td id="paxAmbPetangFollowUp">0</td><td id="paxAmbPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Malam</td><td id="paxAmbMalamBiasa">0</td><td id="paxAmbMalamKecemasan">0</td><td id="paxAmbMalamFollowUp">0</td><td id="paxAmbMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td><td style="border-top: 2px solid #ddd;">Pagi</td><td style="border-top: 2px solid #ddd;"
+id="paxJabPagiBiasa">0</td><td style="border-top: 2px solid #ddd;" id="paxJabPagiKecemasan">0</td><td style="border-top: 2px solid #ddd;" id="paxJabPagiFollowUp">0</td><td style="border-top: 2px solid #ddd; font-weight: bold; background: #f8f9fa;" id="paxJabPagiTotal">0</td></tr>
+<tr><td>Petang</td><td id="paxJabPetangBiasa">0</td><td id="paxJabPetangKecemasan">0</td><td id="paxJabPetangFollowUp">0</td><td id="paxJabPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Malam</td><td id="paxJabMalamBiasa">0</td><td id="paxJabMalamKecemasan">0</td><td id="paxJabMalamFollowUp">0</td><td id="paxJabMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr style="font-weight: bold; background-color: #e9ecef; border-top: 3px double #333;"><td colspan="2">JUMLAH KESELURUHAN PESAKIT</td><td id="paxTotalBiasa">0</td><td id="paxTotalKecemasan">0</td><td id="paxTotalFollowUp">0</td><td id="paxGrandTotalPatients" style="background-color: var(--warning); color: #000; text-align: center;">0</td></tr>
+</tbody>
+</table>
+<p id="data1LegacyNote" style="display:none; color:#C98A2E; font-size:12px; margin-top:8px;"></p>
+</div>
+</div>
+<div class="card section-stats print-avoid-break">
+<h2>
+<span>Data 2 : Pecahan Kategori Pesakit Ke Fasiliti Luar</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('pecahan_kategori', this)"> ⬇️  CSV</button>
+</h2>
+<div class="dashboard-grid-layout uneven">
+<div class="chart-container"><canvas id="jenisKesChart"></canvas></div>
+<div class="table-scroll" style="max-height: 250px;">
+<table>
+<thead style="position: sticky; top: 0; z-index: 1;"><tr><th>Kategori Kes</th><th style="text-align: center;">Jumlah</th><th style="text-align: center;">Peratusan</th></tr></thead>
+<tbody id="jenisKesTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="dashboard-grid-layout section-stats print-avoid-break">
+<div class="card" style="margin-bottom: 0;">
+<h2>
+<span>Data 3 : Pergerakan Kenderaan</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('pergerakan_kenderaan', this)"> ⬇️  CSV</button>
+</h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>Kategori</th><th>No Plat Kenderaan</th><th style="background-color: #004494;">Jumlah Pergerakan</th></tr></thead>
+<tbody id="vehicleTripsBody"></tbody>
+</table>
+</div>
+</div>
+<div class="card" style="margin-bottom: 0;">
+<h2>
+<span>Data 4 : Panggilan Kecemasan</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('panggilan_kecemasan', this)"> ⬇️  CSV</button>
+</h2>
+<table>
+<thead><tr><th>Masa Panggilan</th><th style="background-color: #004494;">Jumlah Panggilan</th><th style="background-color: #004494;">Peratusan (%)</th></tr></thead>
+<tbody>
+<tr><td>Pagi</td><td id="callKecemasanPagi" style="font-weight:bold;">0</td><td id="pctCallPagi" style="text-align:center;">0%</td></tr>
+<tr><td>Petang</td><td id="callKecemasanPetang" style="font-weight:bold;">0</td><td id="pctCallPetang" style="text-align:center;">0%</td></tr>
+<tr><td>Malam</td><td id="callKecemasanMalam" style="font-weight:bold;">0</td><td id="pctCallMalam" style="text-align:center;">0%</td></tr>
+<tr style="font-weight: bold; background-color: #e9ecef; border-top: 2px solid #333;"><td colspan="1">JUMLAH KESELURUHAN</td><td id="callKecemasanTotal" style="background-color: var(--danger); color: white;">0</td><td style="background-color: var(--danger); color: white; text-align:center;">100%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card section-stats print-avoid-break">
+<h2>
+<span>Data 5 : Beban Tugasan Pemandu</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('beban_pemandu', this)"> ⬇️  CSV</button>
+</h2>
+<div class="dashboard-grid-layout uneven">
+<div class="chart-container"><canvas id="pemanduChart"></canvas></div>
+<div class="table-scroll" style="max-height: 250px;">
+<table>
+<thead style="position: sticky; top: 0; z-index: 1;">
+<tr><th rowspan="2" style="vertical-align: middle;">Pemandu</th><th colspan="3" style="text-align: center; border-bottom: 1px solid #ddd;">Pergerakan</th><th rowspan="2" style="vertical-align: middle; text-align: center;">Jumlah Kes</th><th rowspan="2" style="vertical-align: middle; text-align: center;">Peratusan<br>(Tugas)</th></tr>
+<tr><th style="text-align: center;">Pagi</th><th style="text-align: center;">Petang</th><th style="text-align: center;">Malam</th></tr>
+</thead>
+<tbody id="driverStatsBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="card section-stats print-avoid-break">
+<h2>
+<span>Data 6 : Pesakit Diambil (Stepdown)</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('stepdown_luar', this)"> ⬇️  CSV</button>
+</h2>
+<table>
+<thead><tr><th>Kenderaan</th><th>Syif</th><th style="background-color: #6f42c1; color: white;">Jumlah Pesakit Diambil</th></tr></thead>
+<tbody>
+<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td><td>Pagi</td><td id="stepAmbPagiTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Petang</td><td id="stepAmbPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Malam</td><td id="stepAmbMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td><td style="border-top: 2px solid #ddd;">Pagi</td><td style="border-top: 2px solid #ddd; font-weight: bold; background: #f8f9fa;"
+id="stepJabPagiTotal">0</td></tr>
+<tr><td>Petang</td><td id="stepJabPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Malam</td><td id="stepJabMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr style="font-weight: bold; background-color: #e2d9f3; border-top: 3px double #6f42c1;"><td colspan="2">JUMLAH KESELURUHAN PESAKIT DIAMBIL</td><td id="stepGrandTotalPatients" style="background-color: #6f42c1; color: #fff; font-weight: 900;">0</td></tr>
+</tbody>
+</table>
+</div>
+<div class="card section-stats print-avoid-break" style="border: 2px solid var(--warning);">
+<h2 style="color: var(--warning); border-bottom-color: var(--warning);">
+<span>Data 7 : Analisa Penggunaan Bahan Api</span>
+<div>
+<button class="btn-table-download hide-print" onclick="window.downloadFuelCSV()"> ⬇️  CSV</button>
+<button class="btn-table-download hide-print" style="background-color: #17a2b8;" onclick="window.downloadFuelRawCSV()"> ⬇️  CSV Penuh (Rekod Mentah)</button>
+</div>
+</h2>
+<p style="font-size: 11px; color: gray; margin-top:-10px;">Klik <strong>👁️ Resit</strong> untuk memuat naik dan memaparkan resit pengisian terkini bagi kenderaan tersebut (satu-satu semakan sahaja, bukan muat turun pukal).</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr><th>Kenderaan</th><th>Kapasiti (L)</th><th>Odo Awal</th><th>Odo Akhir</th><th>Jarak (b)</th><th>Penggunaan (c)</th><th style="background-color: #ffc107; color: #000;">Kadar (Km/L)</th><th class="hide-print">Tindakan</th></tr>
+</thead>
+<tbody id="fuelStatsBody">
+<tr><td colspan="8" style="text-align:center; color:#999;">Memuat turun...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card section-stats print-avoid-break">
+<h2>
+<span>Data 8 : Beban Tugas Pengiring</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('beban_pengiring', this)"> ⬇️  CSV</button>
+</h2>
+<div class="table-scroll" style="max-height: 400px;">
+<table>
+<thead style="position: sticky; top: 0; z-index: 1;">
+<tr><th rowspan="2" style="vertical-align: middle;">Pegawai Pengiring</th><th colspan="3" style="text-align: center; border-bottom: 1px solid #ddd;">Pergerakan</th><th rowspan="2" style="vertical-align: middle; text-align: center;">Kes</th><th rowspan="2" style="vertical-align: middle; text-align: center;">Peratusan<br>(Tugas)</th></tr>
+<tr><th style="text-align: center;">Pagi</th><th style="text-align: center;">Petang</th><th style="text-align: center;">Malam</th></tr>
+</thead>
+<tbody id="escortStatsBody"></tbody>
+</table>
+</div>
+</div>
+<div class="card section-stats print-avoid-break" style="border: 2px solid #17a2b8; background-color: #f4f8fc;">
+<h2 style="color: #17a2b8; border-bottom-color: #17a2b8;">
+<span>Data 9 : Analisa Permohonan Kenderaan (VCC)</span>
+</h2>
+<div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 0;">
+<div class="stat-box" style="border-left-color: #17a2b8; background: #fff;"><h3 id="statTotalMohon" style="color:#17a2b8;">0</h3><p>Jumlah Permohonan</p></div>
+<div class="stat-box" style="border-left-color: var(--warning); background: #fff;"><h3 id="statMohonProses" style="color:#d39e00;">0</h3><p>Dalam Proses<br>(Fasa 1 & 2)</p></div>
+<div class="stat-box" style="border-left-color: var(--success); background: #fff;"><h3 id="statMohonLulus" style="color:var(--success);">0</h3><p>Diluluskan / Selesai</p></div>
+<div class="stat-box" style="border-left-color: var(--danger); background: #fff;"><h3 id="statMohonTolak" style="color:var(--danger);">0</h3><p>Ditolak / Batal</p></div>
+</div>
+</div>
+<div class="signature-section section-stats">
+<div class="sig-box">
+<p class="sig-title">Disediakan Oleh :</p>
+<div class="sig-space"></div>
+<p class="sig-name">( Tandatangan & Cop Rasmi )</p>
+</div>
+<div class="sig-box">
+<p class="sig-title">Disemak Oleh :</p>
+<div class="sig-space"></div>
+<p class="sig-name">( Tandatangan & Cop Rasmi )</p>
+</div>
+<div class="sig-box">
+<p class="sig-title">Diluluskan Oleh :</p>
+<div class="sig-space"></div>
+<p class="sig-name">( Tandatangan & Cop Rasmi )</p>
+</div>
+</div>
+
+<div class="watermark-footer hide-print">
+&copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>
+Vehicle Logistics And Operations System (VELOS)<br>
+<span style="opacity: 0.8;">VELOS Edisi 4 (Firestore), Versi 1.0 (Modul Admin) &middot; Dikemaskini 01/08/2026</span>
+</div>
+</div>
+</div>
+
+</div>
+
+<div class="print-footer-ref" id="printFooterRef"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  where,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const PORTAL_EMAIL = "admin@pitas.velos";
+
+/* ---------------------------------------------------------------------
+   AUTH GATE
+--------------------------------------------------------------------- */
+const loginView = document.getElementById('loginView');
+const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
+const loginForm = document.getElementById('loginForm');
+const passwordInput = document.getElementById('passwordInput');
+const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+const loginError = document.getElementById('loginError');
+
+onAuthStateChanged(auth, function (user) {
+  if (user) {
+    loginView.style.display = 'none';
+    secureDashboardWrapper.style.display = 'block';
+    initDashboard();
+  } else {
+    loginView.style.display = 'flex';
+    secureDashboardWrapper.style.display = 'none';
+    teardownDashboard();
+  }
+});
+
+loginForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  loginError.textContent = '';
+  loginSubmitBtn.disabled = true;
+  loginSubmitBtn.textContent = 'Mengesahkan...';
+  try {
+    await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+  } catch (err) {
+    loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
+    loginError.style.display = 'block';
+  } finally {
+    loginSubmitBtn.disabled = false;
+    loginSubmitBtn.textContent = 'Log Masuk';
+    passwordInput.value = '';
+  }
+});
+
+window.doLogout = function () { signOut(auth); };
+
+/* ---------------------------------------------------------------------
+   DASHBOARD STATE
+--------------------------------------------------------------------- */
+let ambulanceData = [], fuelDataLog = [], permohonanData = [], cloudTangkiCap = {};
+let dashboardInitialized = false;
+let unsubLog = null, unsubFuel = null, unsubMohon = null;
+let isFullLogView = false;
+let myChartPesakit = null, myChartPemandu = null;
+const ambulansList = ['BNU 9974', 'BPL 7944', 'BPP 4693'];
+const malayMonths = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+
+// Fuel docs carry no time field -- odoPengisian is the ascending tiebreak
+// when two fills share a date. Missing (optional field) sorts as 0.
+const fillOdoKey = x => (typeof x.odoPengisian === 'number' ? x.odoPengisian : 0);
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+function todayLocalISO() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+function getKenderaanCapacity(plat) {
+  return (cloudTangkiCap[plat] !== undefined && cloudTangkiCap[plat] !== null) ? cloudTangkiCap[plat] : 150;
+}
+
+window.editCapacity = function (plat) {
+  const currentCap = getKenderaanCapacity(plat);
+  Swal.fire({
+    title: 'Kapasiti Tangki (Liter)',
+    text: 'Sila masukkan kapasiti tangki sebenar untuk kenderaan ' + plat + ':',
+    input: 'number', inputValue: currentCap, showCancelButton: true,
+    confirmButtonColor: '#0056b3', confirmButtonText: 'Simpan ke Awan', cancelButtonText: 'Batal',
+    inputValidator: function (value) { if (!value || value <= 0) return 'Sila masukkan nilai yang sah!'; }
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    const newCap = parseFloat(result.value);
+    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    setDoc(doc(db, 'kapasitiKenderaan', plat), { kapasiti: newCap }).then(function () {
+      cloudTangkiCap[plat] = newCap;
+      window.updateUI();
+      Swal.fire('Disimpan!', 'Kapasiti tangki ' + plat + ' dikemaskini.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+    });
+  });
+};
+
+/* ---------------------------------------------------------------------
+   STARTUP — three collections stay live via onSnapshot for the
+   lifetime of the session (Section 9 of the brief: no polling).
+   kapasitiKenderaan is a one-shot getDocs, refreshed by "Sync Data".
+   resitBahanApi is never bulk-read or subscribed here (Section 7,
+   rules 2 & 3) -- see window.lihatResit for the single-doc exception.
+--------------------------------------------------------------------- */
+function initDashboard() {
+  if (dashboardInitialized) return;
+  dashboardInitialized = true;
+
+  const now = new Date();
+  document.getElementById('pilihanBulan').value = now.getFullYear() + '-' + pad2(now.getMonth() + 1);
+  document.getElementById('pilihanBulan').addEventListener('change', window.updateUI);
+
+  Swal.fire({ title: 'Syncing...', text: 'Sila tunggu, sistem sedang memuatkan data terkini.', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+  let logReady = false, fuelReady = false, mohonReady = false, capReady = false, firstSyncDone = false;
+  function maybeFinishFirstSync() {
+    if (firstSyncDone || !(logReady && fuelReady && mohonReady && capReady)) return;
+    firstSyncDone = true;
+    window.updateUI();
+    Swal.close();
+  }
+
+  getDocs(collection(db, 'kapasitiKenderaan')).then(function (snap) {
+    cloudTangkiCap = {};
+    snap.forEach(function (d) { cloudTangkiCap[d.id] = d.data().kapasiti; });
+    capReady = true;
+    if (firstSyncDone) window.updateUI();
+    maybeFinishFirstSync();
+  }).catch(function () { cloudTangkiCap = {}; capReady = true; maybeFinishFirstSync(); });
+
+  unsubLog = onSnapshot(collection(db, 'logPergerakan'), function (snap) {
+    ambulanceData = snap.docs.map(function (d) { return d.data(); });
+    logReady = true;
+    if (firstSyncDone) window.updateUI();
+    maybeFinishFirstSync();
+  }, function (err) { console.error('Ralat langganan logPergerakan:', err); logReady = true; maybeFinishFirstSync(); });
+
+  unsubFuel = onSnapshot(collection(db, 'logBahanApi'), function (snap) {
+    fuelDataLog = snap.docs.map(function (d) { return d.data(); });
+    fuelReady = true;
+    if (firstSyncDone) window.updateUI();
+    maybeFinishFirstSync();
+  }, function (err) { console.error('Ralat langganan logBahanApi:', err); fuelReady = true; maybeFinishFirstSync(); });
+
+  unsubMohon = onSnapshot(collection(db, 'permohonanVCC'), function (snap) {
+    permohonanData = snap.docs.map(function (d) { return d.data(); });
+    mohonReady = true;
+    if (firstSyncDone) window.updateUI();
+    maybeFinishFirstSync();
+  }, function (err) { console.error('Ralat langganan permohonanVCC:', err); mohonReady = true; maybeFinishFirstSync(); });
+}
+
+function teardownDashboard() {
+  dashboardInitialized = false;
+  if (unsubLog) { unsubLog(); unsubLog = null; }
+  if (unsubFuel) { unsubFuel(); unsubFuel = null; }
+  if (unsubMohon) { unsubMohon(); unsubMohon = null; }
+  ambulanceData = []; fuelDataLog = []; permohonanData = []; cloudTangkiCap = {};
+}
+
+window.refreshDataSilently = function () {
+  const btn = document.getElementById('btnRefreshTop');
+  if (btn) { btn.innerHTML = ' 🔄  Memuat Turun...'; btn.disabled = true; }
+  getDocs(collection(db, 'kapasitiKenderaan')).then(function (snap) {
+    cloudTangkiCap = {};
+    snap.forEach(function (d) { cloudTangkiCap[d.id] = d.data().kapasiti; });
+    window.updateUI();
+    if (btn) { btn.innerHTML = ' 🔄  Sync Data'; btn.disabled = false; }
+    Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }).fire({ icon: 'success', title: 'Cloud Data Synced!' });
+  }).catch(function () {
+    if (btn) { btn.innerHTML = ' 🔄  Sync Data'; btn.disabled = false; }
+    Swal.fire('Ralat', 'Gagal memuat turun kapasiti kenderaan.', 'error');
+  });
+};
+
+/* ---------------------------------------------------------------------
+   DELETE — trip cascades to every logBahanApi fill of that trip (via
+   the logId field) and each fill's own resitBahanApi doc.
+--------------------------------------------------------------------- */
+window.deleteEntry = function (id) {
+  Swal.fire({ title: 'Padam Rekod?', text: 'Rekod pergerakan ini (termasuk rekod bahan api) akan dipadam kekal!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Padam', cancelButtonText: 'Batal' })
+    .then(function (result) {
+      if (!result.isConfirmed) return;
+      Swal.fire({ title: 'Memproses Pemadaman...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+      const strId = String(id);
+      deleteDoc(doc(db, 'logPergerakan', strId))
+        .then(function () { return getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', Number(id)))); })
+        .then(function (fuelSnap) {
+          const cascade = [];
+          fuelSnap.forEach(function (fd) {
+            cascade.push(deleteDoc(doc(db, 'logBahanApi', fd.id)));
+            cascade.push(deleteDoc(doc(db, 'resitBahanApi', fd.id)));
+          });
+          return Promise.all(cascade);
+        })
+        .then(function () {
+          Swal.fire('Terpadam!', 'Rekod tersebut berjaya dibersihkan.', 'success');
+        })
+        .catch(function (err) {
+          Swal.fire('Ralat', 'Gagal memadam rekod: ' + (err.message || err), 'error');
+        });
+    });
+};
+
+window.deleteFuelEntry = function (id) {
+  Swal.fire({ title: 'Padam Log Bahan Api?', text: 'Data akan dipadam dari log sistem awan ini.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Padam', cancelButtonText: 'Batal' })
+    .then(function (result) {
+      if (!result.isConfirmed) return;
+      const strId = String(id);
+      Promise.all([
+        deleteDoc(doc(db, 'logBahanApi', strId)),
+        deleteDoc(doc(db, 'resitBahanApi', strId))
+      ]).then(function () {
+        Swal.fire('Terpadam!', '', 'success');
+      }).catch(function (err) {
+        Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
+      });
+    });
+};
+
+// Single getDoc, only when the admin taps to view -- never onSnapshot,
+// never a bulk getDocs. Section 7, rules 2 & 3.
+window.lihatResit = function (fillId) {
+  Swal.fire({ title: 'Memuat Resit...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+  getDoc(doc(db, 'resitBahanApi', String(fillId))).then(function (snap) {
+    if (snap.exists() && snap.data().resit) {
+      Swal.fire({ title: 'Resit Bahan Api', imageUrl: snap.data().resit, imageAlt: 'Resit Bahan Api', confirmButtonText: 'Tutup', width: 'auto' });
+    } else {
+      Swal.fire('Tiada Resit', 'Tiada resit disimpan untuk pengisian ini.', 'info');
+    }
+  }).catch(function (err) {
+    Swal.fire('Ralat', 'Gagal memuatkan resit: ' + (err.message || err), 'error');
+  });
+};
+
+/* ---------------------------------------------------------------------
+   PADAM PANGKALAN DATA — the revamp has no automated Sheets backup
+   (Section 11: CSV export buttons only, no GAS trigger), so this now
+   requires a typed confirmation instead of a silent pre-delete backup.
+   Wipes logPergerakan, logBahanApi, resitBahanApi and permohonanVCC via
+   batched deletes, then stamps sistemMeta/lastFullReset.
+--------------------------------------------------------------------- */
+async function wipeCollection(name) {
+  const snap = await getDocs(collection(db, name));
+  const docs = snap.docs;
+  for (let i = 0; i < docs.length; i += 450) {
+    const batch = writeBatch(db);
+    docs.slice(i, i + 450).forEach(function (d) { batch.delete(d.ref); });
+    await batch.commit();
+  }
+}
+
+window.clearData = function () {
+  Swal.fire({
+    title: 'AMARAN MERAH!',
+    html: 'Padam <strong>SEMUA</strong> rekod Pergerakan, Bahan Api, Resit &amp; Permohonan VCC di awan secara KEKAL?<br><br>' +
+      '<strong style="color:#C62828;">Sistem ini tidak membuat salinan sandaran automatik.</strong> Sila sahkan perkara berikut sebelum meneruskan:<br><br>' +
+      '<div style="text-align:left; display:inline-block;">' +
+      '<label style="display:block; margin-bottom:10px; font-weight:normal;"><input type="checkbox" id="chkLaporanTahunan" style="margin-right:8px;">Laporan tahunan telah dicetak</label>' +
+      '<label style="display:block; margin-bottom:10px; font-weight:normal;"><input type="checkbox" id="chkCsvLog" style="margin-right:8px;">CSV Log Pergerakan telah dimuat turun</label>' +
+      '<label style="display:block; margin-bottom:0; font-weight:normal;"><input type="checkbox" id="chkCsvFuel" style="margin-right:8px;">CSV Bahan Api telah dimuat turun</label>' +
+      '</div>',
+    icon: 'error',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    confirmButtonText: 'Seterusnya',
+    cancelButtonText: 'Batal',
+    preConfirm: function () {
+      const okLaporan = document.getElementById('chkLaporanTahunan').checked;
+      const okCsvLog = document.getElementById('chkCsvLog').checked;
+      const okCsvFuel = document.getElementById('chkCsvFuel').checked;
+      if (!okLaporan || !okCsvLog || !okCsvFuel) {
+        Swal.showValidationMessage('Sila tandakan ketiga-tiga kotak semak sebelum meneruskan.');
+        return false;
       }
+      return true;
+    }
+  }).then(function (checklistResult) {
+    if (!checklistResult.isConfirmed) return;
+    return Swal.fire({
+      title: 'AMARAN MERAH!',
+      html: 'Padam <strong>SEMUA</strong> rekod Pergerakan, Bahan Api, Resit &amp; Permohonan VCC di awan secara KEKAL?<br><br>Taip <strong>PADAM</strong> di bawah untuk mengesahkan.',
+      icon: 'error',
+      input: 'text',
+      inputPlaceholder: 'Taip PADAM',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Sahkan Padam',
+      cancelButtonText: 'Batal',
+      inputValidator: function (value) { if (value !== 'PADAM') return 'Sila taip PADAM (huruf besar) untuk mengesahkan.'; }
+    });
+  }).then(function (result) {
+    if (!result || !result.isConfirmed) return;
+    Swal.fire({ title: 'Memadam Semua Rekod...', text: 'Sila tunggu, jangan tutup tetingkap ini.', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+    Promise.all([
+      wipeCollection('logPergerakan'),
+      wipeCollection('logBahanApi'),
+      wipeCollection('resitBahanApi'),
+      wipeCollection('permohonanVCC')
+    ]).then(function () {
+      return setDoc(doc(db, 'sistemMeta', 'lastFullReset'), { tarikh: todayLocalISO() });
+    }).then(function () {
+      Swal.fire('Berjaya Dikosongkan!', 'Semua rekod telah dipadam.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat Pemadaman', 'Sebahagian atau semua data gagal dipadam: ' + (err.message || err), 'error');
+    });
+  });
+};
+
+/* ---------------------------------------------------------------------
+   STATS COMPUTATION — field names match what log-pemandu.html writes
+   to logPergerakan/logBahanApi exactly (tarikh is the native
+   input[type=date] value, safe for new Date()/string comparisons --
+   this is NOT the dd/MM/yyyy convention used by permohonanVCC).
+--------------------------------------------------------------------- */
+function computeMonthStats(monthStr) {
+  let totalPatients = 0, totalStepdown = 0, emptyTrips = 0, totalFilteredTrips = 0, totalPengiringTrips = 0;
+  let paxStats = { amb: { pagi: { biasa: 0, kecemasan: 0, followup: 0 }, petang: { biasa: 0, kecemasan: 0, followup: 0 }, malam: { biasa: 0, kecemasan: 0, followup: 0 } }, jab: { pagi: { biasa: 0, kecemasan: 0, followup: 0 }, petang: { biasa: 0, kecemasan: 0, followup: 0 }, malam: { biasa: 0, kecemasan: 0, followup: 0 } }, totals: { biasa: 0, kecemasan: 0, followup: 0, takTergolong: 0 } };
+  let stepdownStats = { amb: { pagi: 0, petang: 0, malam: 0 }, jab: { pagi: 0, petang: 0, malam: 0 }, totals: 0 };
+  let tripStats = { "BNU 9974": 0, "BPL 7944": 0, "BPP 4693": 0, "SYJ 7904": 0, "SAA 8110 K": 0, "VFP 2850": 0, "SAC 7316 C": 0, "WLL 1078": 0, "SAA 5285 N": 0, "SAA 2680 W": 0, grandTotal: 0 };
+  let customAmb = {}; let customJab = {};
+  let emergencyCallStats = { pagi: 0, petang: 0, malam: 0, total: 0 };
+  let driverStats = {}, overallDriverTrips = {}, escortStats = {};
+  const escortsOf = item => {
+    if (Array.isArray(item.pengiringList)) return item.pengiringList.filter(x => x && x !== "Tiada Pengiring");
+    if (item.pengiring && item.pengiring !== "Tiada Pengiring") return String(item.pengiring).split(/,\s*/).filter(Boolean);
+    return [];
+  };
+
+  let filteredData = ambulanceData.filter(item => item.tarikh && item.tarikh.startsWith(monthStr)).sort((a, b) => {
+    if (a.kenderaan !== b.kenderaan) return (a.kenderaan || "").localeCompare(b.kenderaan || "");
+    if (a.tarikh !== b.tarikh) return new Date(b.tarikh) - new Date(a.tarikh);
+    return (b.masa || "").localeCompare(a.masa || "");
+  });
+  filteredData.forEach(item => {
+    totalFilteredTrips++;
+    const cPax = (item.pesakitList ? item.pesakitList.length : 0);
+    const cStep = (item.stepdownList ? item.stepdownList.length : 0);
+    totalPatients += cPax; totalStepdown += cStep;
+    if (cPax === 0 && cStep === 0) emptyTrips++;
+    const vType = (item.kategoriKenderaan === 'Ambulans' || ambulansList.includes(item.kenderaan)) ? 'amb' : 'jab';
+    const sKey = item.syif ? item.syif.toLowerCase() : 'pagi';
+
+    if (['BNU 9974', 'BPL 7944', 'BPP 4693', 'SYJ 7904', 'SAA 8110 K', 'VFP 2850', 'SAC 7316 C', 'WLL 1078', 'SAA 5285 N', 'SAA 2680 W'].includes(item.kenderaan)) {
+      tripStats[item.kenderaan]++;
+    } else {
+      if (vType === 'amb') customAmb[item.kenderaan] = (customAmb[item.kenderaan] || 0) + 1;
+      else customJab[item.kenderaan] = (customJab[item.kenderaan] || 0) + 1;
+    }
+    tripStats.grandTotal++;
+    if (cPax > 0) {
+      item.pesakitList.forEach(p => {
+        if (p.jenisKes === "Rujukan Biasa") { paxStats.totals.biasa++; if (paxStats[vType][sKey]) paxStats[vType][sKey].biasa++; }
+        else if (p.jenisKes === "Rujukan Kecemasan") { paxStats.totals.kecemasan++; if (paxStats[vType][sKey]) paxStats[vType][sKey].kecemasan++; }
+        else if (p.jenisKes === "Temujanji") { paxStats.totals.followup++; if (paxStats[vType][sKey]) paxStats[vType][sKey].followup++; }
+        else { paxStats.totals.takTergolong++; }
+      });
+    }
+    if (cStep > 0) { stepdownStats.totals += cStep; if (stepdownStats[vType][sKey] !== undefined) stepdownStats[vType][sKey] += cStep; }
+    if (item.nota === "Ambulance Call") { if (sKey === 'pagi') emergencyCallStats.pagi++; else if (sKey === 'petang') emergencyCallStats.petang++; else if (sKey === 'malam') emergencyCallStats.malam++; emergencyCallStats.total++; }
+
+    [item.pemandu, item.pemandu2].filter(Boolean).forEach(namaPemandu => {
+      if (!driverStats[namaPemandu]) driverStats[namaPemandu] = { pagi: 0, petang: 0, malam: 0, patients: 0 };
+      if (sKey === 'pagi') driverStats[namaPemandu].pagi++; else if (sKey === 'petang') driverStats[namaPemandu].petang++; else if (sKey === 'malam') driverStats[namaPemandu].malam++;
+      driverStats[namaPemandu].patients += (cPax + cStep);
+      overallDriverTrips[namaPemandu] = (overallDriverTrips[namaPemandu] || 0) + 1;
     });
 
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      loginError.style.display = 'none';
-      loginError.textContent = '';
+    const escs = escortsOf(item);
+    if (escs.length > 0 && item.nota !== "Ambulance Call") {
+      totalPengiringTrips += escs.length;
+      escs.forEach(namaPengiring => {
+        if (!escortStats[namaPengiring]) escortStats[namaPengiring] = { pagi: 0, petang: 0, malam: 0, patients: 0 };
+        if (sKey === 'pagi') escortStats[namaPengiring].pagi++; else if (sKey === 'petang') escortStats[namaPengiring].petang++; else if (sKey === 'malam') escortStats[namaPengiring].malam++;
+        escortStats[namaPengiring].patients += cPax;
+      });
+    }
+  });
+  return { totalPatients, totalStepdown, emptyTrips, totalFilteredTrips, totalPengiringTrips, paxStats, stepdownStats, tripStats, customAmb, customJab, emergencyCallStats, driverStats, overallDriverTrips, escortStats, filteredData };
+}
 
-      loginSubmitBtn.disabled = true;
-      loginSubmitBtn.textContent = 'Mengesahkan...';
+// Vehicle Km/L: jarak comes from that vehicle's own trips this month
+// (logPergerakan.odoAwal/odoAkhir); liter comes from logBahanApi, which
+// carries no odometer field at all in this schema (each fill is its own
+// doc with just liter + optional odoPengisian). If a vehicle refuelled
+// with no trip logged that month, jarak/kadar can't be computed --
+// shown as "-" rather than a garbage NaN.
+function computeFuelStatsForMonth(monthStr) {
+  const normPlat = s => (s || '').toString().trim().toUpperCase().replace(/\s+/g, ' ');
+  const firstFillOf = e => e.liter;
+  let [yFuel, mFuel] = monthStr.split('-');
+  let prevDate = new Date(parseInt(yFuel), parseInt(mFuel) - 2, 1);
+  let pPrefix = prevDate.getFullYear() + '-' + String(prevDate.getMonth() + 1).padStart(2, '0');
 
-      try {
-        await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
-      } catch (err) {
-        loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
-        loginError.style.display = 'block';
-      } finally {
-        loginSubmitBtn.disabled = false;
-        loginSubmitBtn.textContent = 'Log Masuk';
+  let curEntries = fuelDataLog.filter(e => e.tarikh && e.tarikh.startsWith(monthStr)).sort((a, b) => (a.tarikh || '').localeCompare(b.tarikh || '') || fillOdoKey(a) - fillOdoKey(b));
+  let curTrips = ambulanceData.filter(t => t.tarikh && t.tarikh.startsWith(monthStr));
+
+  let vFuelGroup = {};
+  curEntries.forEach(e => {
+    let k = normPlat(e.kenderaan);
+    if (!vFuelGroup[k]) vFuelGroup[k] = { entries: [], trips: [], origPlat: e.kenderaan };
+    vFuelGroup[k].entries.push(e);
+  });
+  curTrips.forEach(t => {
+    let k = normPlat(t.kenderaan);
+    if (!vFuelGroup[k]) vFuelGroup[k] = { entries: [], trips: [], origPlat: t.kenderaan };
+    vFuelGroup[k].trips.push(t);
+  });
+
+  for (let plat in vFuelGroup) {
+    let vData = vFuelGroup[plat];
+    vData.cap = getKenderaanCapacity(vData.origPlat);
+    let trips = vData.trips.slice().sort((a, b) => (a.tarikh + 'T' + (a.masa || '').split(' - ')[0]).localeCompare(b.tarikh + 'T' + (b.masa || '').split(' - ')[0]));
+    let entries = vData.entries.slice().sort((a, b) => (a.tarikh || '').localeCompare(b.tarikh || '') || fillOdoKey(a) - fillOdoKey(b));
+    vData.entries = entries;
+
+    const hasTrips = trips.length > 0;
+    const minOdo = hasTrips ? trips[0].odoAwal : null;
+    const maxOdo = hasTrips ? trips[trips.length - 1].odoAkhir : null;
+    const jarak = hasTrips ? (maxOdo - minOdo) : null;
+
+    const ii_belian = entries.reduce((sum, x) => sum + x.liter, 0);
+    const hasFuelData = entries.length > 0;
+    const iii_val = hasFuelData ? (vData.cap - firstFillOf(entries[entries.length - 1])) : null;
+
+    const prevMonthEntries = fuelDataLog.filter(e => normPlat(e.kenderaan) === plat && e.tarikh && e.tarikh.startsWith(pPrefix))
+      .sort((a, b) => (a.tarikh || '').localeCompare(b.tarikh || '') || fillOdoKey(a) - fillOdoKey(b));
+
+    let i_val;
+    if (prevMonthEntries.length > 0) i_val = vData.cap - firstFillOf(prevMonthEntries[prevMonthEntries.length - 1]);
+    else if (entries.length > 0) i_val = vData.cap - firstFillOf(entries[0]);
+    else i_val = 0;
+
+    const c_guna = hasFuelData ? (i_val + ii_belian - iii_val) : ii_belian;
+    const kadar = (jarak > 0 && c_guna > 0) ? (jarak / c_guna) : 0;
+
+    Object.assign(vData, { hasTrips, minOdo, maxOdo, jarak, ii_belian, hasFuelData, i_val, iii_val, c_guna, kadar });
+  }
+  return vFuelGroup;
+}
+
+window.toggleLogView = function () {
+  isFullLogView = !isFullLogView;
+  window.updateUI();
+};
+
+window.updateUI = function () {
+  const targetedMonth = document.getElementById('pilihanBulan').value;
+  if (!targetedMonth) return;
+
+  const [y, m] = targetedMonth.split('-');
+  const monthName = malayMonths[parseInt(m, 10) - 1];
+  document.getElementById('printMonthLabel').innerText = '(' + monthName + ' ' + y + ')';
+  const printFooter = document.getElementById('printFooterRef');
+  if (printFooter) printFooter.innerText = 'SistemLogKenderaan_Velos_LaporanStatistikBulanan (' + monthName + ' ' + y + ')';
+
+  const { totalPatients, totalStepdown, emptyTrips, totalFilteredTrips, totalPengiringTrips, paxStats, stepdownStats, tripStats, customAmb, customJab, emergencyCallStats, driverStats, overallDriverTrips, escortStats, filteredData } = computeMonthStats(targetedMonth);
+  const sumT = (obj) => obj.biasa + obj.kecemasan + obj.followup;
+  document.getElementById('statTotalTrips').innerText = totalFilteredTrips; document.getElementById('statTotalPatients').innerText = totalPatients;
+  document.getElementById('statTotalStepdown').innerText = totalStepdown; document.getElementById('statNoPatientTrips').innerText = emptyTrips;
+  document.getElementById('paxAmbPagiBiasa').innerText = paxStats.amb.pagi.biasa; document.getElementById('paxAmbPagiKecemasan').innerText = paxStats.amb.pagi.kecemasan; document.getElementById('paxAmbPagiFollowUp').innerText = paxStats.amb.pagi.followup; document.getElementById('paxAmbPagiTotal').innerText = sumT(paxStats.amb.pagi);
+  document.getElementById('paxAmbPetangBiasa').innerText = paxStats.amb.petang.biasa; document.getElementById('paxAmbPetangKecemasan').innerText = paxStats.amb.petang.kecemasan; document.getElementById('paxAmbPetangFollowUp').innerText = paxStats.amb.petang.followup; document.getElementById('paxAmbPetangTotal').innerText = sumT(paxStats.amb.petang);
+  document.getElementById('paxAmbMalamBiasa').innerText = paxStats.amb.malam.biasa; document.getElementById('paxAmbMalamKecemasan').innerText = paxStats.amb.malam.kecemasan; document.getElementById('paxAmbMalamFollowUp').innerText = paxStats.amb.malam.followup; document.getElementById('paxAmbMalamTotal').innerText = sumT(paxStats.amb.malam);
+
+  document.getElementById('paxJabPagiBiasa').innerText = paxStats.jab.pagi.biasa; document.getElementById('paxJabPagiKecemasan').innerText = paxStats.jab.pagi.kecemasan; document.getElementById('paxJabPagiFollowUp').innerText = paxStats.jab.pagi.followup; document.getElementById('paxJabPagiTotal').innerText = sumT(paxStats.jab.pagi);
+  document.getElementById('paxJabPetangBiasa').innerText = paxStats.jab.petang.biasa; document.getElementById('paxJabPetangKecemasan').innerText = paxStats.jab.petang.kecemasan; document.getElementById('paxJabPetangFollowUp').innerText = paxStats.jab.petang.followup; document.getElementById('paxJabPetangTotal').innerText = sumT(paxStats.jab.petang);
+  document.getElementById('paxJabMalamBiasa').innerText = paxStats.jab.malam.biasa; document.getElementById('paxJabMalamKecemasan').innerText = paxStats.jab.malam.kecemasan; document.getElementById('paxJabMalamFollowUp').innerText = paxStats.jab.malam.followup; document.getElementById('paxJabMalamTotal').innerText = sumT(paxStats.jab.malam);
+
+  document.getElementById('paxTotalBiasa').innerText = paxStats.totals.biasa; document.getElementById('paxTotalKecemasan').innerText = paxStats.totals.kecemasan; document.getElementById('paxTotalFollowUp').innerText = paxStats.totals.followup; document.getElementById('paxGrandTotalPatients').innerText = paxStats.totals.biasa + paxStats.totals.kecemasan + paxStats.totals.followup + paxStats.totals.takTergolong;
+  const takTergolongEl = document.getElementById('data1LegacyNote');
+  if (takTergolongEl) {
+    takTergolongEl.style.display = paxStats.totals.takTergolong > 0 ? 'block' : 'none';
+    takTergolongEl.innerText = '⚠️ ' + paxStats.totals.takTergolong + ' pesakit tidak tergolong dalam mana-mana kategori diiktiraf. Jumlah ini disertakan dalam Jumlah Keseluruhan Pesakit di atas, tetapi tidak dipecahkan mengikut kategori.';
+  }
+  document.getElementById('stepAmbPagiTotal').innerText = stepdownStats.amb.pagi; document.getElementById('stepAmbPetangTotal').innerText = stepdownStats.amb.petang; document.getElementById('stepAmbMalamTotal').innerText = stepdownStats.amb.malam;
+  document.getElementById('stepJabPagiTotal').innerText = stepdownStats.jab.pagi; document.getElementById('stepJabPetangTotal').innerText = stepdownStats.jab.petang; document.getElementById('stepJabMalamTotal').innerText = stepdownStats.jab.malam;
+  document.getElementById('stepGrandTotalPatients').innerText = stepdownStats.totals;
+
+  const vehicleTripsBody = document.getElementById('vehicleTripsBody');
+  if (vehicleTripsBody) {
+    let ambHTML = '', jabHTML = '';
+    const ambListFixed = ['BNU 9974', 'BPL 7944', 'BPP 4693'];
+    const jabListFixed = ['SYJ 7904', 'SAA 8110 K', 'VFP 2850', 'SAC 7316 C', 'WLL 1078', 'SAA 5285 N', 'SAA 2680 W'];
+    let ambCount = ambListFixed.length + Object.keys(customAmb).length;
+    let jabCount = jabListFixed.length + Object.keys(customJab).length;
+    let firstAmb = true;
+    ambListFixed.forEach(plat => { let count = tripStats[plat] || 0; let pct = totalFilteredTrips > 0 ? ((count / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%'; ambHTML += '<tr>' + (firstAmb ? '<td rowspan="' + ambCount + '" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td>' : '') + '<td>' + plat + '</td><td style="font-weight: bold;">' + count + ' kali <span style="font-weight:normal; color:#555; font-size:11px;">(' + pct + ')</span></td></tr>'; firstAmb = false; });
+    for (let plat in customAmb) { let count = customAmb[plat]; let pct = totalFilteredTrips > 0 ? ((count / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%'; ambHTML += '<tr>' + (firstAmb ? '<td rowspan="' + ambCount + '" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td>' : '') + '<td style="color: #555; font-style: italic;">' + plat + '</td><td style="font-weight: bold; color: #555;">' + count + ' kali <span style="font-weight:normal; font-size:11px;">(' + pct + ')</span></td></tr>'; firstAmb = false; }
+    let firstJab = true;
+    jabListFixed.forEach(plat => { let count = tripStats[plat] || 0; let pct = totalFilteredTrips > 0 ? ((count / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%'; jabHTML += '<tr>' + (firstJab ? '<td rowspan="' + jabCount + '" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td>' : '') + '<td ' + (firstJab ? 'style="border-top: 2px solid #ddd;"' : '') + '>' + plat + '</td><td style="font-weight: bold; ' + (firstJab ? 'border-top: 2px solid #ddd;' : '') + '">' + count + ' kali <span style="font-weight:normal; color:#555; font-size:11px;">(' + pct + ')</span></td></tr>'; firstJab = false; });
+    for (let plat in customJab) { let count = customJab[plat]; let pct = totalFilteredTrips > 0 ? ((count / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%'; jabHTML += '<tr>' + (firstJab ? '<td rowspan="' + jabCount + '" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td>' : '') + '<td style="color: #555; font-style: italic; ' + (firstJab ? 'border-top: 2px solid #ddd;' : '') + '">' + plat + '</td><td style="font-weight: bold; color: #555; ' + (firstJab ? 'border-top: 2px solid #ddd;' : '') + '">' + count + ' kali <span style="font-weight:normal; font-size:11px;">(' + pct + ')</span></td></tr>'; firstJab = false; }
+    vehicleTripsBody.innerHTML = ambHTML + jabHTML + '<tr style="font-weight: bold; background-color: #e9ecef; border-top: 3px double #333;"><td colspan="2">JUMLAH KESELURUHAN</td><td style="background-color: var(--secondary); color: white; font-weight: bold;">' + tripStats.grandTotal + ' kali</td></tr>';
+  }
+  document.getElementById('callKecemasanPagi').innerText = emergencyCallStats.pagi; document.getElementById('callKecemasanPetang').innerText = emergencyCallStats.petang; document.getElementById('callKecemasanMalam').innerText = emergencyCallStats.malam; document.getElementById('callKecemasanTotal').innerText = emergencyCallStats.total;
+  document.getElementById('pctCallPagi').innerText = emergencyCallStats.total > 0 ? ((emergencyCallStats.pagi / emergencyCallStats.total) * 100).toFixed(1) + '%' : '0%';
+  document.getElementById('pctCallPetang').innerText = emergencyCallStats.total > 0 ? ((emergencyCallStats.petang / emergencyCallStats.total) * 100).toFixed(1) + '%' : '0%';
+  document.getElementById('pctCallMalam').innerText = emergencyCallStats.total > 0 ? ((emergencyCallStats.malam / emergencyCallStats.total) * 100).toFixed(1) + '%' : '0%';
+  const driverStatsBody = document.getElementById('driverStatsBody');
+  const topDriverAlert = document.getElementById('topDriverAlert');
+  if (driverStatsBody) {
+    driverStatsBody.innerHTML = '';
+    let topDriver = null, maxScore = -1, maxTrips = 0, maxPatients = 0;
+    for (const [d, s] of Object.entries(driverStats)) {
+      const tTrips = s.pagi + s.petang + s.malam; const tPatients = s.patients; const score = tTrips + tPatients;
+      if (score > maxScore) { maxScore = score; topDriver = d; maxTrips = tTrips; maxPatients = tPatients; }
+      const pct = totalFilteredTrips > 0 ? ((tTrips / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%';
+      driverStatsBody.innerHTML += '<tr><td><strong>' + d + '</strong></td><td style="text-align: center;">' + s.pagi + '</td><td style="text-align: center;">' + s.petang + '</td><td style="text-align: center;">' + s.malam + '</td><td style="text-align: center; font-weight: bold;">' + s.patients + '</td><td style="text-align: center; font-weight: bold;">' + pct + '</td></tr>';
+    }
+    if (topDriver && totalFilteredTrips > 0) { topDriverAlert.style.display = 'block'; topDriverAlert.innerHTML = ' 🏆  Pemandu Terbaik Bulan Ini:<br><span>' + topDriver + '</span> (' + maxTrips + ' Pergerakan | ' + maxPatients + ' Pesakit)'; }
+    else { topDriverAlert.style.display = 'none'; }
+  }
+  const escortStatsBody = document.getElementById('escortStatsBody');
+  if (escortStatsBody) {
+    escortStatsBody.innerHTML = '';
+    for (const [e, s] of Object.entries(escortStats)) {
+      const eTrips = s.pagi + s.petang + s.malam; const pctE = totalPengiringTrips > 0 ? ((eTrips / totalPengiringTrips) * 100).toFixed(1) + '%' : '0%';
+      escortStatsBody.innerHTML += '<tr><td><strong>' + e + '</strong></td><td style="text-align: center;">' + s.pagi + '</td><td style="text-align: center;">' + s.petang + '</td><td style="text-align: center;">' + s.malam + '</td><td style="text-align: center; font-weight: bold;">' + s.patients + '</td><td style="text-align: center; font-weight: bold;">' + pctE + '</td></tr>';
+    }
+  }
+  const totalCases = paxStats.totals.biasa + paxStats.totals.kecemasan + paxStats.totals.followup + paxStats.totals.takTergolong;
+  const tbody2 = document.getElementById('jenisKesTableBody');
+  if (tbody2) {
+    const getPct = (val) => totalCases > 0 ? ((val / totalCases) * 100).toFixed(1) + '%' : '0%';
+    tbody2.innerHTML = '<tr><td>Rujukan Biasa</td><td style="text-align: center; font-weight: bold;">' + paxStats.totals.biasa + '</td><td style="text-align: center;">' + getPct(paxStats.totals.biasa) + '</td></tr><tr><td>Rujukan Kecemasan</td><td style="text-align: center; font-weight: bold;">' + paxStats.totals.kecemasan + '</td><td style="text-align: center;">' + getPct(paxStats.totals.kecemasan) + '</td></tr><tr><td>Temujanji</td><td style="text-align: center; font-weight: bold;">' + paxStats.totals.followup + '</td><td style="text-align: center;">' + getPct(paxStats.totals.followup) + '</td></tr><tr><td>Tiada Kategori / Lain-lain</td><td style="text-align: center; font-weight: bold;">' + paxStats.totals.takTergolong + '</td><td style="text-align: center;">' + getPct(paxStats.totals.takTergolong) + '</td></tr><tr style="background-color: #e9ecef; font-weight: bold;"><td>JUMLAH KESELURUHAN PESAKIT DIHANTAR</td><td style="text-align: center;">' + totalCases + '</td><td style="text-align: center;">100%</td></tr>';
+  }
+  if (typeof Chart !== 'undefined') {
+    if (myChartPesakit) myChartPesakit.destroy();
+    myChartPesakit = new Chart(document.getElementById('jenisKesChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Rujukan Biasa', 'Rujukan Kecemasan', 'Temujanji', 'Tiada Kategori / Lain-lain'], datasets: [{ data: [paxStats.totals.biasa, paxStats.totals.kecemasan, paxStats.totals.followup, paxStats.totals.takTergolong], backgroundColor: ['#17a2b8', '#dc3545', '#ffc107', '#6c757d'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: '#fff', backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 4, font: { weight: 'bold', size: 11 }, formatter: (value, ctx) => { if (value === 0) return null; let sum = 0; ctx.chart.data.datasets[0].data.map(data => { sum += data; }); return value + " (" + (value * 100 / sum).toFixed(1) + "%)"; } } } } });
+    if (myChartPemandu) myChartPemandu.destroy();
+    const dNames = Object.keys(overallDriverTrips); const dTrips = Object.values(overallDriverTrips);
+    const bC = ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)', 'rgba(0, 150, 136, 0.8)', 'rgba(233, 30, 99, 0.8)', 'rgba(139, 195, 74, 0.8)', 'rgba(63, 81, 181, 0.8)'];
+    myChartPemandu = new Chart(document.getElementById('pemanduChart').getContext('2d'), { type: 'bar', data: { labels: dNames, datasets: [{ label: 'Jumlah Pergerakan', data: dTrips, backgroundColor: dNames.map((_, i) => bC[i % bC.length]), borderWidth: 1, borderRadius: 4 }] }, options: { layout: { padding: { top: 25 } }, responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', backgroundColor: 'rgba(0,0,0,0.6)', anchor: 'end', align: 'top', borderRadius: 4, font: { weight: 'bold', size: 11 }, formatter: (value, ctx) => { if (value === 0) return null; let pct = totalFilteredTrips > 0 ? ((value / totalFilteredTrips) * 100).toFixed(1) + '%' : ''; return value + " (" + pct + ")"; } } } } });
+  } else {
+    console.warn("Amaran: Carta tidak dipaparkan kerana Chart.js gagal dimuatkan.");
+  }
+
+  const fuelStatsBody = document.getElementById('fuelStatsBody');
+  const vFuelGroup = computeFuelStatsForMonth(targetedMonth);
+  if (Object.keys(vFuelGroup).length === 0) {
+    fuelStatsBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999;">Tiada rekod bagi bulan ini.</td></tr>';
+  } else {
+    fuelStatsBody.innerHTML = '';
+    for (let plat in vFuelGroup) {
+      let vData = vFuelGroup[plat]; let entries = vData.entries; let origPlat = vData.origPlat;
+      const firstFillCurrent = entries.length ? entries[0].liter : 0;
+      let fInfo = vData.hasFuelData
+        ? '(i: ' + vData.i_val.toFixed(2) + ' + ii: ' + vData.ii_belian.toFixed(2) + ' - iii: ' + vData.iii_val.toFixed(2) + ')'
+        : '(Tiada Data Pengisian Bulan Ini. Guna Jum. Semasa)';
+      if (firstFillCurrent > vData.cap) {
+        fInfo += ' <span style="color:red; font-weight:bold;">⚠️ Amaran: Isian pertama melebihi kapasiti tangki (&gt; ' + vData.cap + 'L) - rekod ini mungkin gabungan dua isian, sila pisahkan.</span>';
       }
+      let capDisplay = vData.cap;
+      if (cloudTangkiCap[origPlat] === undefined || cloudTangkiCap[origPlat] === null) {
+        capDisplay = '<span style="color:#d33; font-weight:bold;">' + vData.cap + '</span> <button class="hide-print" onclick="window.editCapacity(\'' + origPlat + '\')" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:3px;" title="Ubah Kapasiti"> ✏️ </button>';
+      }
+      const latestFillId = entries.length ? entries[entries.length - 1].id : null;
+      const actionButtons = latestFillId
+        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatResit(\'' + latestFillId + '\')"> 👁️  Resit</button> <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + latestFillId + '\')">Padam</button>'
+        : '<span style="color:#999; font-size:11px;">Tiada Rekod</span>';
+      const jarakDisplay = vData.hasTrips ? vData.jarak : '<span style="color:#999;">Tiada trip</span>';
+      const minOdoDisplay = vData.hasTrips ? vData.minOdo : '-';
+      const maxOdoDisplay = vData.hasTrips ? vData.maxOdo : '-';
+      fuelStatsBody.innerHTML += '<tr><td><strong>' + origPlat + '</strong></td><td style="white-space:nowrap;">' + capDisplay + '</td><td>' + minOdoDisplay + '</td><td>' + maxOdoDisplay + '</td><td style="font-weight:bold;">' + jarakDisplay + '</td><td>' + vData.c_guna.toFixed(3) + '<br><span style="font-size:10px; color:#555;">' + fInfo + '</span></td><td style="font-weight:bold; font-size:15px; color:#d39e00; background-color:#fffdf5; text-align:center;">' + vData.kadar.toFixed(3) + '</td><td class="hide-print" style="white-space:nowrap;">' + actionButtons + '</td></tr>';
+    }
+  }
+
+  const tbody = document.getElementById('dataTableBody');
+  let htmlRows = '';
+  if (filteredData.length === 0) {
+    htmlRows = '<tr><td colspan="14" style="text-align:center; color:gray;">Tiada rekod untuk paparan ini.</td></tr>';
+  } else {
+    let displayData = isFullLogView ? filteredData : filteredData.slice(0, 15);
+    displayData.forEach(item => {
+      const cPax = (item.pesakitList ? item.pesakitList.length : 0); const cStep = (item.stepdownList ? item.stepdownList.length : 0);
+      let wadHTML = '', destHTML = '', kesHTML = '';
+      if (cPax > 0 || cStep > 0) {
+        if (cPax > 0) item.pesakitList.forEach(p => { wadHTML += '<div>[H] ' + p.wad + '</div>'; destHTML += '<div>[H] ' + p.destinasi + '</div>'; kesHTML += '<div>' + p.jenisKes + '</div>'; });
+        if (cStep > 0) item.stepdownList.forEach(p => { wadHTML += '<div>[A] ' + p.wad + '</div>'; destHTML += '<div>[A] Pitas</div>'; kesHTML += '<div>Stepdown</div>'; });
+      } else { wadHTML = destHTML = kesHTML = '<span style="color:gray;">Tiada</span>'; }
+      const dispEsc = (item.pengiring && item.pengiring !== "Tiada Pengiring") ? '<strong>' + item.pengiring + '</strong>' : '<span style="color:gray;">Tiada</span>';
+      const dispPemandu = '<strong>' + item.pemandu + '</strong>' + (item.pemandu2 ? '<br><small style="color:#555;">+ ' + item.pemandu2 + '</small>' : '');
+      htmlRows += '<tr><td>' + item.tarikh + '</td><td>' + item.masa + '</td><td>' + item.syif + '</td><td style="background-color:#e6f2ff;"><strong>' + item.kenderaan + '</strong></td><td>' + item.odoAwal + '</td><td>' + item.odoAkhir + '</td><td>' + dispPemandu + '</td><td>' + dispEsc + '</td><td>' + wadHTML + '</td><td>' + destHTML + '</td><td>' + kesHTML + '</td><td style="text-align:center; font-weight:bold;">H:' + cPax + '<br>A:' + cStep + '</td><td><strong>' + item.nota + '</strong></td><td class="hide-print" style="text-align:center;"><button class="btn-danger-action" style="padding: 3px 7px;" onclick="window.deleteEntry(\'' + item.id + '\')">Padam</button></td></tr>';
     });
-  </script>
+    if (!isFullLogView && filteredData.length > 15) {
+      htmlRows += '<tr><td colspan="14" style="text-align:center; background:#e9ecef; color:#333; padding:10px;"><em>Menunjukkan 15 rekod terkini. Sila klik butang "Papar Semua Rekod" untuk melihat keseluruhan rekod bulan ini.</em></td></tr>';
+    }
+  }
+  if (tbody) tbody.innerHTML = htmlRows;
+
+  const btnTog = document.getElementById('btnToggleLog');
+  if (btnTog) btnTog.innerText = isFullLogView ? "Papar 15 Terkini Sahaja" : "Papar Semua Rekod";
+
+  // --- DATA 9 : ANALISA PERMOHONAN VCC ---
+  try {
+    const curMohon = permohonanData.filter(item => {
+      let tarikhCheck = item.tarikhGerak || item.tarikh || null;
+      if (!tarikhCheck) return false;
+      const dateStr = String(tarikhCheck);
+      const [selYear, selMonth] = targetedMonth.split('-');
+      const sYear = parseInt(selYear, 10);
+      const sMonth = parseInt(selMonth, 10);
+
+      let match = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (match) return parseInt(match[1], 10) === sYear && parseInt(match[2], 10) === sMonth;
+      match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (match) return parseInt(match[3], 10) === sYear && parseInt(match[2], 10) === sMonth;
+      return dateStr.startsWith(targetedMonth);
+    });
+
+    let mLulus = 0, mTolak = 0, mProses = 0;
+    curMohon.forEach(m => {
+      let s = String(m.status).toUpperCase();
+      if (s.includes("LULUS")) mLulus++;
+      else if (s.includes("TOLAK")) mTolak++;
+      else mProses++;
+    });
+
+    document.getElementById('statTotalMohon').innerText = curMohon.length;
+    document.getElementById('statMohonProses').innerText = mProses;
+    document.getElementById('statMohonLulus').innerText = mLulus;
+    document.getElementById('statMohonTolak').innerText = mTolak;
+  } catch (err) {
+    console.log("Ralat memuatkan Data 9:", err);
+  }
+};
+
+/* ---------------------------------------------------------------------
+   CSV EXPORTS — resitBahanApi is never a column, never in scope
+   (Section 7, rule 4).
+--------------------------------------------------------------------- */
+window.downloadMasterLogCSV = function () {
+  if (ambulanceData.length === 0) return Swal.fire('Tiada Data', 'Tiada rekod untuk dieksport.', 'info');
+  const targetedMonth = document.getElementById('pilihanBulan').value;
+  let filtered = ambulanceData.filter(item => item.tarikh && item.tarikh.startsWith(targetedMonth)).sort((a, b) => {
+    if (a.kenderaan !== b.kenderaan) return (a.kenderaan || "").localeCompare(b.kenderaan || "");
+    if (a.tarikh !== b.tarikh) return new Date(b.tarikh) - new Date(a.tarikh);
+    return (b.masa || "").localeCompare(a.masa || "");
+  });
+  if (filtered.length === 0) return Swal.fire('Tiada Data', 'Tiada rekod pada bulan ini untuk dieksport.', 'info');
+
+  let csvRows = ["ID,Tarikh,Masa,Syif,Kenderaan,Odometer Awal,Odometer Akhir,Pemandu,Pengiring,Wad Asal / Fasiliti,Destinasi,Jenis Kes,Hantar,Ambil,Tujuan"];
+  filtered.forEach(r => {
+    let cPax = r.pesakitList ? r.pesakitList.length : 0;
+    let cStep = r.stepdownList ? r.stepdownList.length : 0;
+    let cleanNota = (r.nota || "Tiada Tujuan").replace(/,/g, " ").replace(/"/g, '""');
+    let combinedPemandu = [r.pemandu, r.pemandu2].filter(Boolean).join(', ');
+
+    let wads = [], dests = [], kesses = [];
+    if (r.pesakitList) r.pesakitList.forEach(p => { wads.push("[H] " + p.wad); dests.push("[H] " + p.destinasi); kesses.push(p.jenisKes); });
+    if (r.stepdownList) r.stepdownList.forEach(p => { wads.push("[A] " + p.wad); dests.push("[A] Pitas"); kesses.push("Stepdown"); });
+
+    let combinedWad = wads.length > 0 ? wads.join(" & ") : "Tiada";
+    let combinedDest = dests.length > 0 ? dests.join(" & ") : "Tiada";
+    let combinedKes = kesses.length > 0 ? kesses.join(" & ") : "Tiada";
+
+    csvRows.push('"' + r.id + '","' + r.tarikh + '","' + r.masa + '","' + r.syif + '","' + r.kenderaan + '",' + r.odoAwal + ',' + r.odoAkhir + ',"' + combinedPemandu + '","' + r.pengiring + '","' + combinedWad + '","' + combinedDest + '","' + combinedKes + '",' + cPax + ',' + cStep + ',"' + cleanNota + '"');
+  });
+
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
+  a.download = 'Log_Pergerakan_Lengkap_' + targetedMonth + '.csv'; a.click();
+};
+
+window.downloadTableCSV = function (filename, btnElement) {
+  const container = btnElement.parentElement.nextElementSibling;
+  const table = container.tagName === 'TABLE' ? container : container.querySelector('table');
+  if (!table) return;
+  let csvRows = [];
+  let pending = {};
+  table.querySelectorAll('tr').forEach(row => {
+    let cols = [];
+    let colIdx = 0;
+    row.querySelectorAll('td, th').forEach(c => {
+      while (pending[colIdx]) { cols[colIdx] = pending[colIdx].text; pending[colIdx].left--; if (pending[colIdx].left <= 0) delete pending[colIdx]; colIdx++; }
+      const span = parseInt(c.getAttribute('colspan'), 10) || 1;
+      const rowspan = parseInt(c.getAttribute('rowspan'), 10) || 1;
+      cols[colIdx] = '"' + c.innerText.replace(/"/g, '""') + '"';
+      if (rowspan > 1) pending[colIdx] = { text: '""', left: rowspan - 1 };
+      colIdx++;
+      for (let i = 1; i < span; i++) { cols[colIdx] = '""'; if (rowspan > 1) pending[colIdx] = { text: '""', left: rowspan - 1 }; colIdx++; }
+    });
+    while (pending[colIdx]) { cols[colIdx] = pending[colIdx].text; pending[colIdx].left--; if (pending[colIdx].left <= 0) delete pending[colIdx]; colIdx++; }
+    csvRows.push(cols.join(','));
+  });
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
+  a.download = 'Data_' + filename + '_' + document.getElementById('pilihanBulan').value + '.csv'; a.click();
+};
+
+window.downloadFuelCSV = function () {
+  let csvRows = ["Kenderaan,Kapasiti(L),Odometer Awal,Odometer Akhir,Jarak (Km),Penggunaan (L),Kadar Km/L"];
+  document.getElementById('fuelStatsBody').querySelectorAll('tr').forEach(r => {
+    const tds = r.querySelectorAll('td');
+    if (tds.length >= 7) csvRows.push('"' + tds[0].innerText + '",' + parseFloat(tds[1].innerText) + ',' + tds[2].innerText + ',' + tds[3].innerText + ',' + tds[4].innerText + ',' + parseFloat(tds[5].innerText.split(' ')[0]) + ',' + parseFloat(tds[6].innerText));
+  });
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
+  a.download = 'Laporan_Bahan_Api_' + document.getElementById('pilihanBulan').value + '.csv'; a.click();
+};
+
+window.downloadFuelRawCSV = function () {
+  if (fuelDataLog.length === 0) return Swal.fire('Tiada Data', 'Tiada rekod bahan api untuk dieksport.', 'info');
+  const targetedMonth = document.getElementById('pilihanBulan').value;
+  let filtered = fuelDataLog.filter(item => item.tarikh && item.tarikh.startsWith(targetedMonth)).sort((a, b) => (a.tarikh || '').localeCompare(b.tarikh || '') || fillOdoKey(a) - fillOdoKey(b));
+  if (filtered.length === 0) return Swal.fire('Tiada Data', 'Tiada rekod bahan api pada bulan ini untuk dieksport.', 'info');
+
+  let csvRows = ["ID,Tarikh,Kenderaan,Odometer Awal (Trip),Odometer Akhir (Trip),Odometer Pengisian,Liter"];
+  filtered.forEach(r => {
+    let matchedTrip = ambulanceData.find(t => String(t.id) === String(r.logId));
+    let odoAwalVal = matchedTrip ? matchedTrip.odoAwal : '';
+    let odoAkhirVal = matchedTrip ? matchedTrip.odoAkhir : '';
+    csvRows.push('"' + r.id + '","' + r.tarikh + '","' + r.kenderaan + '",' + odoAwalVal + ',' + odoAkhirVal + ',' + (r.odoPengisian || '') + ',' + r.liter);
+  });
+
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
+  a.download = 'Log_Bahan_Api_Lengkap_' + targetedMonth + '.csv'; a.click();
+};
+
+window.addEventListener('beforeprint', function () {
+  const targetedMonth = document.getElementById('pilihanBulan').value;
+  if (targetedMonth) {
+    const [y, m] = targetedMonth.split('-'); const monthName = malayMonths[parseInt(m, 10) - 1];
+    document.title = 'Velos_Admin_Report_' + monthName + '_' + y;
+  } else { document.title = 'Velos_Admin_Report_Keseluruhan'; }
+});
+window.addEventListener('afterprint', function () { document.title = 'VELOS — Admin Dashboard'; });
+</script>
 
 </body>
 </html>
