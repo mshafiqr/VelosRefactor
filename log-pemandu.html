@@ -903,12 +903,9 @@ window.updateUserTable = function () {
    DELETE — cascades to every logBahanApi fill of this trip and each
    fill's own resitBahanApi doc. Matches live "Padam" behaviour.
 
-   NOTE: firestore.rules currently restricts delete on logPergerakan,
-   logBahanApi, and resitBahanApi to isAdmin() only. This button will
-   return permission-denied for driver@pitas.velos until a dedicated
-   rules-only session widens delete to isAdmin() || isDriver() on all
-   three collections. Built now, matching live UI/behaviour exactly,
-   per explicit instruction -- not skipped.
+   firestore.rules grants delete on logPergerakan, logBahanApi, and
+   resitBahanApi to isAdmin() || isDriver(), so this works for
+   driver@pitas.velos as well as admin.
 --------------------------------------------------------------------- */
 window.deleteEntry = function (id) {
   Swal.fire({ title: 'Padam Rekod?', text: "Jika anda tersalah isi, padam rekod ini dan isikan semula data yang betul.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Padam', cancelButtonText: 'Batal' })
