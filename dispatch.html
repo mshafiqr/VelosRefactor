@@ -360,6 +360,9 @@ loginForm.addEventListener('submit', async function (e) {
   btnLogin.innerText = 'Mengesahkan...';
   const email = vccTypeSelection.value === 'Klinikal' ? 'vccc@pitas.velos' : 'vccm@pitas.velos';
   const otherEmail = email === 'vccc@pitas.velos' ? 'vccm@pitas.velos' : 'vccc@pitas.velos';
+  // Remembered so a master@pitas.velos login (not in VCC_ACCOUNTS) still
+  // knows which queue the user meant, including across a page reload.
+  localStorage.setItem('dispatchVccTypeHint', vccTypeSelection.value);
   try {
     await setPersistence(auth, browserLocalPersistence);
     try {
@@ -395,8 +398,17 @@ const VCC_TITLE_MAP = {
 };
 
 onAuthStateChanged(auth, function (user) {
-  if (user && VCC_ACCOUNTS[user.email]) {
-    currentVccType = VCC_ACCOUNTS[user.email];
+  let resolvedVccType = '';
+  if (user) {
+    if (VCC_ACCOUNTS[user.email]) {
+      resolvedVccType = VCC_ACCOUNTS[user.email];
+    } else if (user.email === MASTER_EMAIL) {
+      const hint = localStorage.getItem('dispatchVccTypeHint');
+      resolvedVccType = (hint === 'Klinikal' || hint === 'Jabatan') ? hint : 'Klinikal';
+    }
+  }
+  if (user && resolvedVccType) {
+    currentVccType = resolvedVccType;
     loginView.style.display = 'none';
     secureDashboardWrapper.style.display = 'block';
     document.getElementById('vccTitleDisplay').innerHTML = VCC_TITLE_MAP[currentVccType] || currentVccType.toUpperCase();
