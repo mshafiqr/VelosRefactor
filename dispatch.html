@@ -317,7 +317,9 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
   getFirestore,
@@ -357,6 +359,7 @@ loginForm.addEventListener('submit', async function (e) {
   btnLogin.innerText = 'Mengesahkan...';
   const email = vccTypeSelection.value === 'Klinikal' ? 'vccc@pitas.velos' : 'vccm@pitas.velos';
   try {
+    await setPersistence(auth, browserLocalPersistence);
     await signInWithEmailAndPassword(auth, email, loginPassword.value);
   } catch (err) {
     loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';

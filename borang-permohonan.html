@@ -471,7 +471,9 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
   getFirestore,
@@ -505,7 +507,10 @@ loginForm.addEventListener('submit', function (e) {
   loginError.style.display = 'none';
   btnLogin.disabled = true;
   btnLogin.innerText = 'Mengesahkan...';
-  signInWithEmailAndPassword(auth, USER_EMAIL, loginPassword.value)
+  setPersistence(auth, browserLocalPersistence)
+    .then(function () {
+      return signInWithEmailAndPassword(auth, USER_EMAIL, loginPassword.value);
+    })
     .catch(function () {
       loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';
       loginError.style.display = 'block';
