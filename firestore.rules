@@ -23,6 +23,7 @@ service cloud.firestore {
     function uidVccC()      { return 'LZiT3i8OsMUy23vX5a1CAubpuDw2'; }
     function uidVccM()      { return 'y4WorrRkS2f0vWP9bOZCsXAwFF23'; }
     function uidKenderaan() { return 'xUiId6yJRFMsEvZxVz8iLw8Znud2'; }
+    function uidMaster()    { return '0NnSA4HSbnaZejQAjQ1NOJ3Kt8d2'; }
 
     // ---- Role helpers ------------------------------------------------------
     function signedIn()    { return request.auth != null; }
@@ -33,23 +34,24 @@ service cloud.firestore {
     function isVccM()      { return signedIn() && request.auth.uid == uidVccM(); }
     function isVcc()       { return isVccC() || isVccM(); }
     function isKenderaan() { return signedIn() && request.auth.uid == uidKenderaan(); }
+    function isMaster()    { return signedIn() && request.auth.uid == uidMaster(); }
 
     // ---- logPergerakan -----------------------------------------------------
     // Driver log. Reads are unscoped because odometer chain validation
     // compares across all drivers and both fetched months.
     match /logPergerakan/{id} {
-      allow read:   if isDriver() || isAdmin() || isKenderaan();
-      allow create: if isDriver() || isAdmin();
-      allow update: if isAdmin() || isDriver();
-      allow delete: if isAdmin() || isDriver();
+      allow read:   if isDriver() || isAdmin() || isMaster() || isKenderaan();
+      allow create: if isDriver() || isAdmin() || isMaster();
+      allow update: if isAdmin() || isMaster() || isDriver();
+      allow delete: if isAdmin() || isMaster() || isDriver();
     }
 
     // ---- logBahanApi -------------------------------------------------------
     match /logBahanApi/{id} {
-      allow read:   if isDriver() || isAdmin();
-      allow create: if isDriver() || isAdmin();
-      allow update: if isAdmin() || isDriver();
-      allow delete: if isAdmin() || isDriver();
+      allow read:   if isDriver() || isAdmin() || isMaster();
+      allow create: if isDriver() || isAdmin() || isMaster();
+      allow update: if isAdmin() || isMaster() || isDriver();
+      allow delete: if isAdmin() || isMaster() || isDriver();
     }
 
     // ---- resitBahanApi -----------------------------------------------------
@@ -65,10 +67,10 @@ service cloud.firestore {
     // lives in the client (single getDoc only, never onSnapshot, never
     // getDocs). See Section 7 of the brief.
     match /resitBahanApi/{id} {
-      allow read:   if isDriver() || isAdmin();
-      allow create: if isDriver() || isAdmin();
-      allow update: if isAdmin() || isDriver();
-      allow delete: if isAdmin() || isDriver();
+      allow read:   if isDriver() || isAdmin() || isMaster();
+      allow create: if isDriver() || isAdmin() || isMaster();
+      allow update: if isAdmin() || isMaster() || isDriver();
+      allow delete: if isAdmin() || isMaster() || isDriver();
     }
 
     // ---- permohonanVCC -----------------------------------------------------
@@ -76,15 +78,17 @@ service cloud.firestore {
     // Writes are scoped by suffix. Reads are NOT scoped between the two VCC
     // accounts -- see note at the bottom of this file.
     match /permohonanVCC/{id} {
-      allow read:   if isUser() || isVcc() || isAdmin();
-      allow create: if isUser() || isAdmin();
+      allow read:   if isUser() || isVcc() || isAdmin() || isMaster();
+      allow create: if isUser() || isAdmin() || isMaster();
 
       allow update: if isAdmin()
+                    || isMaster()
                     || (isVccC() && id.matches('.*C$'))
                     || (isVccM() && id.matches('.*M$'));
 
       // Requester may withdraw only while the request is still untouched.
       allow delete: if isAdmin()
+                    || isMaster()
                     || (isUser() && resource.data.status == 'Menunggu')
                     || (isVccC() && id.matches('.*C$'))
                     || (isVccM() && id.matches('.*M$'));
@@ -94,13 +98,13 @@ service cloud.firestore {
     // Read by driver (liter validation) and borang. Admin-only writes.
     match /kapasitiKenderaan/{plat} {
       allow read:  if signedIn();
-      allow write: if isAdmin();
+      allow write: if isAdmin() || isMaster();
     }
 
     // ---- sistemMeta --------------------------------------------------------
     match /sistemMeta/{docId} {
-      allow read:  if isAdmin();
-      allow write: if isAdmin();
+      allow read:  if isAdmin() || isMaster();
+      allow write: if isAdmin() || isMaster();
     }
 
     // ---- Portal Kenderaan --------------------------------------------------
