@@ -603,7 +603,7 @@ function pad2(n) { return String(n).padStart(2, '0'); }
 function todayLocalISO() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
 
 function getKenderaanCapacity(plat) {
-  return (cloudTangkiCap[plat] !== undefined && cloudTangkiCap[plat] !== null) ? cloudTangkiCap[plat] : 150;
+  return (cloudTangkiCap[plat] !== undefined && cloudTangkiCap[plat] !== null) ? cloudTangkiCap[plat] : 70;
 }
 
 window.editCapacity = function (plat) {

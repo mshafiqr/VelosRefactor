@@ -394,7 +394,7 @@ function initPortal() {
   portalInitialized = true;
 
   // Load kapasitiKenderaan even if the collection is empty -- tangkiCap
-  // simply stays {} and liter validation falls back to 150L.
+  // simply stays {} and liter validation falls back to 70L.
   getDocs(collection(db, 'kapasitiKenderaan')).then(function (snap) {
     tangkiCap = {};
     snap.forEach(function (d) { tangkiCap[d.id] = d.data().kapasiti; });
@@ -698,8 +698,8 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
       Swal.fire({ title: 'Ralat Nilai Liter', text: 'Nilai Liter (' + overLimitFill.liter + 'L) terlalu besar — adakah anda tersalah masukkan bacaan ODOMETER ke dalam ruangan Liter? Sila semak semula.', icon: 'error' });
       return;
     }
-    // Soft warning: over vehicle tank capacity (fallback 150L), per fill.
-    const capTangki = parseFloat(tangkiCap[finalK]) || 150;
+    // Soft warning: over vehicle tank capacity (fallback 70L), per fill.
+    const capTangki = parseFloat(tangkiCap[finalK]) || 70;
     const overCapFill = fills.find(function (f) { return f.liter > capTangki; });
     if (overCapFill) literAmaran = ' PERHATIAN: Isian ' + overCapFill.liter + 'L melebihi kapasiti tangki ' + finalK + ' (' + capTangki + 'L). Pasti nilai ini betul?';
 
