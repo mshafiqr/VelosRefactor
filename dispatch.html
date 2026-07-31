@@ -358,20 +358,36 @@ loginForm.addEventListener('submit', async function (e) {
   loginError.style.display = 'none';
   btnLogin.disabled = true;
   btnLogin.innerText = 'Mengesahkan...';
-  const email = vccTypeSelection.value === 'Klinikal' ? 'vccc@pitas.velos' : 'vccm@pitas.velos';
-  const otherEmail = email === 'vccc@pitas.velos' ? 'vccm@pitas.velos' : 'vccc@pitas.velos';
-  // Remembered so a master@pitas.velos login (not in VCC_ACCOUNTS) still
-  // knows which queue the user meant, including across a page reload.
-  localStorage.setItem('dispatchVccTypeHint', vccTypeSelection.value);
   try {
     await setPersistence(auth, browserLocalPersistence);
     try {
-      await signInWithEmailAndPassword(auth, email, loginPassword.value);
-    } catch (err) {
+      await signInWithEmailAndPassword(auth, 'vccc@pitas.velos', loginPassword.value);
+    } catch (errVccc) {
       try {
-        await signInWithEmailAndPassword(auth, otherEmail, loginPassword.value);
-      } catch (err2) {
-        await signInWithEmailAndPassword(auth, MASTER_EMAIL, loginPassword.value);
+        await signInWithEmailAndPassword(auth, 'vccm@pitas.velos', loginPassword.value);
+      } catch (errVccm) {
+        awaitingMasterRoleChoice = true;
+        try {
+          await signInWithEmailAndPassword(auth, MASTER_EMAIL, loginPassword.value);
+          const roleChoice = await Swal.fire({
+            title: 'Pilih Peranan VCC',
+            text: 'Log masuk sebagai akaun induk. Sila pilih peranan VCC untuk sesi ini.',
+            icon: 'question',
+            showDenyButton: true,
+            showCancelButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            confirmButtonText: 'VCC Klinikal',
+            denyButtonText: 'VCC Jabatan'
+          });
+          const chosenVccType = roleChoice.isConfirmed ? 'Klinikal' : 'Jabatan';
+          // Remembered so a page reload (persisted master session) resolves
+          // to the same role without re-prompting.
+          localStorage.setItem('dispatchVccTypeHint', chosenVccType);
+          renderAuthenticatedDashboard(chosenVccType);
+        } finally {
+          awaitingMasterRoleChoice = false;
+        }
       }
     }
   } catch (err) {
@@ -391,13 +407,32 @@ let currentVccType = '';
 let allPermohonanRaw = [];
 let unsubscribePermohonan = null;
 let portalInitialized = false;
+// True while a master@pitas.velos login is waiting on the role-picker
+// SweetAlert2 prompt -- onAuthStateChanged must not render the dashboard
+// on its own during this window; the submit handler renders it explicitly
+// once a role is chosen.
+let awaitingMasterRoleChoice = false;
 
 const VCC_TITLE_MAP = {
   'Klinikal': 'VEHICLE COORDINATION CENTRE<br>(CLINICAL)',
   'Jabatan': 'VEHICLE COORDINATION CENTRE<br>(PEGAWAI KENDERAAN)'
 };
 
+function renderAuthenticatedDashboard(vccType) {
+  currentVccType = vccType;
+  loginView.style.display = 'none';
+  secureDashboardWrapper.style.display = 'block';
+  document.getElementById('vccTitleDisplay').innerHTML = VCC_TITLE_MAP[currentVccType] || currentVccType.toUpperCase();
+  document.getElementById('historyTitleType').innerText = currentVccType.toUpperCase();
+  renderHistoryHeader();
+  renderAktifHeaders();
+  renderFasaHelperTexts();
+  window.goTo('menu');
+  initPortal();
+}
+
 onAuthStateChanged(auth, function (user) {
+  if (awaitingMasterRoleChoice) return;
   let resolvedVccType = '';
   if (user) {
     if (VCC_ACCOUNTS[user.email]) {
@@ -408,16 +443,7 @@ onAuthStateChanged(auth, function (user) {
     }
   }
   if (user && resolvedVccType) {
-    currentVccType = resolvedVccType;
-    loginView.style.display = 'none';
-    secureDashboardWrapper.style.display = 'block';
-    document.getElementById('vccTitleDisplay').innerHTML = VCC_TITLE_MAP[currentVccType] || currentVccType.toUpperCase();
-    document.getElementById('historyTitleType').innerText = currentVccType.toUpperCase();
-    renderHistoryHeader();
-    renderAktifHeaders();
-    renderFasaHelperTexts();
-    window.goTo('menu');
-    initPortal();
+    renderAuthenticatedDashboard(resolvedVccType);
   } else if (user) {
     // Signed in with an account this portal doesn't recognise -- fail
     // safe rather than show a blank/broken dashboard.
