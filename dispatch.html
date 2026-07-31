@@ -455,13 +455,23 @@ function parseTarikhMasaVELOS(str) {
    (getPermohonanAktif / getAllVccRecords) so the render functions below
    stay byte-for-byte identical to the live file's field references.
 --------------------------------------------------------------------- */
+function resolveKembali(raw) {
+  if (raw.masaTamat !== 'Rujuk Catatan') {
+    return { masa: raw.masaTamat, tarikh: raw.tarikhKembali || '-' };
+  }
+  const m = (raw.catatan || '').match(/\[Kembali:\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\]/);
+  return m
+    ? { masa: m[2], tarikh: m[1] }
+    : { masa: 'Rujuk Catatan', tarikh: raw.tarikhKembali || '-' };
+}
+
 function toAktifEntry(raw, isKlinikal, isAkanDatang) {
   const entry = {
     rowIdx: raw.id,
     status: raw.status,
     tarikhMohon: raw.timestamp,
     tarikhGerak: raw.tarikh,
-    masa: isKlinikal ? raw.masaMula : (raw.masaMula + " - " + raw.masaTamat),
+    masa: isKlinikal ? raw.masaMula : (raw.masaMula + " - " + resolveKembali(raw).masa),
     nama: raw.nama,
     jabatan: raw.jabatan,
     telefon: raw.telefon,
@@ -496,7 +506,7 @@ function toRekodEntry(raw, isKlinikal) {
     nama: raw.nama,
     jabatan: raw.jabatan,
     tarikhGerak: raw.tarikh,
-    masa: isKlinikal ? raw.masaMula : (raw.masaMula + " - " + raw.masaTamat),
+    masa: isKlinikal ? raw.masaMula : (raw.masaMula + " - " + resolveKembali(raw).masa),
     tujuan: raw.tujuan,
     destinasi: raw.destinasi,
     status: raw.status,
@@ -1120,6 +1130,7 @@ window.cetakRekod = function (encodedData) {
 
   let isKlinikal = item.id.endsWith('C');
   let masaKeputusanRow = json.masaKeputusan ? `<tr><td style="padding:4px 0;">Tarikh & Masa Kelulusan</td><td style="padding:4px 0;">: <strong>${json.masaKeputusan}</strong></td></tr>` : '';
+  const kembali = resolveKembali(json);
 
   let html = `
     <div class="print-receipt-header">
@@ -1168,7 +1179,7 @@ window.cetakRekod = function (encodedData) {
         <tr><td style="width:140px; padding:4px 0;">Pemohon / Unit</td><td style="padding:4px 0;">: ${json.namaRaw} (${json.jabatan})</td></tr>
         <tr><td style="padding:4px 0;">No. Telefon</td><td style="padding:4px 0;">: ${json.telefon}</td></tr>
         <tr><td style="padding:4px 0;">Tarikh & Masa Bertolak</td><td style="padding:4px 0;">: <strong>${json.tarikh}, ${json.masaMula}</strong></td></tr>
-        <tr><td style="padding:4px 0;">Tarikh & Masa Kembali</td><td style="padding:4px 0;">: <strong>${json.tarikhKembali || '-'}, ${json.masaTamat}</strong></td></tr>
+        <tr><td style="padding:4px 0;">Tarikh & Masa Kembali</td><td style="padding:4px 0;">: <strong>${kembali.tarikh}, ${kembali.masa}</strong></td></tr>
         <tr><td style="padding:4px 0;">Pemandu Diperlukan</td><td style="padding:4px 0;">: <strong>${json.pemanduDiperlukan || '1'} Pemandu</strong></td></tr>
         <tr><td style="padding:4px 0;">Tujuan</td><td style="padding:4px 0;">: <strong>${json.tujuan}</strong></td></tr>
         <tr><td style="padding:4px 0;">Destinasi</td><td style="padding:4px 0;">: <strong>${json.destinasi}</strong></td></tr>
