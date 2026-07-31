@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" integrity="sha384-M00GJNq2IplZCB3+JOJEl2H0un45ODvqJSSnIc4DvG8gPn8RX5ToITFXcv3AvOx5" crossorigin="anonymous"></script>
+<script>Chart.register(ChartDataLabels);</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <style>
 :root {
@@ -1097,7 +1098,7 @@ window.updateUI = function () {
       }
       const latestFillId = entries.length ? entries[entries.length - 1].id : null;
       const actionButtons = latestFillId
-        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatResit(\'' + latestFillId + '\')"> 👁️  Resit</button> <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + latestFillId + '\')">Padam</button>'
+        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatResit(\'' + latestFillId + '\')">Resit</button> <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + latestFillId + '\')">Padam</button>'
         : '<span style="color:#999; font-size:11px;">Tiada Rekod</span>';
       const jarakDisplay = vData.hasTrips ? vData.jarak : '<span style="color:#999;">Tiada trip</span>';
       const minOdoDisplay = vData.hasTrips ? vData.minOdo : '-';
