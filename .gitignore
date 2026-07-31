@@ -23,3 +23,8 @@ Thumbs.db
 # Env
 .env
 .env.local
+
+# One-time RTDB -> Firestore migration (script + service account keys)
+migrate.js
+old-rtdb-key.json
+new-firestore-key.json
