@@ -336,6 +336,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const VCC_ACCOUNTS = { 'vccc@pitas.velos': 'Klinikal', 'vccm@pitas.velos': 'Jabatan' };
+const MASTER_EMAIL = "master@pitas.velos";
 
 /* ---------------------------------------------------------------------
    AUTH GATE — two accounts share this portal. vccTypeSelection picks
@@ -358,9 +359,18 @@ loginForm.addEventListener('submit', async function (e) {
   btnLogin.disabled = true;
   btnLogin.innerText = 'Mengesahkan...';
   const email = vccTypeSelection.value === 'Klinikal' ? 'vccc@pitas.velos' : 'vccm@pitas.velos';
+  const otherEmail = email === 'vccc@pitas.velos' ? 'vccm@pitas.velos' : 'vccc@pitas.velos';
   try {
     await setPersistence(auth, browserLocalPersistence);
-    await signInWithEmailAndPassword(auth, email, loginPassword.value);
+    try {
+      await signInWithEmailAndPassword(auth, email, loginPassword.value);
+    } catch (err) {
+      try {
+        await signInWithEmailAndPassword(auth, otherEmail, loginPassword.value);
+      } catch (err2) {
+        await signInWithEmailAndPassword(auth, MASTER_EMAIL, loginPassword.value);
+      }
+    }
   } catch (err) {
     loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';
     loginError.style.display = 'block';

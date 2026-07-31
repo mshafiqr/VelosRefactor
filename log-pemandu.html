@@ -338,6 +338,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const DRIVER_EMAIL = "driver@pitas.velos";
+const MASTER_EMAIL = "master@pitas.velos";
 
 /* ---------------------------------------------------------------------
    AUTH GATE — no session -> login form. On success -> portal. Sign-out
@@ -359,6 +360,9 @@ loginForm.addEventListener('submit', function (e) {
   setPersistence(auth, browserLocalPersistence)
     .then(function () {
       return signInWithEmailAndPassword(auth, DRIVER_EMAIL, loginPassword.value);
+    })
+    .catch(function () {
+      return signInWithEmailAndPassword(auth, MASTER_EMAIL, loginPassword.value);
     })
     .catch(function () {
       loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';

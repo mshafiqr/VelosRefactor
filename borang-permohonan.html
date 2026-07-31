@@ -490,6 +490,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const USER_EMAIL = "user@pitas.velos";
+const MASTER_EMAIL = "master@pitas.velos";
 
 /* ---------------------------------------------------------------------
    AUTH GATE — same pattern as log-pemandu.html
@@ -510,6 +511,9 @@ loginForm.addEventListener('submit', function (e) {
   setPersistence(auth, browserLocalPersistence)
     .then(function () {
       return signInWithEmailAndPassword(auth, USER_EMAIL, loginPassword.value);
+    })
+    .catch(function () {
+      return signInWithEmailAndPassword(auth, MASTER_EMAIL, loginPassword.value);
     })
     .catch(function () {
       loginError.textContent = 'Kata laluan salah atau ralat log masuk. Sila cuba lagi.';

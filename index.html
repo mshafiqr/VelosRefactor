@@ -543,6 +543,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const PORTAL_EMAIL = "admin@pitas.velos";
+const MASTER_EMAIL = "master@pitas.velos";
 
 /* ---------------------------------------------------------------------
    AUTH GATE
@@ -574,7 +575,11 @@ loginForm.addEventListener('submit', async function (e) {
   loginSubmitBtn.textContent = 'Mengesahkan...';
   try {
     await setPersistence(auth, browserLocalPersistence);
-    await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+    try {
+      await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+    } catch (err) {
+      await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+    }
   } catch (err) {
     loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
     loginError.style.display = 'block';
