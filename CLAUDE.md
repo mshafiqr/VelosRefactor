@@ -1,13 +1,13 @@
 # VELOS REVAMP — Project Instructions
 
-Full brief: [VELOS_REVAMP_BRIEF.md](VELOS_REVAMP_BRIEF.md). Read it before any substantive work — this file is a working reference, not a replacement.
+Revamp complete as of 1 August 2026. All four portals live at https://velos-pitas.web.app
 
 ## What this is
 
 Rebuild of VELOS (Vehicle Logistics and Operations System), Hospital Pitas, from GAS + HtmlService + Firebase Realtime Database onto plain HTML/CSS/JS + Cloud Firestore + Firebase Hosting. Same functionality, same UI/design language, kept identical.
 
 - **Working folder:** `D:\VelosRevamp` (this repo)
-- **Live VELOS (DO NOT TOUCH):** `D:\ClaudeXVelos` — stays running untouched throughout. Never read, edit, or reference files there.
+- **Archived VELOS (DO NOT TOUCH):** `D:\ClaudeXVelos` — stays running untouched throughout. Never edit, only for reference files. 
 - **Firebase project:** new and separate from live VELOS, Spark (free) plan only.
 - **Maintainer:** Shafiq — sole developer, domain expert, no formal IT background. Expects direct answers and clear reasoning.
 
@@ -81,7 +81,7 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 3. **VCC queue type:** determined by ID suffix only (`endsWith('C')` / `endsWith('M')`). No separate field.
 4. **String vs number IDs:** IDs are `Date.now()` (numeric) but cross HTML attribute boundaries as strings. Always `String()`-coerce both sides — never strict `===` against a numeric ID.
 5. **Fuel entry tiebreak:** sorting `logBahanApi` by date must use `odoPengisian` ascending as secondary key. Raw fuel records carry no time field.
-6. **Liter validation:** hard block > 1000. Soft warning above vehicle tank capacity from `kapasitiKenderaan`, fallback 150L. Two drivers have already typed odometer readings into this field.
+6. **Liter validation:** hard block > 1000. Soft warning above vehicle tank capacity from `kapasitiKenderaan`, fallback 70L. Two drivers have already typed odometer readings into this field.
 7. **Character-level bugs:** trace exact literal strings before assuming logic errors. Stray braces, capitalisation in `.includes()`, and single-symbol typos have caused major issues.
 8. **VCC 7-day window:** `Menunggu`/`Diproses` requests are NEVER date-limited. Only the read-only Rekod view is. A stuck request must never silently vanish.
 9. **Tugasan Akan Datang:** `Diluluskan` requests with `tarikh >= today` come from a full-collection status read, NOT the windowed history query.
@@ -97,15 +97,10 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 - **Pros and cons first.** Present before executing any significant change.
 - **Verbatim anchors.** Never assume code from memory. Read the actual file first.
 - **Language.** Malay/English mix for domain terms (`pemandu`, `kenderaan`, `permohonan`, `bahan api`). Match existing language per context.
-- **When Shafiq says something was tested N times:** take it at face value. Do not suggest user error.
 
 ## What not to do
 
 - Do not touch `D:\ClaudeXVelos` or any live VELOS file.
-- Do not share Firebase projects between live VELOS and this rebuild.
-- Do not use GAS at all — not even for backup or uploads.
-- Do not use Realtime Database.
-- Do not use Firebase Storage.
 - Do not change the VCC ID format or suffix convention.
 - Do not use `toISOString()` for any date string in an ID or filename.
 - Do not use `new Date()` directly on `dd/MM/yyyy` strings.
