@@ -1170,32 +1170,6 @@ window.padamRekodHistory = function (id) {
   });
 };
 
-// Cetak dalam tab baharu — window.print() disekat oleh pelayar apabila
-// portal ini dibenamkan dalam iframe Google Sites.
-function bukaTetingkapCetak(kandunganHtml) {
-  let printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    Swal.fire('Ralat', 'Pop-up disekat oleh pelayar. Sila benarkan pop-up untuk portal ini bagi mencetak.', 'error');
-    return;
-  }
-  let docHtml = '<!DOCTYPE html><html lang="ms"><head><meta charset="UTF-8"><title>Cetakan - VELOS</title>'
-    + '<link rel="preconnect" href="https://fonts.googleapis.com">'
-    + '<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">'
-    + '<style>'
-    + '@page { size: A4 portrait; margin: 15mm; }'
-    + 'body { background:#fff; color:#000; margin:0; padding:20px; font-family: \'Public Sans\', sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }'
-    + '.print-receipt-header { text-align:center; border-bottom:3px double #333; padding-bottom:15px; margin-bottom:20px; }'
-    + '</style></head><body>' + kandunganHtml + '</body></html>';
-  printWindow.document.open();
-  printWindow.document.write(docHtml);
-  printWindow.document.close();
-  printWindow.onafterprint = function () { printWindow.close(); };
-  setTimeout(function () {
-    printWindow.focus();
-    printWindow.print();
-  }, 500);
-}
-
 // FUNGSI CETAK REKOD DARI SEJARAH VCC
 window.cetakRekod = function (encodedData) {
   let item = JSON.parse(decodeURIComponent(encodedData));
@@ -1276,7 +1250,7 @@ window.cetakRekod = function (encodedData) {
     `;
 
   document.getElementById('cetakArea').innerHTML = html;
-  bukaTetingkapCetak(html);
+  setTimeout(function () { window.print(); }, 500);
 };
 </script>
 </body>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELOS — System Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webkit-font-smoothing:antialiased}
+
+  /* TOP STRIP */
+  .topstrip{background:#0F2A4A;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .topstrip .ts-left{font-size:11px;color:rgba(255,255,255,0.5);font-weight:500}
+  .topstrip .ts-right{font-size:11px;color:#5DD6DB;font-weight:700}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,#0F2A4A 0%,#0D4F54 50%,#147D82 100%);padding:44px 24px 52px;text-align:center;position:relative;overflow:hidden}
+  .hero .orb1{position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(93,214,219,0.07);pointer-events:none}
+  .hero .orb2{position:absolute;bottom:-80px;left:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none}
+  .hero .tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-size:11px;font-weight:700;padding:6px 14px;border-radius:30px;margin-bottom:18px;letter-spacing:0.05em}
+  .hero h1{font-size:clamp(24px,5vw,38px);font-weight:900;color:white;line-height:1.1;letter-spacing:-0.5px;margin-bottom:10px}
+  .hero h1 .teal{color:#5DD6DB}
+  .hero p{font-size:14px;color:rgba(255,255,255,0.65);max-width:480px;margin:0 auto;line-height:1.65}
+
+  /* MAIN */
+  .main{max-width:720px;margin:0 auto;padding:36px 20px 16px}
+
+  /* PROFILE CARD */
+  .profile-card{background:white;border-radius:16px;border:1px solid #E3E8EE;box-shadow:0 2px 4px rgba(15,42,74,0.07),0 8px 20px rgba(15,42,74,0.08);padding:28px 24px;margin-bottom:14px;display:flex;align-items:center;gap:22px}
+  .profile-avatar{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#0F2A4A,#147D82);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+  .profile-card .p-name{font-size:17px;font-weight:800;color:#0F2A4A;margin-bottom:4px}
+  .profile-card .p-role{font-size:12.5px;color:#147D82;font-weight:600;margin-bottom:4px}
+  .profile-card .p-unit{font-size:12px;color:#5B6774;line-height:1.4}
+
+  /* SECTION CARDS */
+  .sec-card{background:white;border-radius:14px;border:1px solid #E3E8EE;box-shadow:0 1px 2px rgba(15,42,74,0.05),0 3px 8px rgba(15,42,74,0.06);padding:22px 22px;margin-bottom:12px}
+  .sec-card .sec-label{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#147D82;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .sec-card .sec-label .dot{width:6px;height:6px;border-radius:50%;background:#147D82;flex-shrink:0}
+  .sec-card h3{font-size:15px;font-weight:800;color:#0F2A4A;margin-bottom:8px}
+  .sec-card p{font-size:13px;color:#5B6774;line-height:1.7}
+  .sec-card p strong{color:#0F2A4A;font-weight:700}
+
+  /* TWO-COL GRID */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+
+  /* CONTACT CARD */
+  .contact-card{background:#0F2A4A;border-radius:14px;padding:22px 22px;margin-bottom:12px;display:flex;align-items:flex-start;gap:16px}
+  .contact-card .c-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+  .contact-card .c-label{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:6px}
+  .contact-card .c-name{font-size:14.5px;font-weight:800;color:white;margin-bottom:3px}
+  .contact-card .c-detail{font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.6}
+  .contact-card .c-phone{font-size:15px;font-weight:800;color:#5DD6DB;margin-top:6px}
+
+  /* AKRONIM BADGE */
+  .akronim{display:inline-flex;align-items:center;gap:0;margin-bottom:10px}
+  .ak-letter{font-size:22px;font-weight:900;color:#0F2A4A;line-height:1}
+  .ak-letter.tl{color:#147D82}
+  .ak-rest{font-size:13px;color:#5B6774;font-weight:500;padding-left:2px}
+
+  .foot{text-align:center;padding:20px 20px 24px;font-size:11px;color:#A3ADB8;border-top:1px solid #E3E8EE;line-height:1.7}
+
+  @media(max-width:560px){.profile-card{flex-direction:column;text-align:center}.two-col{grid-template-columns:1fr}.contact-card{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div class="topstrip">
+  <div class="ts-left">VELOS · Hospital Pitas, Sabah · Kementerian Kesihatan Malaysia</div>
+  <div class="ts-right">Edisi 4 · Versi 1.0</div>
+</div>
+
+<div class="hero">
+  <div class="orb1"></div><div class="orb2"></div>
+  <div class="tag">⚕️ Tentang Sistem</div>
+  <h1>System <span class="teal">Developer</span></h1>
+  <p>Mengenali sistem VELOS, objektif pembinaannya, dan individu di sebaliknya.</p>
+</div>
+
+<div class="main">
+
+  <!-- DEVELOPER PROFILE -->
+  <div class="profile-card">
+    <div>
+      <div class="p-name">Muhammad Shafiq Bin Mohd Raffi</div>
+      <div class="p-role">Pentadbir & Pembangun Sistem VELOS</div>
+      <div class="p-unit">Penolong Pegawai Perubatan (PPP)<br>Unit Kecemasan & Trauma, Hospital Pitas, Sabah</div>
+    </div>
+  </div>
+
+  <!-- ABOUT VELOS -->
+  <div class="sec-card">
+    <div class="sec-label"><span class="dot"></span>Apakah VELOS?</div>
+    <p>
+      <strong>VELOS</strong> merupakan akronim bagi <strong>Vehicle Logistics & Operations System</strong>. Nama rasmi bagi sistem ini adalah <strong>Sistem Logistik dan Operasi Kenderaan</strong>. Sistem VELOS ini dibangunkan sepenuhnya oleh En. Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan Hospital Pitas, Sabah, Malaysia.
+    </p>
+  </div>
+
+  <!-- OBJEKTIF + MATLAMAT -->
+  <div class="two-col">
+    <div class="sec-card">
+      <div class="sec-label"><span class="dot"></span>Objektif Utama</div>
+      <p>Pewujudan sistem ini adalah sebagai sebuah medium pendigitalan khususnya bagi <strong>Perkhidmatan Pra Hospital & Ambulans</strong> di Hospital Pitas.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-label"><span class="dot"></span>Matlamat</div>
+      <p>Mengintegrasikan beberapa sistem di bawah <strong>Perkhidmatan Penolong Pegawai Perubatan</strong> ke dalam ekosistem <strong>VELOS</strong>.</p>
+    </div>
+  </div>
+
+  <!-- LATAR BELAKANG -->
+  <div class="sec-card">
+    <div class="sec-label"><span class="dot"></span>Latar Belakang</div>
+    <p>VELOS dibina sebagai alternatif dan nilai tambah kepada sistem sedia ada. Sistem ini memanfaatkan kemajuan teknologi dalam menyahut seruan ke arah <strong>Revolusi Pendigitalan Sektor Awam 2026–2030</strong>. VELOS kini dalam fasa pengujian rasmi sebagai Sistem Logistik & Operasi Kenderaan Hospital Pitas, Sabah.</p>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="contact-card">
+    <div class="c-icon">📞</div>
+    <div>
+      <div class="c-label">Hubungi Kami</div>
+      <div class="c-name">En. Muhammad Shafiq Bin Mohd Raffi</div>
+      <div class="c-detail">Unit Kecemasan & Trauma<br>Hospital Pitas, Sabah</div>
+      <div class="c-phone">088-676 100 (Ext. 241)</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="foot">
+  © 2026 Muhammad Shafiq Bin Mohd Raffi.
+Vehicle Logistics And Operations System (VELOS)
+VELOS Edisi 4 (Firestore), Versi 1.0 (Modul Utama) · Dikemaskini 01/08/2026
+
+</div>
+
+</body>
+</html>
