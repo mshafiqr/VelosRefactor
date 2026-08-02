@@ -298,7 +298,7 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 <div class="container">
 
 <div class="control-panel hide-print" style="display: flex; gap: 10px; margin-bottom: 20px; background: #e9ecef; padding: 15px; border-radius: 6px; border-left: 5px solid var(--primary); flex-wrap: wrap;">
-<button class="btn-print" onclick="window.print()"> 🖨️  Cetak Laporan Bulanan (Statistik Sahaja)</button>
+<button class="btn-print" onclick="window.cetakLaporanBulanan()"> 🖨️  Cetak Laporan Bulanan (Statistik Sahaja)</button>
 <button class="btn-export" onclick="window.downloadMasterLogCSV()"> 📁  Muat Turun CSV (Penuh Log Pergerakan)</button>
 <button class="btn-danger-action" style="margin-left: auto;" onclick="window.clearData()"> ⚠️  Padam Pangkalan Data</button>
 </div>
@@ -1268,6 +1268,55 @@ window.addEventListener('beforeprint', function () {
   } else { document.title = 'Velos_Admin_Report_Keseluruhan'; }
 });
 window.addEventListener('afterprint', function () { document.title = 'VELOS — Admin Dashboard'; });
+
+// Cetak dalam tab baharu — window.print() disekat oleh pelayar apabila
+// portal ini dibenamkan dalam iframe Google Sites. Klon kandungan laporan
+// semasa (termasuk carta Chart.js sebagai imej statik) ke tetingkap baharu.
+window.cetakLaporanBulanan = function () {
+  const wrapper = document.getElementById('secureDashboardWrapper');
+  const footerRef = document.getElementById('printFooterRef');
+  if (!wrapper) return;
+
+  const clone = wrapper.cloneNode(true);
+  const canvasAsal = wrapper.querySelectorAll('canvas');
+  const canvasKlon = clone.querySelectorAll('canvas');
+  canvasAsal.forEach(function (cv, i) {
+    const img = document.createElement('img');
+    img.src = cv.toDataURL('image/png');
+    img.style.cssText = 'display:block; max-width:100%; max-height:230px; width:100%; height:100%; object-fit:contain;';
+    canvasKlon[i].replaceWith(img);
+  });
+
+  const targetedMonth = document.getElementById('pilihanBulan').value;
+  let judulLaporan;
+  if (targetedMonth) {
+    const [y, m] = targetedMonth.split('-'); const monthName = malayMonths[parseInt(m, 10) - 1];
+    judulLaporan = 'Velos_Admin_Report_' + monthName + '_' + y;
+  } else { judulLaporan = 'Velos_Admin_Report_Keseluruhan'; }
+
+  let styleTag = null;
+  document.querySelectorAll('style').forEach(function (s) {
+    if (!styleTag && s.textContent.indexOf('.log-pergerakan-section') !== -1) styleTag = s;
+  });
+  const fontLink = '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    + '<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">';
+  const docHtml = '<!DOCTYPE html><html lang="ms"><head><meta charset="UTF-8"><title>' + judulLaporan + '</title>'
+    + fontLink + styleTag.outerHTML + '</head><body>' + clone.outerHTML + (footerRef ? footerRef.outerHTML : '') + '</body></html>';
+
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    Swal.fire('Ralat', 'Pop-up disekat oleh pelayar. Sila benarkan pop-up untuk portal ini bagi mencetak.', 'error');
+    return;
+  }
+  printWindow.document.open();
+  printWindow.document.write(docHtml);
+  printWindow.document.close();
+  printWindow.onafterprint = function () { printWindow.close(); };
+  setTimeout(function () {
+    printWindow.focus();
+    printWindow.print();
+  }, 500);
+};
 </script>
 
 </body>

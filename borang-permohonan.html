@@ -907,6 +907,29 @@ ${extraInfo}
     }
   });
 }
+// Cetak dalam tab baharu — window.print() disekat oleh pelayar apabila
+// portal ini dibenamkan dalam iframe Google Sites.
+function bukaTetingkapCetak(kandunganHtml) {
+  let printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    Swal.fire('Ralat', 'Pop-up disekat oleh pelayar. Sila benarkan pop-up untuk portal ini bagi mencetak.', 'error');
+    return;
+  }
+  let docHtml = '<!DOCTYPE html><html lang="ms"><head><meta charset="UTF-8"><title>Cetakan - VELOS</title><style>'
+    + '@page { size: A4 portrait; margin: 15mm; }'
+    + 'body { background:#fff; padding:20px; color:#000; font-family: Arial, sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }'
+    + '.print-receipt-header { text-align:center; border-bottom:3px double #333; padding-bottom:15px; margin-bottom:20px; }'
+    + '.vcc-reference-notice { display:block; border:2px dashed #dc3545; background-color:#f8d7da; color:#721c24; padding:12px; text-align:center; font-weight:bold; font-size:14px; border-radius:6px; margin-bottom:25px; }'
+    + '</style></head><body>' + kandunganHtml + '</body></html>';
+  printWindow.document.open();
+  printWindow.document.write(docHtml);
+  printWindow.document.close();
+  printWindow.onafterprint = function () { printWindow.close(); };
+  setTimeout(function () {
+    printWindow.focus();
+    printWindow.print();
+  }, 500);
+}
 window.cetakTiket = function (d) {
   let json = d.json;
   let isKlinikal = d.id.endsWith('C');
@@ -975,7 +998,7 @@ Sila tunjukkan TIKET PERJALANAN ini kepada pemandu yang bertugas sebagai bukti k
 `;
 
   document.getElementById('cetakArea').innerHTML = html;
-  setTimeout(function () { window.print(); }, 500);
+  bukaTetingkapCetak(html);
 };
 // KAD CETAKAN BEBAS LOGO YANG SEIMBANG
 function sediaKadResitUntukCetak(dataCetak, type) {
@@ -1291,7 +1314,7 @@ window.cetakResitGlobal = function (id) {
   if (item && item.json) {
     let isKlinikal = String(id).endsWith('C');
     sediaKadResitUntukCetak(item.json, isKlinikal ? 'A' : 'B');
-    setTimeout(function () { window.print(); }, 500);
+    bukaTetingkapCetak(document.getElementById('cetakArea').innerHTML);
   }
 };
 
