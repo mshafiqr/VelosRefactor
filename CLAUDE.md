@@ -15,7 +15,9 @@ Rebuild of VELOS (Vehicle Logistics and Operations System), Hospital Pitas, from
 
 | File | Replaces | Role |
 |---|---|---|
-| `index.html` | `Admin_Velos.html` | Admin dashboard |
+| `admin.html` | `Admin_Velos.html` | Admin dashboard (served at `/admin`) |
+| `index.html` | — | Standalone landing page |
+| `about.html` | — | Standalone about page |
 | `log-pemandu.html` | `Log_Pemandu.html` | Driver movement + fuel log (build first) |
 | `borang-permohonan.html` | `Borang_Permohonan.html` | VCC request form (user-facing) |
 | `dispatch.html` | `Dispatch.html` | VCC dispatch officer dashboard |
@@ -41,7 +43,7 @@ Date format is permanent: all VCC timestamps stay `dd/MM/yyyy HH:mm` strings in 
 
 ## Authentication
 
-Firebase Auth, email/password. Six shared role accounts — not individual staff accounts. The addresses are usernames, not real mailboxes. No staff email is ever stored.
+Firebase Auth, email/password. Shared role accounts — not individual staff accounts. The addresses are usernames, not real mailboxes. No staff email is ever stored.
 
 | Account | Portal |
 |---|---|
@@ -49,8 +51,10 @@ Firebase Auth, email/password. Six shared role accounts — not individual staff
 | `user@pitas.velos` | Portal Permohonan (`borang-permohonan.html`) |
 | `vccc@pitas.velos` | VCC Klinikal (`dispatch.html`) |
 | `vccm@pitas.velos` | VCC Jabatan (`dispatch.html`) |
-| `admin@pitas.velos` | Admin dashboard (`index.html`) — full access |
+| `admin@pitas.velos` | Admin dashboard (`admin.html`) — full access |
 | `kenderaan@pitas.velos` | Portal Kenderaan (reserved, not yet built) |
+| `master@pitas.velos` | All four portals — universal fallback login. Each portal's login form retries with this account (same password field) if the portal-specific account fails to sign in. In `dispatch.html`, a successful master login prompts a role picker (Klinikal vs Jabatan) since that portal maps two accounts to two queue types. |
+| `visitor@pitas.velos` | Admin dashboard (`admin.html`) — read-only viewer role, gated by fixed UID (`VISITOR_UID`) rather than email. |
 
 No global gate. Each portal page checks its own auth state on load; no session → show that portal's login form. `firestore.rules` is the actual enforcement — the login form alone protects nothing. Passwords live in Firebase Console only, never in this repo.
 
