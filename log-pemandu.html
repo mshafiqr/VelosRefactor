@@ -158,20 +158,10 @@ body { pointer-events: auto !important; }
 <label>Kenderaan Digunakan</label>
 <select id="kenderaan" required>
 <option value="" disabled selected>Pilih Kenderaan...</option>
-<optgroup label="Ambulans">
-<option value="BNU 9974">BNU 9974</option>
-<option value="BPL 7944">BPL 7944</option>
-<option value="BPP 4693">BPP 4693</option>
+<optgroup label="Ambulans" id="optgroupAmbulans">
 <option value="Lain-lain (Ambulans)">Lain-lain</option>
 </optgroup>
-<optgroup label="Kenderaan Jabatan">
-<option value="SYJ 7904">SYJ 7904</option>
-<option value="SAA 8110 K">SAA 8110 K</option>
-<option value="VFP 2850">VFP 2850</option>
-<option value="SAC 7316 C">SAC 7316 C</option>
-<option value="WLL 1078">WLL 1078</option>
-<option value="SAA 5285 N">SAA 5285 N</option>
-<option value="SAA 2680 W">SAA 2680 W</option>
+<optgroup label="Kenderaan Jabatan" id="optgroupJabatan">
 <option value="Lain-lain (Kenderaan Jabatan)">Lain-lain</option>
 </optgroup>
 </select>
@@ -183,7 +173,7 @@ body { pointer-events: auto !important; }
 <label>Nama Pemandu</label>
 <select id="namaPemandu" required>
 <option value="" disabled selected>Pilih Pemandu...</option>
-<option value="Ahmad Agar">Ahmad Agar</option><option value="Masnin">Masnin</option><option value="Rafaie">Rafaie</option><option value="Jilie">Jilie</option><option value="Mazni">Mazni</option><option value="Nurikram">Nurikram</option><option value="Rosley">Rosley</option><option value="Affendy">Affendy</option><option value="SN Reno">SN Reno</option><option value="PPK Franli">PPK Franli</option><option value="PKA Fikri">PKA Fikri</option><option value="PPK Shan">PPK Shan</option><option value="PPK Armay">PPK Armay</option><option value="PPK James">PPK James</option><option value="CC Dell">CC Dell</option><option value="PPP Shafiq">PPP Shafiq</option><option value="Lain-lain">Lain-lain</option>
+<option value="Lain-lain">Lain-lain</option>
 </select>
 </div>
 <div class="form-group" id="manualPemanduGroup" style="display: none;">
@@ -195,7 +185,7 @@ body { pointer-events: auto !important; }
 <label>Nama Pemandu 2 (Jika Ada)</label>
 <select id="namaPemandu2">
 <option value="" selected>Pilih Pemandu 2 (jika ada)...</option>
-<option value="Ahmad Agar">Ahmad Agar</option><option value="Masnin">Masnin</option><option value="Rafaie">Rafaie</option><option value="Jilie">Jilie</option><option value="Mazni">Mazni</option><option value="Nurikram">Nurikram</option><option value="Rosley">Rosley</option><option value="Affendy">Affendy</option><option value="SN Reno">SN Reno</option><option value="PPK Franli">PPK Franli</option><option value="PKA Fikri">PKA Fikri</option><option value="PPK Shan">PPK Shan</option><option value="PPK Armay">PPK Armay</option><option value="PPK James">PPK James</option><option value="CC Dell">CC Dell</option><option value="PPP Shafiq">PPP Shafiq</option><option value="Lain-lain">Lain-lain</option>
+<option value="Lain-lain">Lain-lain</option>
 </select>
 </div>
 <div class="form-group" id="manualPemandu2Group" style="display: none;">
@@ -207,28 +197,6 @@ body { pointer-events: auto !important; }
 <input list="senaraiPengiring" id="namaPengiringInput" placeholder="Taip atau pilih nama pengiring..." required>
 <datalist id="senaraiPengiring">
 <option value="Tiada Pengiring"></option>
-<option value="Shafiq Raffi"></option>
-<option value="Difliks Mintu"></option>
-<option value="Sean Sarto"></option>
-<option value="Zaini Kahar"></option>
-<option value="Maixol Malintang"></option>
-<option value="Hartono Ensiew"></option>
-<option value="Nurfauzie Nordin"></option>
-<option value="Amirul Shafiq"></option>
-<option value="Nor Afeeza Singgan"></option>
-<option value="Christyal Doikin"></option>
-<option value="Yonathan Ah Gau"></option>
-<option value="Norhashima Ali Aspar"></option>
-<option value="Felona Domadul"></option>
-<option value="Sherenie Azryin"></option>
-<option value="Saidah Bedin"></option>
-<option value="Yanti Yabin"></option>
-<option value="Kelly Chai"></option>
-<option value="Rhona A/K David"></option>
-<option value="Ellista Timin"></option>
-<option value="Norsiah Kasah"></option>
-<option value="Jenny Ruminggon"></option>
-<option value="Rishkahzie Simon"></option>
 </datalist>
 <button type="button" id="btnToggleMorePengiring" class="btn-add-p" style="margin-top: 8px;">➕ Tambah Pengiring</button>
 <div id="morePengiringGroup" style="display: none; margin-top: 10px;">
@@ -324,6 +292,7 @@ import {
   getFirestore,
   collection,
   doc,
+  getDoc,
   getDocs,
   setDoc,
   updateDoc,
@@ -339,6 +308,13 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const DRIVER_EMAIL = "driver@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
+
+// ---- konfigurasi (Firestore-backed lists) ---------------------------
+let configPemandu = [];
+let configPengiring = [];
+let configKenderaan = { ambulans: [], jabatan: [] };
+let configWad = [];
+let configDestinasi = [];
 
 /* ---------------------------------------------------------------------
    AUTH GATE — no session -> login form. On success -> portal. Sign-out
@@ -409,6 +385,31 @@ function initPortal() {
     snap.forEach(function (d) { tangkiCap[d.id] = d.data().kapasiti; });
   }).catch(function () { tangkiCap = {}; });
 
+  // Hospital-specific lists -- read-once, not onSnapshot. Admin edits
+  // these via Firebase Console; a portal reload picks up the change.
+  Promise.all([
+    getDoc(doc(db, 'konfigurasi', 'pemandu')),
+    getDoc(doc(db, 'konfigurasi', 'pengiring')),
+    getDoc(doc(db, 'konfigurasi', 'kenderaan')),
+    getDoc(doc(db, 'konfigurasi', 'wad')),
+    getDoc(doc(db, 'konfigurasi', 'destinasi'))
+  ]).then(function (snaps) {
+    const [pdSnap, pgSnap, kdSnap, wdSnap, dsSnap] = snaps;
+    if (pdSnap.exists()) configPemandu = pdSnap.data().senarai || [];
+    if (pgSnap.exists()) configPengiring = pgSnap.data().senarai || [];
+    if (kdSnap.exists()) configKenderaan = kdSnap.data();
+    if (wdSnap.exists()) configWad = wdSnap.data().senarai || [];
+    if (dsSnap.exists()) configDestinasi = dsSnap.data().senarai || [];
+    ambulansList = configKenderaan.ambulans || [];
+    KENDERAAN_VALUES = [].concat(configKenderaan.ambulans || [], configKenderaan.jabatan || []);
+    PEMANDU_VALUES = configPemandu.slice();
+    populateKonfigurasiSelects();
+    injectDatalists();
+    restoreLocalStoragePersistence();
+  }).catch(function (err) {
+    console.error('Ralat memuat konfigurasi:', err);
+  });
+
   // Real-time trip log. Never poll.
   unsubscribeLogPergerakan = onSnapshot(collection(db, 'logPergerakan'), function (snapshot) {
     ambulanceData = snapshot.docs.map(function (d) { return d.data(); });
@@ -434,7 +435,7 @@ function buildTimestamp() {
    STATE + STATIC DATA (ported from live Log_Pemandu)
 --------------------------------------------------------------------- */
 let ambulanceData = [];
-const ambulansList = ['BNU 9974', 'BPL 7944', 'BPP 4693'];
+let ambulansList = [];
 let tangkiCap = {};
 
 // Edit mode -- set by window.editEntry, cleared by exitEditMode. Tracks
@@ -471,16 +472,58 @@ setupMonthFilter();
 const dTarikh = new Date();
 document.getElementById('tarikh').value = dTarikh.getFullYear() + '-' + pad2(dTarikh.getMonth() + 1) + '-' + pad2(dTarikh.getDate());
 
-const WAD_OPTIONS = `<option value="Unit Kecemasan & Trauma (ETU)">ETU</option><option value="Wad Lelaki (MW)">MW</option><option value="Wad Perempuan (FW)">FW</option><option value="Wad Kanak-Kanak (CW)">CW</option><option value="Wad Bersalin (LR)">LR</option><option value="Unit Pesakit Luar (OPD)">OPD</option><option value="Unit Hemodialisis (HDU)">HDU</option><option value="Unit Thalasemia Daycare (TDC)">TDC</option><option value="Lain-lain">Lain-lain</option>`;
-const DEST_OPTIONS = `<option value="QEH">QEH</option><option value="QEH 2">QEH 2</option><option value="SWACH">SWACH</option><option value="HKM">HKM</option><option value="HMBP">HMBP</option><option value="Lain-lain">Lain-lain</option>`;
-
 // Known fixed option values, for edit-mode "is this a known option or a
-// manually-typed one" detection when pre-populating the form.
-const KENDERAAN_VALUES = ['BNU 9974', 'BPL 7944', 'BPP 4693', 'SYJ 7904', 'SAA 8110 K', 'VFP 2850', 'SAC 7316 C', 'WLL 1078', 'SAA 5285 N', 'SAA 2680 W'];
-const PEMANDU_VALUES = ['Ahmad Agar', 'Masnin', 'Rafaie', 'Jilie', 'Mazni', 'Nurikram', 'Rosley', 'Affendy', 'SN Reno', 'PPK Franli', 'PKA Fikri', 'PPK Shan', 'PPK Armay', 'PPK James', 'CC Dell', 'PPP Shafiq'];
+// manually-typed one" detection when pre-populating the form. Populated
+// from konfigurasi once initPortal()'s fetch resolves.
+let KENDERAAN_VALUES = [];
+let PEMANDU_VALUES = [];
 const NOTA_VALUES = ['Menghantar Pesakit', 'Bengkel', 'Pengisian Bahan Api', 'Ambulance Call', 'Retrieval', 'Medical Team Standby', 'Menghantar sampel / ubat / dokumen', 'Menghantar Kakitangan', 'Mobile Blood Bank'];
-const WAD_VALUES = ['Unit Kecemasan & Trauma (ETU)', 'Wad Lelaki (MW)', 'Wad Perempuan (FW)', 'Wad Kanak-Kanak (CW)', 'Wad Bersalin (LR)', 'Unit Pesakit Luar (OPD)', 'Unit Hemodialisis (HDU)', 'Unit Thalasemia Daycare (TDC)'];
-const DEST_VALUES = ['QEH', 'QEH 2', 'SWACH', 'HKM', 'HMBP'];
+
+// Datalist option text: "MW — Wad Lelaki" for entries with a trailing
+// "(code)"; the submitted/stored value is always the full string.
+function datalistLabel(val) {
+  const m = val.match(/\(([^)]+)\)$/);
+  return m ? m[1] + ' — ' + val.replace(/\s*\([^)]+\)$/, '').trim() : val;
+}
+
+function populateKonfigurasiSelects() {
+  const ambGroup = document.getElementById('optgroupAmbulans');
+  const jabGroup = document.getElementById('optgroupJabatan');
+  if (ambGroup) {
+    ambGroup.insertAdjacentHTML('afterbegin', (configKenderaan.ambulans || []).map(function (plat) {
+      return '<option value="' + plat + '">' + plat + '</option>';
+    }).join(''));
+  }
+  if (jabGroup) {
+    jabGroup.insertAdjacentHTML('afterbegin', (configKenderaan.jabatan || []).map(function (plat) {
+      return '<option value="' + plat + '">' + plat + '</option>';
+    }).join(''));
+  }
+  ['namaPemandu', 'namaPemandu2'].forEach(function (selId) {
+    const sel = document.getElementById(selId);
+    const lainOption = sel && sel.querySelector('option[value="Lain-lain"]');
+    if (!lainOption) return;
+    lainOption.insertAdjacentHTML('beforebegin', configPemandu.map(function (nama) {
+      return '<option value="' + nama + '">' + nama + '</option>';
+    }).join(''));
+  });
+}
+
+function injectDatalists() {
+  let wadDl = document.getElementById('wad-datalist');
+  if (!wadDl) { wadDl = document.createElement('datalist'); wadDl.id = 'wad-datalist'; document.body.appendChild(wadDl); }
+  wadDl.innerHTML = configWad.map(function (v) { return '<option value="' + v + '">' + datalistLabel(v) + '</option>'; }).join('');
+
+  let destDl = document.getElementById('dest-datalist');
+  if (!destDl) { destDl = document.createElement('datalist'); destDl.id = 'dest-datalist'; document.body.appendChild(destDl); }
+  destDl.innerHTML = configDestinasi.map(function (v) { return '<option value="' + v + '">' + datalistLabel(v) + '</option>'; }).join('');
+
+  const pengiringDl = document.getElementById('senaraiPengiring');
+  if (pengiringDl) {
+    pengiringDl.innerHTML = '<option value="Tiada Pengiring"></option>' +
+      configPengiring.map(function (v) { return '<option value="' + v + '"></option>'; }).join('');
+  }
+}
 
 function setSelectOrManualOnEl(selectEl, manualGroupEl, manualInputEl, value, knownValues, otherOptionValue) {
   if (knownValues.indexOf(value) !== -1) {
@@ -506,15 +549,14 @@ window.addPatientRow = function () {
   const div = document.createElement('div'); div.className = 'patient-block';
   div.innerHTML = `
 <div class="patient-row-inputs">
-<div><label>Wad Asal</label><select class="p-wad" required onchange="window.savePatientPref(this, 'saved_p_wad'); window.toggleManual(this, 'manual-wad-group', 'p-wad-manual')">${WAD_OPTIONS}</select><div class="manual-wad-group" style="display: none; margin-top: 5px;"><input type="text" class="p-wad-manual" placeholder="Wad"></div></div>
-<div><label>Destinasi</label><select class="p-destinasi" required onchange="window.savePatientPref(this, 'saved_p_destinasi'); window.toggleManual(this, 'manual-destinasi-group', 'p-destinasi-manual')">${DEST_OPTIONS}</select><div class="manual-destinasi-group" style="display: none; margin-top: 5px;"><input type="text" class="p-destinasi-manual" placeholder="Destinasi"></div></div>
+<div><label>Wad Asal</label><input type="text" class="p-wad" list="wad-datalist" placeholder="Taip kod atau nama wad..." autocomplete="off" required onchange="window.savePatientPref(this, 'saved_p_wad')"></div>
+<div><label>Destinasi</label><input type="text" class="p-destinasi" list="dest-datalist" placeholder="Taip destinasi..." autocomplete="off" required onchange="window.savePatientPref(this, 'saved_p_destinasi')"></div>
 <div><label>Kategori</label><select class="p-jenisKes" required><option value="Rujukan Biasa">Rujukan Biasa</option><option value="Rujukan Kecemasan">Rujukan Kecemasan</option><option value="Temujanji">Temujanji</option></select></div>
 </div><button type="button" class="btn-remove-patient" onclick="this.parentElement.remove()">Padam Kes</button>`;
   pContainer.appendChild(div);
 
-  const savedWad = localStorage.getItem('v2_saved_p_wad'); if (savedWad) { div.querySelector('.p-wad').value = savedWad; window.toggleManual(div.querySelector('.p-wad'), 'manual-wad-group', 'p-wad-manual'); }
-  const savedDest = localStorage.getItem('v2_saved_p_destinasi');
-  if (savedDest) { div.querySelector('.p-destinasi').value = savedDest; window.toggleManual(div.querySelector('.p-destinasi'), 'manual-destinasi-group', 'p-destinasi-manual'); }
+  const savedWad = localStorage.getItem('v2_saved_p_wad'); if (savedWad) div.querySelector('.p-wad').value = savedWad;
+  const savedDest = localStorage.getItem('v2_saved_p_destinasi'); if (savedDest) div.querySelector('.p-destinasi').value = savedDest;
 };
 window.addStepdownRow = function () {
   const pContainer = document.getElementById('stepdownPatientsContainer');
@@ -522,16 +564,10 @@ window.addStepdownRow = function () {
   const div = document.createElement('div'); div.className = 'patient-block'; div.style.borderColor = '#6f42c1'; div.style.backgroundColor = '#fcf8ff';
   div.innerHTML = `
 <div class="patient-row-inputs">
-<div><label>Fasiliti Luar</label><select class="p-wad" required onchange="window.savePatientPref(this, 'saved_stepdown_wad'); window.toggleManual(this, 'manual-wad-group', 'p-wad-manual')">${DEST_OPTIONS}</select><div class="manual-wad-group" style="display: none; margin-top: 5px;"><input type="text" class="p-wad-manual" placeholder="Fasiliti"></div></div>
+<div><label>Fasiliti Luar</label><input type="text" class="p-wad" list="dest-datalist" placeholder="Taip destinasi..." autocomplete="off" required onchange="window.savePatientPref(this, 'saved_stepdown_wad')"></div>
 </div><button type="button" class="btn-remove-patient" onclick="this.parentElement.remove()">Padam Kes</button>`;
   pContainer.appendChild(div);
-  const savedStepWad = localStorage.getItem('v2_saved_stepdown_wad'); if (savedStepWad) { div.querySelector('.p-wad').value = savedStepWad; window.toggleManual(div.querySelector('.p-wad'), 'manual-wad-group', 'p-wad-manual'); }
-};
-window.toggleManual = function (selectEl, groupCls, inputCls) {
-  const group = selectEl.parentElement.querySelector('.' + groupCls);
-  const input = selectEl.parentElement.querySelector('.' + inputCls);
-  if (selectEl.value === 'Lain-lain') { group.style.display = 'block'; input.setAttribute('required', 'required'); }
-  else { group.style.display = 'none'; input.removeAttribute('required'); input.value = ''; }
+  const savedStepWad = localStorage.getItem('v2_saved_stepdown_wad'); if (savedStepWad) div.querySelector('.p-wad').value = savedStepWad;
 };
 document.getElementById('btnAddPatient').addEventListener('click', window.addPatientRow);
 document.getElementById('btnAddStepdownPatient').addEventListener('click', window.addStepdownRow);
@@ -683,6 +719,20 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
     return;
   }
 
+  // Soft warning only -- wad/destinasi are free text now (datalist), so
+  // an unrecognised value must not block the save, just flag it.
+  let wadDestAmaran = '';
+  let hasUnknownWadDest = false;
+  document.querySelectorAll('#patientsContainer .p-wad').forEach(function (el) {
+    if (el.value.trim() && configWad.indexOf(el.value.trim()) === -1) hasUnknownWadDest = true;
+  });
+  document.querySelectorAll('#patientsContainer .p-destinasi, #stepdownPatientsContainer .p-wad').forEach(function (el) {
+    if (el.value.trim() && configDestinasi.indexOf(el.value.trim()) === -1) hasUnknownWadDest = true;
+  });
+  if (hasUnknownWadDest) {
+    wadDestAmaran = ' Nama wad/destinasi tidak dalam senarai. Pastikan ejaan betul sebelum disimpan.';
+  }
+
   if (isRefueled) {
     const oPengisianRaw = document.getElementById('odoPengisian').value;
     const oPengisian = oPengisianRaw.trim() !== '' ? parseFloat(oPengisianRaw) : null;
@@ -753,18 +803,18 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
   const presentExistingIds = fillPayloads.filter(function (f) { return f.isExisting; }).map(function (f) { return String(f.id); });
   const removedFillIds = editMode ? editExistingFillIds.filter(function (fid) { return presentExistingIds.indexOf(String(fid)) === -1; }) : [];
 
-  Swal.fire({ title: 'SISTEM LOG KENDERAAN', text: 'Pasti untuk menghantar semua rekod ini?' + literAmaran, icon: literAmaran ? 'warning' : 'question', showCancelButton: true, confirmButtonColor: '#0056b3', confirmButtonText: 'Ya', cancelButtonText: 'Batal' })
+  Swal.fire({ title: 'SISTEM LOG KENDERAAN', text: 'Pasti untuk menghantar semua rekod ini?' + literAmaran + wadDestAmaran, icon: (literAmaran || wadDestAmaran) ? 'warning' : 'question', showCancelButton: true, confirmButtonColor: '#0056b3', confirmButtonText: 'Ya', cancelButtonText: 'Batal' })
     .then(function (res) {
       if (!res.isConfirmed) return;
 
       const pList = [], sList = [];
       document.getElementById('patientsContainer').querySelectorAll('.patient-block').forEach(function (b) {
-        const w = b.querySelector('.p-wad').value === 'Lain-lain' ? b.querySelector('.p-wad-manual').value : b.querySelector('.p-wad').value;
-        const d = b.querySelector('.p-destinasi').value === 'Lain-lain' ? b.querySelector('.p-destinasi-manual').value : b.querySelector('.p-destinasi').value;
+        const w = b.querySelector('.p-wad').value;
+        const d = b.querySelector('.p-destinasi').value;
         pList.push({ wad: w, destinasi: d, jenisKes: b.querySelector('.p-jenisKes').value });
       });
       document.getElementById('stepdownPatientsContainer').querySelectorAll('.patient-block').forEach(function (b) {
-        const w = b.querySelector('.p-wad').value === 'Lain-lain' ? b.querySelector('.p-wad-manual').value : b.querySelector('.p-wad').value;
+        const w = b.querySelector('.p-wad').value;
         sList.push({ wad: w, destinasi: "N/A", jenisKes: "Stepdown" });
       });
       const d = document.getElementById('namaPemandu').value;
@@ -1032,8 +1082,8 @@ window.editEntry = function (id) {
   (item.pesakitList || []).forEach(function (p) {
     window.addPatientRow();
     const row = document.getElementById('patientsContainer').lastElementChild;
-    setSelectOrManualOnEl(row.querySelector('.p-wad'), row.querySelector('.manual-wad-group'), row.querySelector('.p-wad-manual'), p.wad, WAD_VALUES, 'Lain-lain');
-    setSelectOrManualOnEl(row.querySelector('.p-destinasi'), row.querySelector('.manual-destinasi-group'), row.querySelector('.p-destinasi-manual'), p.destinasi, DEST_VALUES, 'Lain-lain');
+    row.querySelector('.p-wad').value = p.wad;
+    row.querySelector('.p-destinasi').value = p.destinasi;
     row.querySelector('.p-jenisKes').value = p.jenisKes;
   });
   if ((item.pesakitList || []).length === 0) window.addPatientRow();
@@ -1042,7 +1092,7 @@ window.editEntry = function (id) {
   (item.stepdownList || []).forEach(function (p) {
     window.addStepdownRow();
     const row = document.getElementById('stepdownPatientsContainer').lastElementChild;
-    setSelectOrManualOnEl(row.querySelector('.p-wad'), row.querySelector('.manual-wad-group'), row.querySelector('.p-wad-manual'), p.wad, DEST_VALUES, 'Lain-lain');
+    row.querySelector('.p-wad').value = p.wad;
   });
 
   // Fuel fills aren't on the trip doc -- fetch this trip's existing
@@ -1116,11 +1166,18 @@ window.resetFuelFillRows();
 
 ['kenderaan', 'namaPemandu', 'namaPengiringInput'].forEach(function (id) {
   const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('change', function () { localStorage.setItem('v2_saved_' + id, this.value); });
-    const v = localStorage.getItem('v2_saved_' + id); if (v) { el.value = v; el.dispatchEvent(new Event('change')); }
-  }
+  if (el) el.addEventListener('change', function () { localStorage.setItem('v2_saved_' + id, this.value); });
 });
+// Restore happens after konfigurasi loads (see initPortal) -- restoring
+// against an empty <select> before options exist would silently no-op.
+function restoreLocalStoragePersistence() {
+  ['kenderaan', 'namaPemandu', 'namaPengiringInput'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = localStorage.getItem('v2_saved_' + id);
+    if (v) { el.value = v; el.dispatchEvent(new Event('change')); }
+  });
+}
 </script>
 </body>
 </html>

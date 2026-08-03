@@ -257,17 +257,17 @@ body { pointer-events: auto !important; }
 <p style="font-size:12px; color:gray; margin-top:-10px;">Sila masukkan nama sehingga 3 pegawai pengiring (jika ada).</p>
 <div class="form-group">
 <label>Pegawai Pengiring 1</label>
-<input type="text" id="pengiringA_1" placeholder="Nama Pegawai Pengiring 1">
+<input type="text" id="pengiringA_1" list="pengiring-datalist" autocomplete="off" placeholder="Nama Pegawai Pengiring 1">
 </div>
 <button type="button" id="btnToggleMorePengiringA" class="btn-add" style="margin-top: -5px;">+ Tambah Pengiring 2 & 3</button>
 <div id="morePengiringGroupA" style="display: none; margin-top: 15px;">
 <div class="form-group">
 <label>Pegawai Pengiring 2</label>
-<input type="text" id="pengiringA_2" placeholder="Nama Pegawai Pengiring 2">
+<input type="text" id="pengiringA_2" list="pengiring-datalist" autocomplete="off" placeholder="Nama Pegawai Pengiring 2">
 </div>
 <div class="form-group">
 <label>Pegawai Pengiring 3</label>
-<input type="text" id="pengiringA_3" placeholder="Nama Pegawai Pengiring 3">
+<input type="text" id="pengiringA_3" list="pengiring-datalist" autocomplete="off" placeholder="Nama Pegawai Pengiring 3">
 </div>
 </div>
 </div>
@@ -283,23 +283,7 @@ body { pointer-events: auto !important; }
 </div>
 <div class="form-group">
 <label>Wad / Unit / Kakitangan</label>
-<select id="jabatanA" class="req-a" onchange="checkManual('jabatanA', 'jabatanManualGroupA', 'jabatanManualA')">
-<option value="" disabled selected>Pilih Wad/Unit/Kakitangan...</option>
-<option value="Kakitangan Individu">Kakitangan Individu</option>
-<option value="Unit Kecemasan & Trauma (ETU)">Unit Kecemasan & Trauma (ETU)</option>
-<option value="Wad Lelaki (MW)">Wad Lelaki (MW)</option>
-<option value="Wad Perempuan (FW)">Wad Perempuan (FW)</option>
-<option value="Wad Kanak-Kanak (CW)">Wad Kanak-Kanak (CW)</option>
-<option value="Wad Bersalin (LR)">Wad Bersalin (LR)</option>
-<option value="Unit Pesakit Luar (OPD)">Unit Pesakit Luar (OPD)</option>
-<option value="Unit Thalasemia Daycare (TDC)">Unit Thalasemia Daycare (TDC)</option>
-<option value="Unit Hemodialisis (HDU)">Unit Hemodialisis (HDU)</option>
-<option value="Lain-lain">Lain-lain</option>
-</select>
-</div>
-<div class="form-group manual-input" id="jabatanManualGroupA" style="display: none;">
-<label>Sila Nyatakan Wad/Unit/Kakitangan</label>
-<input type="text" id="jabatanManualA" placeholder="Taip nama unit...">
+<input type="text" id="jabatanA" class="req-a" list="wad-datalist" autocomplete="off" placeholder="Taip kod atau nama wad/unit...">
 </div>
 </div>
 </div>
@@ -320,38 +304,7 @@ body { pointer-events: auto !important; }
 </div>
 <div class="form-group">
 <label>Wad / Unit / Kakitangan</label>
-<select id="jabatanB" class="req-b" onchange="checkManual('jabatanB', 'jabatanManualGroupB', 'jabatanManualB')">
-<option value="" disabled selected>Pilih Wad/Unit/Kakitangan...</option>
-<option value="Kakitangan Individu">Kakitangan Individu</option>
-<option value="Unit Kecemasan & Trauma">Unit Kecemasan & Trauma</option>
-<option value="Wad Lelaki">Wad Lelaki</option>
-<option value="Wad Perempuan">Wad Perempuan</option>
-<option value="Wad Kanak-Kanak">Wad Kanak-Kanak</option>
-<option value="Wad Bersalin">Wad Bersalin</option>
-<option value="Unit Pesakit Luar">Unit Pesakit Luar</option>
-<option value="Unit Radiologi">Unit Radiologi</option>
-<option value="Unit TDC">Unit TDC</option>
-<option value="Unit Rekod Perubatan">Unit Rekod Perubatan</option>
-<option value="Unit Sajian & Dietetik">Unit Sajian & Dietetik</option>
-<option value="Unit CSSU">Unit CSSU</option>
-<option value="Unit Porter">Unit Porter</option>
-<option value="Unit Hasil">Unit Hasil</option>
-<option value="Unit Pengurusan">Unit Pengurusan</option>
-<option value="Unit Kewangan">Unit Kewangan</option>
-<option value="Unit Farmasi">Unit Farmasi</option>
-<option value="Unit Patologi (Makmal)">Unit Patologi (Makmal)</option>
-<option value="Unit Tabung Darah">Unit Tabung Darah</option>
-<option value="Unit Kualiti">Unit Kualiti</option>
-<option value="Unit Kerja Sosial Perubatan">Unit Kerja Sosial Perubatan</option>
-<option value="Unit Kejuruteraan">Unit Kejuruteraan</option>
-<option value="Unit Rehabilitasi">Unit Rehabilitasi</option>
-<option value="Unit Cara Kerja">Unit Cara Kerja</option>
-<option value="Lain-lain">Lain-lain</option>
-</select>
-</div>
-<div class="form-group manual-input" id="jabatanManualGroupB" style="display: none;">
-<label>Sila Nyatakan Wad/Unit/Kakitangan</label>
-<input type="text" id="jabatanManualB" placeholder="Taip di sini...">
+<input type="text" id="jabatanB" class="req-b" list="wad-datalist" autocomplete="off" placeholder="Taip kod atau nama wad/unit...">
 </div>
 </div>
 <div class="card">
@@ -492,6 +445,11 @@ const db = getFirestore(app);
 const USER_EMAIL = "user@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
 
+// ---- konfigurasi (Firestore-backed lists) ---------------------------
+let configWad = [];
+let configDestinasi = [];
+let configPengiring = [];
+
 /* ---------------------------------------------------------------------
    AUTH GATE — same pattern as log-pemandu.html
 --------------------------------------------------------------------- */
@@ -553,6 +511,22 @@ function initPortal() {
   if (portalInitialized) return;
   portalInitialized = true;
 
+  // Hospital-specific lists -- read-once, not onSnapshot. Admin edits
+  // these via Firebase Console; a portal reload picks up the change.
+  Promise.all([
+    getDoc(doc(db, 'konfigurasi', 'wad')),
+    getDoc(doc(db, 'konfigurasi', 'destinasi')),
+    getDoc(doc(db, 'konfigurasi', 'pengiring'))
+  ]).then(function (snaps) {
+    const [wdSnap, dsSnap, pgSnap] = snaps;
+    if (wdSnap.exists()) configWad = wdSnap.data().senarai || [];
+    if (dsSnap.exists()) configDestinasi = dsSnap.data().senarai || [];
+    if (pgSnap.exists()) configPengiring = pgSnap.data().senarai || [];
+    injectDatalists();
+  }).catch(function (err) {
+    console.error('Ralat memuat konfigurasi:', err);
+  });
+
   // Real-time, unscoped read of the whole collection -- matches
   // firestore.rules (isUser() has unscoped read) and lets the 7-day
   // window be applied purely client-side (see renderPermohonanGlobal),
@@ -565,6 +539,29 @@ function initPortal() {
   }, function (err) {
     console.error('Ralat langganan permohonanVCC:', err);
   });
+}
+
+// Datalist option text: "MW — Wad Lelaki" for entries with a trailing
+// "(code)"; the submitted/stored value is always the full string.
+function datalistLabel(val) {
+  const m = val.match(/\(([^)]+)\)$/);
+  return m ? m[1] + ' — ' + val.replace(/\s*\([^)]+\)$/, '').trim() : val;
+}
+
+// Injected once into the page -- wad/destinasi/pengiring datalists don't
+// exist statically in the markup (unlike log-pemandu.html's pengiring one).
+function injectDatalists() {
+  let wadDl = document.getElementById('wad-datalist');
+  if (!wadDl) { wadDl = document.createElement('datalist'); wadDl.id = 'wad-datalist'; document.body.appendChild(wadDl); }
+  wadDl.innerHTML = configWad.map(function (v) { return '<option value="' + v + '">' + datalistLabel(v) + '</option>'; }).join('');
+
+  let destDl = document.getElementById('dest-datalist');
+  if (!destDl) { destDl = document.createElement('datalist'); destDl.id = 'dest-datalist'; document.body.appendChild(destDl); }
+  destDl.innerHTML = configDestinasi.map(function (v) { return '<option value="' + v + '">' + datalistLabel(v) + '</option>'; }).join('');
+
+  let pengiringDl = document.getElementById('pengiring-datalist');
+  if (!pengiringDl) { pengiringDl = document.createElement('datalist'); pengiringDl.id = 'pengiring-datalist'; document.body.appendChild(pengiringDl); }
+  pengiringDl.innerHTML = configPengiring.map(function (v) { return '<option value="' + v + '"></option>'; }).join('');
 }
 
 /* ---------------------------------------------------------------------
@@ -698,7 +695,7 @@ ${btnPadam}
 <label>No. Pendaftaran (RN)</label>
 <input type="text" id="rnPesakit_${pId}" class="req-a" placeholder="Cth: 123456/26">
 </div>
-<div class="form-group"><label>Destinasi</label><select id="destinasiA_${pId}" class="req-a" onchange="checkManual('destinasiA_${pId}', 'destManualGrp_${pId}', 'destManual_${pId}')"><option value="" disabled selected>Pilih Destinasi...</option><option value="QEH">QEH</option><option value="QEH 2">QEH 2</option><option value="SWACH">SWACH</option><option value="HKM">HKM</option><option value="HMBP">HMBP</option><option value="Lain-lain">Lain-lain</option></select></div><div class="form-group manual-input" id="destManualGrp_${pId}" style="display: none;"><label>Sila Nyatakan Destinasi Penuh</label><input type="text" id="destManual_${pId}" placeholder="Taip destinasi lengkap..."></div>
+<div class="form-group"><label>Destinasi</label><input type="text" id="destinasiA_${pId}" class="req-a" list="dest-datalist" autocomplete="off" placeholder="Taip destinasi..."></div>
 <div class="form-group full-width">
 <label>Tujuan</label>
 <input type="text" id="tujuanA_${pId}" class="req-a" placeholder="Cth: Direct admission / CT Scan">
@@ -1370,7 +1367,23 @@ document.getElementById('btnHantar').addEventListener('click', function (e) {
 
   const jenis = document.getElementById('jenisPerjalanan').value;
   if (!jenis) return;
-  Swal.fire({ title: 'Sahkan Permohonan', text: 'Hantar borang permohonan kenderaan ini?', icon: 'question', showCancelButton: true, confirmButtonColor: '#0056b3', confirmButtonText: 'Ya, Hantar', cancelButtonText: 'Batal' }).then(function (res) {
+
+  // Soft warning only -- wad/destinasi are free text now (datalist), so
+  // an unrecognised value must not block the save, just flag it.
+  let hasUnknownWadDest = false;
+  if (jenis === 'A') {
+    const jaVal = document.getElementById('jabatanA').value.trim();
+    if (jaVal && configWad.indexOf(jaVal) === -1) hasUnknownWadDest = true;
+    document.querySelectorAll('[id^="destinasiA_"]').forEach(function (el) {
+      if (el.value.trim() && configDestinasi.indexOf(el.value.trim()) === -1) hasUnknownWadDest = true;
+    });
+  } else if (jenis === 'B') {
+    const jbVal = document.getElementById('jabatanB').value.trim();
+    if (jbVal && configWad.indexOf(jbVal) === -1) hasUnknownWadDest = true;
+  }
+  const wadDestAmaran = hasUnknownWadDest ? ' Nama wad/destinasi tidak dalam senarai. Pastikan ejaan betul sebelum disimpan.' : '';
+
+  Swal.fire({ title: 'Sahkan Permohonan', text: 'Hantar borang permohonan kenderaan ini?' + wadDestAmaran, icon: hasUnknownWadDest ? 'warning' : 'question', showCancelButton: true, confirmButtonColor: '#0056b3', confirmButtonText: 'Ya, Hantar', cancelButtonText: 'Batal' }).then(function (res) {
     if (!res.isConfirmed) return;
 
     const btn = document.querySelector('.btn-main');
@@ -1378,8 +1391,7 @@ document.getElementById('btnHantar').addEventListener('click', function (e) {
 
     if (jenis === 'A') {
       const newID = generateID('C');
-      const jA = document.getElementById('jabatanA').value;
-      const finalJA = jA === 'Lain-lain' ? document.getElementById('jabatanManualA').value : jA;
+      const finalJA = document.getElementById('jabatanA').value;
 
       let senaraiNamaPesakit = [], catatanTagging = "", senaraiCetakHTML = "", destinasiSenarai = [], tujuanSenarai = [], senaraiPesakitData = [];
       const pBlocks = document.querySelectorAll('.patient-block');
@@ -1389,8 +1401,7 @@ document.getElementById('btnHantar').addEventListener('click', function (e) {
         let pId = block.id.split('_')[1];
         let nama = document.getElementById('namaPesakit_' + pId).value;
         let rn = document.getElementById('rnPesakit_' + pId).value;
-        let dest = document.getElementById('destinasiA_' + pId).value;
-        let finalDest = dest === 'Lain-lain' ? document.getElementById('destManual_' + pId).value : dest;
+        let finalDest = document.getElementById('destinasiA_' + pId).value;
         destinasiSenarai.push(finalDest);
         let tujuan = document.getElementById('tujuanA_' + pId).value;
         tujuanSenarai.push(tujuan);
@@ -1465,8 +1476,7 @@ document.getElementById('btnHantar').addEventListener('click', function (e) {
 
     } else if (jenis === 'B') {
       const newID = generateID('M');
-      const jB = document.getElementById('jabatanB').value;
-      const finalJB = jB === 'Lain-lain' ? document.getElementById('jabatanManualB').value : jB;
+      const finalJB = document.getElementById('jabatanB').value;
       const tB = document.getElementById('tujuanB').value;
       const finalTB = tB === 'Lain-lain' ? document.getElementById('tujuanManualB').value : tB;
       let senarai = document.getElementById('penumpangB').value;

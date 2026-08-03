@@ -325,6 +325,7 @@ import {
   getFirestore,
   collection,
   doc,
+  getDoc,
   updateDoc,
   deleteDoc,
   onSnapshot,
@@ -337,6 +338,10 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const VCC_ACCOUNTS = { 'vccc@pitas.velos': 'Klinikal', 'vccm@pitas.velos': 'Jabatan' };
 const MASTER_EMAIL = "master@pitas.velos";
+
+// ---- konfigurasi (Firestore-backed lists) ---------------------------
+let configPemandu = [];
+let configKenderaan = { ambulans: [], jabatan: [] };
 
 /* ---------------------------------------------------------------------
    AUTH GATE — two accounts share this portal. vccTypeSelection picks
@@ -463,6 +468,20 @@ onAuthStateChanged(auth, function (user) {
 function initPortal() {
   if (portalInitialized) return;
   portalInitialized = true;
+
+  // Hospital-specific lists -- read-once, not onSnapshot. Admin edits
+  // these via Firebase Console; a portal reload picks up the change.
+  Promise.all([
+    getDoc(doc(db, 'konfigurasi', 'pemandu')),
+    getDoc(doc(db, 'konfigurasi', 'kenderaan'))
+  ]).then(function (snaps) {
+    const [pdSnap, kdSnap] = snaps;
+    if (pdSnap.exists()) configPemandu = pdSnap.data().senarai || [];
+    if (kdSnap.exists()) configKenderaan = kdSnap.data();
+  }).catch(function (err) {
+    console.error('Ralat memuat konfigurasi:', err);
+  });
+
   // Full-collection, real-time, no query filter -- lets the active
   // queue (computeAktifData) and the windowed history (computeRekodData)
   // both derive from one always-current source. Never poll.
@@ -955,23 +974,25 @@ window.terimaPermohonan = function (rowIdx) {
 };
 
 window.promptLulus = function (rowIdx) {
+  const ambOptionsHtml = (configKenderaan.ambulans || []).map(function (plat) {
+    return '<option value="' + plat + '">' + plat + '</option>';
+  }).join('');
+  const jabOptionsHtml = (configKenderaan.jabatan || []).map(function (plat) {
+    return '<option value="' + plat + '">' + plat + '</option>';
+  }).join('');
+  const drvOptionsHtml = configPemandu.map(function (nama) {
+    return '<option value="' + nama + '">' + nama + '</option>';
+  }).join('') + '<option value="Lain-lain">Lain-lain / Luar</option>';
+
   let htmlOptions = `
     <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Kenderaan:</div>
     <select id="swalVeh" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
         <option value="" disabled selected>-- Kenderaan --</option>
         <optgroup label="Ambulans">
-            <option value="BNU 9974">BNU 9974</option>
-            <option value="BPL 7944">BPL 7944</option>
-            <option value="BPP 4693">BPP 4693</option>
+            ${ambOptionsHtml}
         </optgroup>
         <optgroup label="Kenderaan Jabatan">
-            <option value="SYJ 7904">SYJ 7904</option>
-            <option value="SAA 8110 K">SAA 8110 K</option>
-            <option value="VFP 2850">VFP 2850</option>
-            <option value="SAC 7316 C">SAC 7316 C</option>
-            <option value="WLL 1078">WLL 1078</option>
-            <option value="SAA 5285 N">SAA 5285 N</option>
-            <option value="SAA 2680 W">SAA 2680 W</option>
+            ${jabOptionsHtml}
         </optgroup>
         <option value="Kenderaan Sewa / Lain">Lain-lain / Sewa Khas</option>
     </select>
@@ -979,45 +1000,13 @@ window.promptLulus = function (rowIdx) {
     <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Pemandu 1:</div>
     <select id="swalDrv" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
         <option value="" disabled selected>-- Pemandu Bertugas --</option>
-        <option value="Ahmad Agar">Ahmad Agar</option>
-        <option value="Masnin">Masnin</option>
-        <option value="Rafaie">Rafaie</option>
-        <option value="Jilie">Jilie</option>
-        <option value="Mazni">Mazni</option>
-        <option value="Nurikram">Nurikram</option>
-        <option value="Rosley">Rosley</option>
-        <option value="Affendy">Affendy</option>
-        <option value="SN Reno">SN Reno</option>
-        <option value="PPK Franli">PPK Franli</option>
-        <option value="PKA Fikri">PKA Fikri</option>
-        <option value="PPK Shan">PPK Shan</option>
-        <option value="PPK Armay">PPK Armay</option>
-        <option value="PPK James">PPK James</option>
-        <option value="CC Dell">CC Dell</option>
-        <option value="PPP Shafiq">PPP Shafiq</option>
-        <option value="Lain-lain">Lain-lain / Luar</option>
+        ${drvOptionsHtml}
     </select>
 
     <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Pemandu 2 (Pilihan):</div>
     <select id="swalDrv2" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
         <option value="-" selected>-- Tiada Pemandu Kedua --</option>
-        <option value="Ahmad Agar">Ahmad Agar</option>
-        <option value="Masnin">Masnin</option>
-        <option value="Rafaie">Rafaie</option>
-        <option value="Jilie">Jilie</option>
-        <option value="Mazni">Mazni</option>
-        <option value="Nurikram">Nurikram</option>
-        <option value="Rosley">Rosley</option>
-        <option value="Affendy">Affendy</option>
-        <option value="SN Reno">SN Reno</option>
-        <option value="PPK Franli">PPK Franli</option>
-        <option value="PKA Fikri">PKA Fikri</option>
-        <option value="PPK Shan">PPK Shan</option>
-        <option value="PPK Armay">PPK Armay</option>
-        <option value="PPK James">PPK James</option>
-        <option value="CC Dell">CC Dell</option>
-        <option value="PPP Shafiq">PPP Shafiq</option>
-        <option value="Lain-lain">Lain-lain / Luar</option>
+        ${drvOptionsHtml}
     </select>
 
     <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Nama Pelulus VCC:</div>

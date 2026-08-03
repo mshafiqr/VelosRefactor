@@ -119,6 +119,14 @@ service cloud.firestore {
     //   allow delete: if isAdmin();
     // }
 
+    // ---- konfigurasi -------------------------------------------------------
+    // Hospital-specific lists: pemandu, pengiring, kenderaan, wad, destinasi.
+    // All authenticated accounts read; only admin/master write.
+    match /konfigurasi/{docId} {
+      allow read:  if signedIn();
+      allow write: if isAdmin() || isMaster();
+    }
+
     // ---- Default deny ------------------------------------------------------
     // Anything not matched above is closed. Do not remove this block.
     match /{document=**} {

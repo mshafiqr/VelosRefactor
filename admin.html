@@ -601,7 +601,8 @@ let dashboardInitialized = false;
 let unsubLog = null, unsubFuel = null, unsubMohon = null;
 let isFullLogView = false;
 let myChartPesakit = null, myChartPemandu = null;
-const ambulansList = ['BNU 9974', 'BPL 7944', 'BPP 4693'];
+let configKenderaan = { ambulans: [], jabatan: [] };
+let ambulansList = [];
 const malayMonths = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
 
 // Fuel docs carry no time field -- odoPengisian is the ascending tiebreak
@@ -654,13 +655,27 @@ function initDashboard() {
 
   Swal.fire({ title: 'Syncing...', text: 'Sila tunggu, sistem sedang memuatkan data terkini.', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
 
-  let logReady = false, fuelReady = false, mohonReady = false, capReady = false, firstSyncDone = false;
+  let logReady = false, fuelReady = false, mohonReady = false, capReady = false, configReady = false, firstSyncDone = false;
   function maybeFinishFirstSync() {
-    if (firstSyncDone || !(logReady && fuelReady && mohonReady && capReady)) return;
+    if (firstSyncDone || !(logReady && fuelReady && mohonReady && capReady && configReady)) return;
     firstSyncDone = true;
     window.updateUI();
     Swal.close();
   }
+
+  // Hospital-specific vehicle list -- read-once, not onSnapshot. Admin
+  // edits this via Firebase Console; a dashboard reload picks up the change.
+  getDoc(doc(db, 'konfigurasi', 'kenderaan')).then(function (snap) {
+    if (snap.exists()) configKenderaan = snap.data();
+    ambulansList = configKenderaan.ambulans || [];
+    configReady = true;
+    if (firstSyncDone) window.updateUI();
+    maybeFinishFirstSync();
+  }).catch(function (err) {
+    console.error('Ralat memuat konfigurasi:', err);
+    configReady = true;
+    maybeFinishFirstSync();
+  });
 
   getDocs(collection(db, 'kapasitiKenderaan')).then(function (snap) {
     cloudTangkiCap = {};
@@ -860,7 +875,8 @@ function computeMonthStats(monthStr) {
   let totalPatients = 0, totalStepdown = 0, emptyTrips = 0, totalFilteredTrips = 0, totalPengiringTrips = 0;
   let paxStats = { amb: { pagi: { biasa: 0, kecemasan: 0, followup: 0 }, petang: { biasa: 0, kecemasan: 0, followup: 0 }, malam: { biasa: 0, kecemasan: 0, followup: 0 } }, jab: { pagi: { biasa: 0, kecemasan: 0, followup: 0 }, petang: { biasa: 0, kecemasan: 0, followup: 0 }, malam: { biasa: 0, kecemasan: 0, followup: 0 } }, totals: { biasa: 0, kecemasan: 0, followup: 0, takTergolong: 0 } };
   let stepdownStats = { amb: { pagi: 0, petang: 0, malam: 0 }, jab: { pagi: 0, petang: 0, malam: 0 }, totals: 0 };
-  let tripStats = { "BNU 9974": 0, "BPL 7944": 0, "BPP 4693": 0, "SYJ 7904": 0, "SAA 8110 K": 0, "VFP 2850": 0, "SAC 7316 C": 0, "WLL 1078": 0, "SAA 5285 N": 0, "SAA 2680 W": 0, grandTotal: 0 };
+  let tripStats = Object.fromEntries([...(configKenderaan.ambulans || []), ...(configKenderaan.jabatan || [])].map(function (p) { return [p, 0]; }));
+  tripStats.grandTotal = 0;
   let customAmb = {}; let customJab = {};
   let emergencyCallStats = { pagi: 0, petang: 0, malam: 0, total: 0 };
   let driverStats = {}, overallDriverTrips = {}, escortStats = {};
@@ -884,7 +900,7 @@ function computeMonthStats(monthStr) {
     const vType = (item.kategoriKenderaan === 'Ambulans' || ambulansList.includes(item.kenderaan)) ? 'amb' : 'jab';
     const sKey = item.syif ? item.syif.toLowerCase() : 'pagi';
 
-    if (['BNU 9974', 'BPL 7944', 'BPP 4693', 'SYJ 7904', 'SAA 8110 K', 'VFP 2850', 'SAC 7316 C', 'WLL 1078', 'SAA 5285 N', 'SAA 2680 W'].includes(item.kenderaan)) {
+    if ([...(configKenderaan.ambulans || []), ...(configKenderaan.jabatan || [])].includes(item.kenderaan)) {
       tripStats[item.kenderaan]++;
     } else {
       if (vType === 'amb') customAmb[item.kenderaan] = (customAmb[item.kenderaan] || 0) + 1;
@@ -1022,8 +1038,8 @@ window.updateUI = function () {
   const vehicleTripsBody = document.getElementById('vehicleTripsBody');
   if (vehicleTripsBody) {
     let ambHTML = '', jabHTML = '';
-    const ambListFixed = ['BNU 9974', 'BPL 7944', 'BPP 4693'];
-    const jabListFixed = ['SYJ 7904', 'SAA 8110 K', 'VFP 2850', 'SAC 7316 C', 'WLL 1078', 'SAA 5285 N', 'SAA 2680 W'];
+    const ambListFixed = configKenderaan.ambulans || [];
+    const jabListFixed = configKenderaan.jabatan || [];
     let ambCount = ambListFixed.length + Object.keys(customAmb).length;
     let jabCount = jabListFixed.length + Object.keys(customJab).length;
     let firstAmb = true;
