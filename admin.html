@@ -297,10 +297,11 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 </div>
 <div class="container">
 
+<div id="viewerBanner" class="hide-print" style="display:none; background: var(--secondary); color: #fff; width: 100%; box-sizing: border-box; font-size: 13px; padding: 8px 16px; border-radius: 6px; margin-bottom: 20px; text-align: center;">⚠ Mod Paparan Sahaja — Anda log masuk sebagai pelawat. Tiada tindakan boleh dilakukan.</div>
 <div class="control-panel hide-print" style="display: flex; gap: 10px; margin-bottom: 20px; background: #e9ecef; padding: 15px; border-radius: 6px; border-left: 5px solid var(--primary); flex-wrap: wrap;">
 <button class="btn-print" onclick="window.print()"> 🖨️  Cetak Laporan Bulanan (Statistik Sahaja)</button>
 <button class="btn-export" onclick="window.downloadMasterLogCSV()"> 📁  Muat Turun CSV (Penuh Log Pergerakan)</button>
-<button class="btn-danger-action" style="margin-left: auto;" onclick="window.clearData()"> ⚠️  Padam Pangkalan Data</button>
+<button id="btnClearData" class="btn-danger-action" style="margin-left: auto;" onclick="window.clearData()"> ⚠️  Padam Pangkalan Data</button>
 </div>
 <div class="card log-pergerakan-section" style="border-top: 3px solid var(--success);">
 <h2 style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--success); border-bottom-color: var(--success);">
@@ -312,7 +313,7 @@ Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak 
 <div class="table-scroll" style="max-height: 500px;">
 <table id="mainDataTable">
 <thead style="position: sticky; top:0; z-index:51;">
-<tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th class="hide-print" style="background:var(--primary); text-align: center;">Tindakan</th></tr>
+<tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th id="thTindakanLog" class="hide-print" style="background:var(--primary); text-align: center;">Tindakan</th></tr>
 </thead>
 <tbody id="dataTableBody"><tr><td colspan="14" style="text-align:center; color:gray;">Memuat turun data awan...</td></tr></tbody>
 </table>
@@ -545,6 +546,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const PORTAL_EMAIL = "admin@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
+const VISITOR_EMAIL = "visitor@pitas.velos";
+const VISITOR_UID = '89fwBTQsc9dAB68P1RnMBgorxrg1';
+let isViewer = false;
 
 /* ---------------------------------------------------------------------
    AUTH GATE
@@ -558,10 +562,12 @@ const loginError = document.getElementById('loginError');
 
 onAuthStateChanged(auth, function (user) {
   if (user) {
+    isViewer = user.uid === VISITOR_UID;
     loginView.style.display = 'none';
     secureDashboardWrapper.style.display = 'block';
     initDashboard();
   } else {
+    isViewer = false;
     loginView.style.display = 'flex';
     secureDashboardWrapper.style.display = 'none';
     teardownDashboard();
@@ -579,7 +585,11 @@ loginForm.addEventListener('submit', async function (e) {
     try {
       await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
     } catch (err) {
-      await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+      try {
+        await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+      } catch (err2) {
+        await signInWithEmailAndPassword(auth, VISITOR_EMAIL, passwordInput.value);
+      }
     }
   } catch (err) {
     loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
@@ -648,6 +658,13 @@ window.editCapacity = function (plat) {
 function initDashboard() {
   if (dashboardInitialized) return;
   dashboardInitialized = true;
+
+  const viewerBanner = document.getElementById('viewerBanner');
+  const btnClearData = document.getElementById('btnClearData');
+  const thTindakanLog = document.getElementById('thTindakanLog');
+  if (viewerBanner) viewerBanner.style.display = isViewer ? 'block' : 'none';
+  if (btnClearData) btnClearData.style.display = isViewer ? 'none' : '';
+  if (thTindakanLog) thTindakanLog.style.display = isViewer ? 'none' : '';
 
   const now = new Date();
   document.getElementById('pilihanBulan').value = now.getFullYear() + '-' + pad2(now.getMonth() + 1);
@@ -1110,11 +1127,11 @@ window.updateUI = function () {
       }
       let capDisplay = vData.cap;
       if (cloudTangkiCap[origPlat] === undefined || cloudTangkiCap[origPlat] === null) {
-        capDisplay = '<span style="color:#d33; font-weight:bold;">' + vData.cap + '</span> <button class="hide-print" onclick="window.editCapacity(\'' + origPlat + '\')" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:3px;" title="Ubah Kapasiti"> ✏️ </button>';
+        capDisplay = '<span style="color:#d33; font-weight:bold;">' + vData.cap + '</span>' + (isViewer ? '' : ' <button class="hide-print" onclick="window.editCapacity(\'' + origPlat + '\')" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:3px;" title="Ubah Kapasiti"> ✏️ </button>');
       }
       const latestFillId = entries.length ? entries[entries.length - 1].id : null;
       const actionButtons = latestFillId
-        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatResit(\'' + latestFillId + '\')">Resit</button> <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + latestFillId + '\')">Padam</button>'
+        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatResit(\'' + latestFillId + '\')">Resit</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + latestFillId + '\')">Padam</button>')
         : '<span style="color:#999; font-size:11px;">Tiada Rekod</span>';
       const jarakDisplay = vData.hasTrips ? vData.jarak : '<span style="color:#999;">Tiada trip</span>';
       const minOdoDisplay = vData.hasTrips ? vData.minOdo : '-';
@@ -1138,7 +1155,8 @@ window.updateUI = function () {
       } else { wadHTML = destHTML = kesHTML = '<span style="color:gray;">Tiada</span>'; }
       const dispEsc = (item.pengiring && item.pengiring !== "Tiada Pengiring") ? '<strong>' + item.pengiring + '</strong>' : '<span style="color:gray;">Tiada</span>';
       const dispPemandu = '<strong>' + item.pemandu + '</strong>' + (item.pemandu2 ? '<br><small style="color:#555;">+ ' + item.pemandu2 + '</small>' : '');
-      htmlRows += '<tr><td>' + item.tarikh + '</td><td>' + item.masa + '</td><td>' + item.syif + '</td><td style="background-color:#e6f2ff;"><strong>' + item.kenderaan + '</strong></td><td>' + item.odoAwal + '</td><td>' + item.odoAkhir + '</td><td>' + dispPemandu + '</td><td>' + dispEsc + '</td><td>' + wadHTML + '</td><td>' + destHTML + '</td><td>' + kesHTML + '</td><td style="text-align:center; font-weight:bold;">H:' + cPax + '<br>A:' + cStep + '</td><td><strong>' + item.nota + '</strong></td><td class="hide-print" style="text-align:center;"><button class="btn-danger-action" style="padding: 3px 7px;" onclick="window.deleteEntry(\'' + item.id + '\')">Padam</button></td></tr>';
+      const tindakanCellLog = isViewer ? '' : '<td class="hide-print" style="text-align:center;"><button class="btn-danger-action" style="padding: 3px 7px;" onclick="window.deleteEntry(\'' + item.id + '\')">Padam</button></td>';
+      htmlRows += '<tr><td>' + item.tarikh + '</td><td>' + item.masa + '</td><td>' + item.syif + '</td><td style="background-color:#e6f2ff;"><strong>' + item.kenderaan + '</strong></td><td>' + item.odoAwal + '</td><td>' + item.odoAkhir + '</td><td>' + dispPemandu + '</td><td>' + dispEsc + '</td><td>' + wadHTML + '</td><td>' + destHTML + '</td><td>' + kesHTML + '</td><td style="text-align:center; font-weight:bold;">H:' + cPax + '<br>A:' + cStep + '</td><td><strong>' + item.nota + '</strong></td>' + tindakanCellLog + '</tr>';
     });
     if (!isFullLogView && filteredData.length > 15) {
       htmlRows += '<tr><td colspan="14" style="text-align:center; background:#e9ecef; color:#333; padding:10px;"><em>Menunjukkan 15 rekod terkini. Sila klik butang "Papar Semua Rekod" untuk melihat keseluruhan rekod bulan ini.</em></td></tr>';

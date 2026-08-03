@@ -35,12 +35,13 @@ service cloud.firestore {
     function isVcc()       { return isVccC() || isVccM(); }
     function isKenderaan() { return signedIn() && request.auth.uid == uidKenderaan(); }
     function isMaster()    { return signedIn() && request.auth.uid == uidMaster(); }
+    function isViewer()    { return request.auth != null && request.auth.uid == '89fwBTQsc9dAB68P1RnMBgorxrg1'; }
 
     // ---- logPergerakan -----------------------------------------------------
     // Driver log. Reads are unscoped because odometer chain validation
     // compares across all drivers and both fetched months.
     match /logPergerakan/{id} {
-      allow read:   if isDriver() || isAdmin() || isMaster() || isKenderaan();
+      allow read:   if isDriver() || isAdmin() || isMaster() || isKenderaan() || isViewer();
       allow create: if isDriver() || isAdmin() || isMaster();
       allow update: if isAdmin() || isMaster() || isDriver();
       allow delete: if isAdmin() || isMaster() || isDriver();
@@ -48,7 +49,7 @@ service cloud.firestore {
 
     // ---- logBahanApi -------------------------------------------------------
     match /logBahanApi/{id} {
-      allow read:   if isDriver() || isAdmin() || isMaster();
+      allow read:   if isDriver() || isAdmin() || isMaster() || isViewer();
       allow create: if isDriver() || isAdmin() || isMaster();
       allow update: if isAdmin() || isMaster() || isDriver();
       allow delete: if isAdmin() || isMaster() || isDriver();
@@ -67,7 +68,7 @@ service cloud.firestore {
     // lives in the client (single getDoc only, never onSnapshot, never
     // getDocs). See Section 7 of the brief.
     match /resitBahanApi/{id} {
-      allow read:   if isDriver() || isAdmin() || isMaster();
+      allow read:   if isDriver() || isAdmin() || isMaster() || isViewer();
       allow create: if isDriver() || isAdmin() || isMaster();
       allow update: if isAdmin() || isMaster() || isDriver();
       allow delete: if isAdmin() || isMaster() || isDriver();
@@ -78,7 +79,7 @@ service cloud.firestore {
     // Writes are scoped by suffix. Reads are NOT scoped between the two VCC
     // accounts -- see note at the bottom of this file.
     match /permohonanVCC/{id} {
-      allow read:   if isUser() || isVcc() || isAdmin() || isMaster();
+      allow read:   if isUser() || isVcc() || isAdmin() || isMaster() || isViewer();
       allow create: if isUser() || isAdmin() || isMaster();
 
       allow update: if isAdmin()
@@ -103,7 +104,7 @@ service cloud.firestore {
 
     // ---- sistemMeta --------------------------------------------------------
     match /sistemMeta/{docId} {
-      allow read:  if isAdmin() || isMaster();
+      allow read:  if isAdmin() || isMaster() || isViewer();
       allow write: if isAdmin() || isMaster();
     }
 
