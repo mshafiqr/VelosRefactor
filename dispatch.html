@@ -150,12 +150,8 @@ select.auth-select { font-weight: bold; background-color: #f8f9fa; }
 <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
 <div class="auth-brand-line2">(VELOS)</div>
 </div>
-<p class="auth-portal-label">Sila pilih unit anda dan masukkan kata laluan penyelaras.</p>
+<p class="auth-portal-label">Vehicle Coordination Centre (VCC)</p>
 <form id="loginForm" novalidate>
-<select id="vccTypeSelection" class="auth-select">
-<option value="Klinikal">VCC : Clinical (Unit Kecemasan)</option>
-<option value="Jabatan">VCC : Management (Pegawai Kenderaan)</option>
-</select>
 <input type="password" id="loginPassword" class="auth-input" required placeholder="Kata Laluan" autocomplete="current-password">
 <button type="submit" class="auth-submit-btn" id="btnLogin">Buka Papan Pemuka</button>
 <p id="loginError" class="auth-error"></p>
@@ -344,15 +340,14 @@ let configPemandu = [];
 let configKenderaan = { ambulans: [], jabatan: [] };
 
 /* ---------------------------------------------------------------------
-   AUTH GATE — two accounts share this portal. vccTypeSelection picks
-   which account signs in; the queue type is read back from the
+   AUTH GATE — two accounts share this portal. The password is tried
+   against each in turn; the queue type is read back from the
    authenticated account's own email rather than tracked separately
    client-side.
 --------------------------------------------------------------------- */
 const loginView = document.getElementById('loginView');
 const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
 const loginForm = document.getElementById('loginForm');
-const vccTypeSelection = document.getElementById('vccTypeSelection');
 const loginPassword = document.getElementById('loginPassword');
 const loginError = document.getElementById('loginError');
 const btnLogin = document.getElementById('btnLogin');
@@ -883,7 +878,8 @@ function binaJadualSejarah(res) {
 
     let masaBertolak = item.json ? (item.json.masaMula || '') : '';
 
-    let infoPemanduText = `<strong>${item.kenderaan}</strong><br><small>${item.pemandu}</small>`;
+    let kenderaanDisplayRekod = (item.kenderaan === 'Kenderaan Lain' && item.json && item.json.platLain) ? item.json.platLain : item.kenderaan;
+    let infoPemanduText = `<strong>${kenderaanDisplayRekod}</strong><br><small>${item.pemandu}</small>`;
     if (item.json && item.json.pelulus && item.json.pelulus !== '-') {
       infoPemanduText += `<br><small style="color:#1E8E5A; font-weight:bold;">🔑 Pelulus: ${item.json.pelulus}</small>`;
     }
