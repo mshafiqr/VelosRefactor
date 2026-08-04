@@ -120,6 +120,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13p
 th, td { padding: 8px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { background-color: var(--primary); color: white; }
 tr:nth-child(even) { background-color: #F6FAFC; }
+tbody tr:hover {
+  background-color: rgba(20, 125, 130, 0.08);
+  transition: background-color 0.15s ease;
+}
 .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }

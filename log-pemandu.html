@@ -45,6 +45,10 @@ th, td { padding: 9px 8px; border: none; border-bottom: 1px solid var(--line); t
 th { background-color: var(--secondary); color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
 tbody tr:last-child td { border-bottom: none; }
 tr:nth-child(even) { background-color: #F6FAFC; }
+tbody tr:hover {
+  background-color: rgba(20, 125, 130, 0.08);
+  transition: background-color 0.15s ease;
+}
 .btn-danger-action, .btn-edit-action { border: none; border-radius: 7px; cursor: pointer; font-weight: bold; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 .btn-danger-action { background-color: var(--danger); color: white; }
 .btn-edit-action { background-color: var(--secondary); color: white; }
