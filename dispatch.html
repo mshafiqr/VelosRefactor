@@ -560,6 +560,7 @@ function toAktifEntry(raw, isKlinikal, isAkanDatang) {
   }
   if (isAkanDatang) {
     entry.kenderaan = raw.kenderaan;
+    entry.platLain = raw.platLain || "";
     entry.pemandu = raw.pemandu;
     entry.pelulus = raw.pelulus || "-";
     entry.catatanLulus = raw.catatanLulus || "-";
@@ -820,12 +821,13 @@ function binaJadualAkanDatang(res) {
     } else {
       colDestinasi = `<strong>Destinasi:</strong> ${item.destinasi}<br><strong>Tujuan:</strong> ${item.tujuan}`;
     }
+    let kenderaanDisplay = (item.kenderaan === 'Kenderaan Lain' && item.platLain) ? item.platLain : item.kenderaan;
     html += `
         <tr>
             <td><strong>${item.tarikhGerak}</strong><br><span style="color:#0F2A4A;">Masa: ${item.masa}</span></td>
             <td><strong>${item.jabatan}</strong><br><small>${item.nama}</small><br><span style="color:#555;">📞 ${item.telefon}</span></td>
             <td>${colDestinasi}</td>
-            <td><strong>${item.kenderaan || '-'}</strong><br><small>${item.pemandu || '-'}</small></td>
+            <td><strong>${kenderaanDisplay || '-'}</strong><br><small>${item.pemandu || '-'}</small></td>
             <td>${item.pelulus || '-'}<br><small>${item.masaKeputusan || ''}</small></td>
         </tr>`;
   });
@@ -994,8 +996,13 @@ window.promptLulus = function (rowIdx) {
         <optgroup label="Kenderaan Jabatan">
             ${jabOptionsHtml}
         </optgroup>
-        <option value="Kenderaan Sewa / Lain">Lain-lain / Sewa Khas</option>
+        <option value="Kenderaan Lain">Lain-lain / Sewa Khas</option>
     </select>
+
+    <div id="blokPlatLain" style="display:none;">
+        <label for="inputPlatLain" style="display:block; text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Plat Kenderaan Lain:</label>
+        <input type="text" id="inputPlatLain" class="swal2-input" placeholder="Cth: BPL 1234" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
+    </div>
 
     <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:5px;">Pilih Pemandu 1:</div>
     <select id="swalDrv" class="swal2-input" style="width:100%; max-width:100%; font-size:14px; margin: 0 0 15px 0;">
@@ -1024,31 +1031,47 @@ window.promptLulus = function (rowIdx) {
     confirmButtonColor: '#28a745',
     confirmButtonText: 'Sahkan & Luluskan',
     cancelButtonText: 'Batal',
+    didOpen: function () {
+      const vehSelect = document.getElementById('swalVeh');
+      const blokPlatLain = document.getElementById('blokPlatLain');
+      vehSelect.addEventListener('change', function () {
+        blokPlatLain.style.display = (vehSelect.value === 'Kenderaan Lain') ? 'block' : 'none';
+      });
+    },
     preConfirm: function () {
       let veh = document.getElementById('swalVeh').value;
       let drv = document.getElementById('swalDrv').value;
       let drv2 = document.getElementById('swalDrv2').value;
       let pel = document.getElementById('swalPelulus').value;
       let catatan = document.getElementById('swalCatatanLulus').value;
+      let platLain = document.getElementById('inputPlatLain').value.trim();
       if (!veh || !drv || !pel) {
         Swal.showValidationMessage('Sila pilih kenderaan, pemandu 1, dan nama pelulus!');
         return false;
       }
+      if (veh === 'Kenderaan Lain' && !platLain) {
+        Swal.showValidationMessage('Sila isikan plat kenderaan lain!');
+        return false;
+      }
       let finalPemandu = (drv2 && drv2 !== '-') ? `${drv} & ${drv2}` : drv;
-      return { veh: veh, drv: finalPemandu, pel: pel, catatan: catatan };
+      return { veh: veh, drv: finalPemandu, pel: pel, catatan: catatan, platLain: platLain };
     }
   }).then(function (res) {
     if (!res.isConfirmed) return;
     Swal.fire({ title: 'Menyimpan ke Awan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
     const ref = doc(db, 'permohonanVCC', String(rowIdx));
-    updateDoc(ref, {
+    const updateData = {
       status: 'Diluluskan',
       kenderaan: res.value.veh,
       pemandu: res.value.drv,
       pelulus: res.value.pel,
       catatanLulus: res.value.catatan || '-',
       masaKeputusan: buildTimestampDMY()
-    }).then(function () {
+    };
+    if (res.value.veh === 'Kenderaan Lain') {
+      updateData.platLain = res.value.platLain;
+    }
+    updateDoc(ref, updateData).then(function () {
       Swal.fire('Selesai!', 'Permohonan diluluskan dan logistik ditetapkan.', 'success');
     }).catch(function (err) {
       Swal.fire('Ralat', err.message || String(err), 'error');
