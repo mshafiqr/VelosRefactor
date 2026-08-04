@@ -252,7 +252,7 @@ select.auth-select { font-weight: bold; background-color: #f8f9fa; }
 <button class="back-btn" onclick="goTo('menu')">‹ Kembali ke Menu</button>
 <div class="card no-print" style="border-top: 3px solid var(--secondary);">
 <h2 style="display: flex; justify-content: space-between; align-items: center; border-bottom-color: var(--secondary); color: var(--secondary); flex-wrap: wrap; gap: 10px;">
-<span>Tugasan Akan Datang (Diluluskan — Belum Bergerak)</span>
+<span>Tugasan Hari Ini</span>
 </h2>
 <p id="akanDatangHelperText" style="font-size: 12px; color: gray; margin-top:-10px;"></p>
 <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: clamp(420px, 65vh, 650px);">
@@ -693,7 +693,7 @@ function renderFasaHelperTexts() {
   document.getElementById('fasa1HelperText').innerHTML = `Fasa 1 : Penerimaan dan triage permohonan. Setiap permohonan baharu akan melalui Fasa 1 untuk proses penerimaan dan akan di-triage mengikut ${kategoriLabel} ${kategoriParen}.`;
   document.getElementById('fasa2HelperText').innerHTML = `Fasa 2 : Proses koordinasi permohonan merupakan fasa koordinasi yang akan dilakukan oleh Admin VCC (${currentVccType}) untuk: 1. Proses penyelarasan pemandu dan kenderaan. 2. Menentukan status permohonan (Diluluskan/Ditolak/Lain-lain).`;
   document.getElementById('fasa3HelperTextVCC').innerHTML = 'Fasa 3 : Jadual ini memaparkan rekod keseluruhan permohonan (Menunggu/Diproses/Diluluskan/Ditolak) secara langsung. Sebarang tindakan (Terima/Koordinasi) hanya boleh dilakukan melalui ruang Fasa 1 dan Fasa 2 di atas — jadual ini adalah rekod sahaja.';
-  document.getElementById('akanDatangHelperText').innerHTML = 'Tugasan Akan Datang : Senarai permohonan yang telah Diluluskan tetapi belum bertolak (tarikh gerak hari ini atau akan datang). VCC bertugas perlu memastikan pemandu dan kenderaan yang ditetapkan dimaklumkan dan bersedia untuk tugasan. Baris akan hilang secara automatik sehari selepas tarikh bertolak — jadual ini adalah paparan sahaja, tiada tindakan diperlukan di sini.';
+  document.getElementById('akanDatangHelperText').innerHTML = 'Tugasan Hari Ini : Memaparkan senarai permohonan yang telah diluluskan. VCC bertugas perlu memastikan pemandu dan kenderaan yang ditetapkan dimaklumkan dan bersedia untuk tugasan mengikut tarikh pergerakan yang dimohon. Rekod tugasan akan hilang secara automatik sehari selepas tarikh bertolak — jadual ini adalah paparan sahaja, tiada tindakan diperlukan di sini.';
 }
 
 function sortAktifByUrgency(data, isKlinikal) {
