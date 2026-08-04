@@ -1190,6 +1190,7 @@ window.cetakRekod = function (encodedData) {
   let isKlinikal = item.id.endsWith('C');
   let masaKeputusanRow = json.masaKeputusan ? `<tr><td style="padding:4px 0;">Tarikh & Masa Kelulusan</td><td style="padding:4px 0;">: <strong>${json.masaKeputusan}</strong></td></tr>` : '';
   const kembali = resolveKembali(json);
+  let kenderaanDisplayTiket = (item.kenderaan === 'Kenderaan Lain' && json.platLain) ? json.platLain : item.kenderaan;
 
   let html = `
     <div class="print-receipt-header">
@@ -1200,7 +1201,7 @@ window.cetakRekod = function (encodedData) {
     <p style="text-align:center; margin:0; font-size: 13px; font-weight:bold;">VCC ID: ${item.id}</p>
 
     <div style="border: 2px solid #28a745; background-color: #e9f7ef !important; color: #155724 !important; padding: 15px; border-radius: 6px; margin-top: 20px; margin-bottom: 25px; text-align:center; font-size:15px; font-weight:bold;">
-    KENDERAAN: ${item.kenderaan} &nbsp;|&nbsp; PEMANDU: ${item.pemandu}
+    KENDERAAN: ${kenderaanDisplayTiket} &nbsp;|&nbsp; PEMANDU: ${item.pemandu}
     </div>
     `;
 
