@@ -1081,6 +1081,8 @@ window.editEntry = function (id) {
 
   document.getElementById('formHeader').innerText = 'Kemaskini Rekod Pergerakan';
   document.getElementById('btnSimpanLog').innerText = 'Kemaskini Rekod Perjalanan';
+  document.getElementById('btnSimpanLog').disabled = true;
+  document.getElementById('btnSimpanLog').innerText = 'Memuat data bahan api...';
   document.getElementById('btnCancelEdit').style.display = 'block';
 
   document.getElementById('tarikh').value = item.tarikh;
@@ -1179,11 +1181,15 @@ window.editEntry = function (id) {
       container.appendChild(window.createFuelFillRow());
     }
     window.updateFuelFillRemoveButtons();
+    document.getElementById('btnSimpanLog').disabled = false;
+    document.getElementById('btnSimpanLog').innerText = 'Kemaskini Rekod Perjalanan';
   }).catch(function () {
     const container = document.getElementById('fuelFillsContainer');
     container.innerHTML = '';
     container.appendChild(window.createFuelFillRow());
     window.updateFuelFillRemoveButtons();
+    document.getElementById('btnSimpanLog').disabled = false;
+    document.getElementById('btnSimpanLog').innerText = 'Kemaskini Rekod Perjalanan';
   });
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
