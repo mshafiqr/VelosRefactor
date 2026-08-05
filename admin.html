@@ -618,6 +618,7 @@ let ambulanceData = [], fuelDataLog = [], permohonanData = [], cloudTangkiCap = 
 let dashboardInitialized = false;
 let unsubLog = null, unsubFuel = null, unsubMohon = null;
 let isFullLogView = false;
+let _auditFillMap = {};
 let myChartPesakit = null, myChartPemandu = null;
 let configKenderaan = { ambulans: [], jabatan: [] };
 let ambulansList = [];
@@ -812,6 +813,39 @@ window.lihatResit = function (fillId) {
     }
   }).catch(function (err) {
     Swal.fire('Ralat', 'Gagal memuatkan resit: ' + (err.message || err), 'error');
+  });
+};
+
+window.lihatSemuaResit = function (plat) {
+  const entries = _auditFillMap[plat] || [];
+  if (entries.length === 0) {
+    Swal.fire('Tiada Rekod', 'Tiada pengisian bahan api direkodkan untuk kenderaan ini bulan ini.', 'info');
+    return;
+  }
+  let rows = entries.map(function (f) {
+    return '<tr>' +
+      '<td style="padding:6px 10px; border-bottom:1px solid #eee;">' + (f.tarikh || '—') + '</td>' +
+      '<td style="padding:6px 10px; border-bottom:1px solid #eee; font-weight:bold;">' + f.liter + 'L</td>' +
+      '<td style="padding:6px 10px; border-bottom:1px solid #eee;">' +
+        '<button onclick="window.lihatResit(\'' + f.id + '\')" ' +
+        'style="background:#6f42c1; color:white; border:none; border-radius:4px; ' +
+        'padding:4px 10px; font-size:12px; cursor:pointer; font-weight:bold;">Lihat Resit</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+  Swal.fire({
+    title: 'Resit Bahan Api — ' + plat,
+    html: '<table style="width:100%; border-collapse:collapse; font-size:13px;">' +
+      '<thead><tr>' +
+        '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Tarikh</th>' +
+        '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Liter</th>' +
+        '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Resit</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>',
+    showConfirmButton: false,
+    showCloseButton: true,
+    width: 420
   });
 };
 
@@ -1126,6 +1160,7 @@ window.updateUI = function () {
     fuelStatsBody.innerHTML = '';
     for (let plat in vFuelGroup) {
       let vData = vFuelGroup[plat]; let entries = vData.entries; let origPlat = vData.origPlat;
+      _auditFillMap[origPlat] = entries;
       const firstFillCurrent = entries.length ? entries[0].liter : 0;
       let fInfo = vData.hasFuelData
         ? '(i: ' + vData.i_val.toFixed(2) + ' + ii: ' + vData.ii_belian.toFixed(2) + ' - iii: ' + vData.iii_val.toFixed(2) + ')'
@@ -1138,8 +1173,8 @@ window.updateUI = function () {
         capDisplay = '<span style="color:#d33; font-weight:bold;">' + vData.cap + '</span>' + (isViewer ? '' : ' <button class="hide-print" onclick="window.editCapacity(\'' + origPlat + '\')" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:3px;" title="Ubah Kapasiti"> ✏️ </button>');
       }
       const latestFillId = entries.length ? entries[entries.length - 1].id : null;
-      const actionButtons = latestFillId
-        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatResit(\'' + latestFillId + '\')">Resit</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + latestFillId + '\')">Padam</button>')
+      const actionButtons = entries.length > 0
+        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatSemuaResit(\'' + origPlat + '\')">Resit (' + entries.length + ')</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + (entries.length ? entries[entries.length-1].id : '') + '\')">Padam</button>')
         : '<span style="color:#999; font-size:11px;">Tiada Rekod</span>';
       const jarakDisplay = vData.hasTrips ? vData.jarak : '<span style="color:#999;">Tiada trip</span>';
       const minOdoDisplay = vData.hasTrips ? vData.minOdo : '-';
