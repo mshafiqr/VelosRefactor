@@ -111,6 +111,10 @@ flex-wrap: wrap; gap: 10px;}
 button.btn-table-download { background-color: #6c757d; color: white; border: none; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
 .btn-zip { background-color: #17a2b8; }
 .btn-danger-action { background-color: var(--danger); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+.fb { display:inline-block; padding:2px 7px; border-radius:4px; font-size:10px; font-weight:bold; white-space:nowrap; margin-bottom:2px; }
+.fb.ok     { background:#e1f5ee; color:#0F6E56; }
+.fb.warn   { background:#FAEEDA; color:#854F0B; }
+.fb.danger { background:#FCEBEB; color:#A32D2D; }
 .btn-export, .btn-print { color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 .btn-export { background-color: var(--success); } .btn-print { background-color: #6f42c1; }
 .editable-month-input { border: 2px solid var(--primary); padding: 6px 12px; font-size: 15px; font-weight: bold; border-radius: 6px; width: auto; font-family: inherit;
@@ -317,9 +321,9 @@ Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak 
 <div class="table-scroll" style="max-height: 500px;">
 <table id="mainDataTable">
 <thead style="position: sticky; top:0; z-index:51;">
-<tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th id="thTindakanLog" class="hide-print" style="background:var(--primary); text-align: center;">Tindakan</th></tr>
+<tr><th>Tarikh</th><th>Masa</th><th>Syif</th><th>Kenderaan</th><th>Odometer Awal</th><th>Odometer Akhir</th><th>Bahan Api</th><th>Pemandu</th><th>Pengiring</th><th>Wad Asal / Fasiliti</th><th>Destinasi</th><th>Jenis Kes</th><th style="text-align:center;">Pesakit (H/A)</th><th>Tujuan</th><th id="thTindakanLog" class="hide-print" style="background:var(--primary); text-align: center;">Tindakan</th></tr>
 </thead>
-<tbody id="dataTableBody"><tr><td colspan="14" style="text-align:center; color:gray;">Memuat turun data awan...</td></tr></tbody>
+<tbody id="dataTableBody"><tr><td colspan="15" style="text-align:center; color:gray;">Memuat turun data awan...</td></tr></tbody>
 </table>
 </div>
 </div>
@@ -1144,10 +1148,17 @@ window.updateUI = function () {
     }
   }
 
+  const fuelDataMap = {};
+  fuelDataLog.forEach(function (f) {
+    const lid = Number(f.logId);
+    if (!fuelDataMap[lid]) fuelDataMap[lid] = [];
+    fuelDataMap[lid].push(f);
+  });
+
   const tbody = document.getElementById('dataTableBody');
   let htmlRows = '';
   if (filteredData.length === 0) {
-    htmlRows = '<tr><td colspan="14" style="text-align:center; color:gray;">Tiada rekod untuk paparan ini.</td></tr>';
+    htmlRows = '<tr><td colspan="15" style="text-align:center; color:gray;">Tiada rekod untuk paparan ini.</td></tr>';
   } else {
     let displayData = isFullLogView ? filteredData : filteredData.slice(0, 15);
     displayData.forEach(item => {
@@ -1160,10 +1171,24 @@ window.updateUI = function () {
       const dispEsc = (item.pengiring && item.pengiring !== "Tiada Pengiring") ? '<strong>' + item.pengiring + '</strong>' : '<span style="color:gray;">Tiada</span>';
       const dispPemandu = '<strong>' + item.pemandu + '</strong>' + (item.pemandu2 ? '<br><small style="color:#555;">+ ' + item.pemandu2 + '</small>' : '');
       const tindakanCellLog = isViewer ? '' : '<td class="hide-print" style="text-align:center;"><button class="btn-danger-action" style="padding: 3px 7px;" onclick="window.deleteEntry(\'' + item.id + '\')">Padam</button></td>';
-      htmlRows += '<tr><td>' + item.tarikh + '</td><td>' + item.masa + '</td><td>' + item.syif + '</td><td style="background-color:#e6f2ff;"><strong>' + item.kenderaan + '</strong></td><td>' + item.odoAwal + '</td><td>' + item.odoAkhir + '</td><td>' + dispPemandu + '</td><td>' + dispEsc + '</td><td>' + wadHTML + '</td><td>' + destHTML + '</td><td>' + kesHTML + '</td><td style="text-align:center; font-weight:bold;">H:' + cPax + '<br>A:' + cStep + '</td><td><strong>' + item.nota + '</strong></td>' + tindakanCellLog + '</tr>';
+      const fills     = fuelDataMap[Number(item.id)] || [];
+      const capTangki = getKenderaanCapacity(item.kenderaan);
+      let fuelCell;
+      if (fills.length === 0) {
+        fuelCell = '<span style="color:gray;">—</span>';
+      } else {
+        fuelCell = fills.map(function (f) {
+          const liter = Number(f.liter);
+          let cls = 'ok', prefix = '';
+          if (liter > 1000)          { cls = 'danger'; prefix = '⚠ '; }
+          else if (liter > capTangki){ cls = 'warn';   prefix = '⚠ '; }
+          return '<span class="fb ' + cls + '">' + prefix + liter + 'L</span>';
+        }).join('<br>');
+      }
+      htmlRows += '<tr><td>' + item.tarikh + '</td><td>' + item.masa + '</td><td>' + item.syif + '</td><td style="background-color:#e6f2ff;"><strong>' + item.kenderaan + '</strong></td><td>' + item.odoAwal + '</td><td>' + item.odoAkhir + '</td><td>' + fuelCell + '</td><td>' + dispPemandu + '</td><td>' + dispEsc + '</td><td>' + wadHTML + '</td><td>' + destHTML + '</td><td>' + kesHTML + '</td><td style="text-align:center; font-weight:bold;">H:' + cPax + '<br>A:' + cStep + '</td><td><strong>' + item.nota + '</strong></td>' + tindakanCellLog + '</tr>';
     });
     if (!isFullLogView && filteredData.length > 15) {
-      htmlRows += '<tr><td colspan="14" style="text-align:center; background:#e9ecef; color:#333; padding:10px;"><em>Menunjukkan 15 rekod terkini. Sila klik butang "Papar Semua Rekod" untuk melihat keseluruhan rekod bulan ini.</em></td></tr>';
+      htmlRows += '<tr><td colspan="15" style="text-align:center; background:#e9ecef; color:#333; padding:10px;"><em>Menunjukkan 15 rekod terkini. Sila klik butang "Papar Semua Rekod" untuk melihat keseluruhan rekod bulan ini.</em></td></tr>';
     }
   }
   if (tbody) tbody.innerHTML = htmlRows;
