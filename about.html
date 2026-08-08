@@ -22,6 +22,8 @@
   .hero .orb1{position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(93,214,219,0.07);pointer-events:none}
   .hero .orb2{position:absolute;bottom:-80px;left:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none}
   .hero .tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-size:11px;font-weight:700;padding:6px 14px;border-radius:30px;margin-bottom:18px;letter-spacing:0.05em}
+  .hero .back-btn{position:absolute;top:18px;left:18px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;transition:background 0.15s;z-index:1}
+  .hero .back-btn:hover{background:rgba(255,255,255,0.18)}
   .hero h1{font-size:clamp(24px,5vw,38px);font-weight:900;color:white;line-height:1.1;letter-spacing:-0.5px;margin-bottom:10px}
   .hero h1 .teal{color:#5DD6DB}
   .hero p{font-size:14px;color:rgba(255,255,255,0.65);max-width:480px;margin:0 auto;line-height:1.65}
@@ -75,6 +77,7 @@
 
 <div class="hero">
   <div class="orb1"></div><div class="orb2"></div>
+  <a href="index.html" class="back-btn">← Laman Utama</a>
   <div class="tag">⚕️ Tentang Sistem</div>
   <h1>System <span class="teal">Developer</span></h1>
   <p>Mengenali sistem VELOS, objektif pembinaannya, dan individu di sebaliknya.</p>
