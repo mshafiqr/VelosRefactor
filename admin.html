@@ -19,6 +19,49 @@
   --warning: #C98A2E; --line: #DCE6ED; --radius: 12px;
   --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
 }
+/* ============================================================
+   VELOS Design System v1
+   Shared visual language across all portals — do not modify
+   tokens without updating all portal files accordingly
+   ============================================================ */
+:root {
+  /* Chrome -- gradient matches the landing page hero exactly (index.html .hero) */
+  --vx-topbar:        #084E4E;
+  --vx-sidebar:       #0A5C5C;
+  --vx-gradient:      linear-gradient(135deg, #0F2A4A 0%, #0D4F54 50%, #147D82 100%);
+  --vx-sidebar-hover: rgba(255,255,255,0.08);
+  --vx-sidebar-active:rgba(255,255,255,0.18);
+
+  /* Brand */
+  --vx-teal:          #147D82;
+  --vx-teal-light:    #E0F4F5;
+  --vx-teal-bright:   #7FDFDF;
+
+  /* Page */
+  --vx-bg:            #EEF8F8;
+  --vx-card:          #FFFFFF;
+  --vx-card-tint:     #F0FAFA;
+  --vx-border:        #DCE6ED;
+
+  /* Text */
+  --vx-text:          #0F2A4A;
+  --vx-muted:         #5B6774;
+  --vx-sb-text:       #A8D4D4;
+  --vx-sb-label:      #5FAAAA;
+
+  /* Semantic */
+  --vx-success:       #1E8E5A;
+  --vx-success-light: #E3F4EB;
+  --vx-danger:        #C62828;
+  --vx-danger-light:  #FDEAEA;
+  --vx-warning:       #C98A2E;
+  --vx-warning-light: #FDF3E0;
+
+  /* Elevation */
+  --vx-shadow:        0 1px 3px rgba(15,42,74,0.05), 0 4px 14px rgba(15,42,74,0.08);
+  --vx-radius:        16px;
+  --vx-radius-sm:     10px;
+}
 body {
   font-family: 'Public Sans', sans-serif;
   background-color: var(--bg-color);
@@ -78,10 +121,10 @@ body {
 /* ==================== DASHBOARD (ported from live Admin_Velos.html) ==================== */
 #secureDashboardWrapper { display: none; padding: 20px; }
 .kkm-corporate-header { text-align: center; background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px;
-border-top: 5px solid var(--primary); border-bottom: 3px solid var(--warning); position: relative;}
-.btn-refresh-top { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px;
+border-top: 5px solid var(--primary); border-bottom: 3px solid var(--line); position: relative;}
+.btn-refresh-top { position: absolute; top: 15px; right: 15px; background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 4px;
 font-weight: bold; cursor: pointer; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
-.btn-refresh-top:active { background: #218838; }
+.btn-refresh-top:active { background: #081D33; }
 .btn-logout-top { position: absolute; top: 15px; right: 145px; background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 4px;
 font-weight: bold; cursor: pointer; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
 .header-logos-inline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #e9ecef; }
@@ -109,16 +152,30 @@ flex-wrap: wrap; gap: 10px;}
 .h2-laporan-utama { font-size: 24px; border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
 
 button.btn-table-download { background-color: #6c757d; color: white; border: none; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
-.btn-zip { background-color: #17a2b8; }
+.btn-zip { background-color: var(--primary); }
 .btn-danger-action { background-color: var(--danger); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;}
 .fb { display:inline-block; padding:2px 7px; border-radius:4px; font-size:10px; font-weight:bold; white-space:nowrap; margin-bottom:2px; }
 .fb.ok     { background:#e1f5ee; color:#0F6E56; }
 .fb.warn   { background:#FAEEDA; color:#854F0B; }
 .fb.danger { background:#FCEBEB; color:#A32D2D; }
 .btn-export, .btn-print { color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-.btn-export { background-color: var(--success); } .btn-print { background-color: #6f42c1; }
+.btn-export { background-color: var(--primary); } .btn-print { background-color: #3E5468; }
 .editable-month-input { border: 2px solid var(--primary); padding: 6px 12px; font-size: 15px; font-weight: bold; border-radius: 6px; width: auto; font-family: inherit;
 background-color: #fff; color: #333; cursor: pointer; outline: none; }
+
+/* ==================== TEAL AS INTERACTION COLOR ==================== */
+button, .btn-export, .btn-print, .btn-table-download, .btn-zip, .btn-refresh-top, .auth-submit-btn, .editable-month-input {
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-export:hover, .btn-print:hover, .btn-table-download:hover, .btn-zip:hover, .btn-refresh-top:hover, .auth-submit-btn:hover:not(:disabled) {
+  background-color: var(--secondary) !important;
+}
+.editable-month-input:hover, .editable-month-input:focus { border-color: var(--secondary); }
+a:not(.vx-sidebar-link):hover { color: var(--secondary); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .vx-sidebar-link:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
 
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
 th, td { padding: 8px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
@@ -136,17 +193,13 @@ tbody tr:hover {
 .stat-box p { margin: 5px 0 0; font-size: 13px; font-weight: bold; }
 
 .leaders-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
-.leader-alert-box { padding: 12px; border-radius: 5px; font-weight: bold; text-align: center; font-size: 14px; display: none; }
-.alert-driver { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.leader-alert-box { padding: 14px 18px; border-radius: 10px; font-weight: 700; text-align: center; font-size: 14px; display: none; line-height: 1.5; }
+.alert-driver { background-color: #E0F4F5; color: #0F2A4A; border: 1px solid #147D82; }
+.alert-driver span { color: #147D82; }
 
 .hide-print { display: table-cell; }
 .watermark-footer { text-align: center; font-size: 12px; color: #888; margin-top: 30px; padding-bottom: 10px; line-height: 1.4; font-weight: 500; }
 .print-footer-ref { display: none; }
-.signature-section { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 2px solid #333; page-break-inside: avoid; }
-.sig-box { width: 30%; text-align: center; }
-.sig-title { font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #2c3e50; }
-.sig-space { height: 80px; border-bottom: 1px dashed #666; margin: 10px auto; width: 80%; }
-.sig-name { font-size: 12px; color: #555; }
 .first-page-wrapper { page-break-after: always; }
 @media print {
 @page { size: A4 landscape; margin: 15mm 10mm 15mm 10mm; }
@@ -230,10 +283,247 @@ top: 15px !important;
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .control-panel { flex-direction: column; }
   .control-panel button { width: 100%; margin-left: 0 !important; }
-  .signature-section { flex-direction: column; gap: 20px; }
-  .sig-box { width: 100%; }
+  .vx-topbar-title { display: none; }
 }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ==================== NAVBAR (Phase 1 pilot) ==================== */
+:root {
+  --navbar-header-h: 52px;
+  --sidebar-w-collapsed: 52px;
+  --sidebar-w-expanded: 250px;
+}
+#sec-dashboard, #sec-log-pergerakan, #sec-laporan,
+#sec-laporan-pesakit, #sec-laporan-kenderaan, #sec-laporan-staf, #sec-laporan-vcc,
+#sec-konfigurasi, #sec-sistem {
+  scroll-margin-top: calc(var(--navbar-header-h) + 14px);
+}
+.vx-topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--navbar-header-h);
+  background: var(--vx-gradient); color: #fff; z-index: 1000;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 16px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.vx-topbar-left { display: flex; align-items: center; gap: 10px; }
+.vx-topbar-left img { height: 32px; width: auto; object-fit: contain; }
+.vx-topbar-title { font-weight: 700; font-size: 15px; letter-spacing: 1px; white-space: nowrap; text-align: center; }
+.vx-topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.vx-status-badge { font-size: 11px; font-weight: 600; color: var(--vx-teal-bright); background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.vx-status-dot { color: #4ADE80; font-size: 8px; display: inline-block; animation: vxBlink 2s infinite; }
+@keyframes vxBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.vx-role-badge { font-size: 11px; font-weight: 600; color: var(--vx-sb-text); background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+.vx-clock { font-size: 12px; font-weight: 600; color: var(--vx-sb-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vx-topbar-right .btn-logout-top {
+  position: static !important; top: auto !important; right: auto !important;
+  box-shadow: none !important; padding: 6px 14px !important; min-height: 0 !important; font-size: 11px !important;
+  background: var(--vx-danger) !important; border-radius: 6px !important; font-weight: 600 !important;
+}
+.vx-topbar-right .vx-topbar-sync {
+  position: static !important; box-shadow: none !important; min-height: 0 !important;
+  padding: 6px 12px !important; font-size: 11px !important; font-weight: 600 !important;
+  background: rgba(255,255,255,0.12) !important; color: #fff !important; border: none !important; border-radius: 20px !important;
+}
+.vx-topbar-right .vx-topbar-sync:hover { background: rgba(255,255,255,0.22) !important; }
+
+/* Sidebar: full-expand is the one stable state (default, no hover-driven
+   resize). The toggle button is the only way to collapse it to an icon-only
+   rail -- deliberate click, never automatic. */
+.vx-sidebar {
+  position: fixed; top: var(--navbar-header-h); left: 0; bottom: 0;
+  width: var(--sidebar-w-expanded); background: var(--vx-gradient);
+  z-index: 999; overflow-x: hidden; overflow-y: auto; transition: width 0.18s ease;
+  display: flex; flex-direction: column; padding-top: 8px;
+}
+.vx-sidebar.vx-collapsed { width: 0; }
+
+/* Toggle lives in the topbar (next to the Jata Negara logo) so it's always
+   visible regardless of sidebar state -- collapsed state shows nothing but
+   this button, since the sidebar itself collapses to zero width. */
+.vx-sidebar-toggle-floating {
+  width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.12); color: #fff; border: none; border-radius: 8px;
+  cursor: pointer; min-height: 0 !important; padding: 0 !important; box-shadow: none !important;
+}
+.vx-sidebar-toggle-floating:hover { background: rgba(255,255,255,0.22); }
+.vx-sidebar-toggle-floating svg { width: 18px; height: 18px; display: block; }
+.vx-sidebar-section-label {
+  color: var(--vx-sb-label); font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; padding: 14px 16px 6px; white-space: nowrap; overflow: hidden;
+  opacity: 1; transition: opacity 0.12s ease;
+}
+.vx-sidebar.vx-collapsed .vx-sidebar-section-label { opacity: 0; }
+.vx-sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 8px 12px; flex-shrink: 0; opacity: 1; transition: opacity 0.12s ease; }
+.vx-sidebar.vx-collapsed .vx-sidebar-divider { opacity: 0; }
+.vx-sidebar-toggle, .vx-sidebar-link, .vx-sidebar-section-label, .vx-sidebar-subgroup { flex-shrink: 0; }
+.vx-sidebar-link {
+  display: flex; align-items: flex-start; gap: 12px; padding: 9px 12px; color: var(--vx-sb-text);
+  text-decoration: none; font-size: 12px; font-weight: 500;
+  overflow: visible; background: none; border: none; width: calc(100% - 12px); margin: 1px 6px; border-radius: 8px;
+  text-align: left; cursor: pointer; font-family: inherit; box-shadow: none !important; min-height: 0 !important;
+}
+.vx-sidebar.vx-collapsed .vx-sidebar-link { overflow: hidden; }
+.vx-sidebar-link:hover { background: var(--vx-sidebar-hover); color: #CBD5E0; }
+.vx-sidebar-link.vx-active { background: var(--vx-sidebar-active); color: var(--vx-teal-bright); }
+.vx-sidebar-icon { flex: 0 0 20px; display: inline-flex; align-items: center; justify-content: center; opacity: 1; margin-top: 2px; transition: opacity 0.12s ease; }
+.vx-sidebar.vx-collapsed .vx-sidebar-icon { opacity: 0.72; margin-top: 0; }
+.vx-sidebar-icon svg { width: 17px; height: 17px; display: block; }
+.vx-sidebar-text {
+  opacity: 1; transition: opacity 0.12s ease; flex: 1 1 auto; min-width: 0; display: block;
+  white-space: normal; overflow: visible; word-break: break-word; line-height: 1.35; padding: 2px 0;
+}
+.vx-sidebar.vx-collapsed .vx-sidebar-text { opacity: 0; }
+.vx-portal-tag { font-size: 9px; font-weight: 700; color: var(--vx-sb-label); margin-left: auto; flex-shrink: 0; opacity: 1; margin-top: 2px; transition: opacity 0.12s ease; }
+.vx-sidebar.vx-collapsed .vx-portal-tag { opacity: 0; }
+
+/* Sidebar submenu (Laporan & Statistik expandable group) */
+.vx-sidebar-parent { justify-content: space-between; }
+.vx-sidebar-parent-chevron { flex: 0 0 auto; transition: transform 0.18s ease, opacity 0.12s ease; margin-left: auto; opacity: 1; margin-top: 2px; }
+.vx-sidebar.vx-collapsed .vx-sidebar-parent-chevron { opacity: 0; }
+.vx-sidebar-parent-chevron svg { width: 13px; height: 13px; display: block; }
+.vx-sidebar-parent.vx-expanded .vx-sidebar-parent-chevron { transform: rotate(90deg); }
+.vx-sidebar-subgroup { max-height: 0; overflow: hidden; transition: max-height 0.2s ease; }
+.vx-sidebar-subgroup.vx-expanded { max-height: 400px; }
+.vx-sidebar-subgroup .vx-sidebar-link { padding-left: 30px; }
+.vx-sidebar.vx-collapsed .vx-sidebar-subgroup .vx-sidebar-link { padding-left: 12px; }
+
+.vx-main-content { padding-top: var(--navbar-header-h); margin-left: var(--sidebar-w-expanded); transition: margin-left 0.18s ease; }
+.vx-main-content.vx-sidebar-collapsed { margin-left: 0; }
+
+/* ==================== DASHBOARD HOME + SHARED COMPONENTS ==================== */
+.vx-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--vx-teal); margin-bottom: 4px; }
+.vx-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--vx-text); }
+.vx-page-title { font-size: 22px; font-weight: 800; color: var(--vx-text); }
+
+.vx-page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.vx-month-nav { display: flex; align-items: center; gap: 4px; }
+.vx-month-nav-btn { background: #fff; border: 1px solid var(--vx-border); color: var(--vx-teal); font-size: 15px; font-weight: 700; border-radius: 8px; padding: 6px 12px; cursor: pointer; min-height: 0; }
+.vx-month-nav input[type="month"] { border: 1px solid var(--vx-border); border-radius: 8px; padding: 6px 10px; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--vx-text); background: #fff; cursor: pointer; }
+
+.vx-alert-strip { display: flex; align-items: center; gap: 10px; background: var(--vx-warning-light); border: 1px solid #F0D5A0; border-radius: var(--vx-radius-sm); padding: 10px 14px; margin-bottom: 16px; }
+.vx-alert-strip svg { width: 16px; height: 16px; stroke: var(--vx-warning); flex-shrink: 0; }
+.vx-alert-txt { font-size: 12px; color: #7A4F0A; flex: 1; }
+.vx-alert-txt strong { font-weight: 700; }
+
+.vx-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+.vx-kpi { background: var(--vx-card); border-radius: var(--vx-radius); padding: 18px 20px; box-shadow: var(--vx-shadow); display: flex; gap: 14px; align-items: flex-start; }
+.vx-kpi-ico { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.vx-kpi-ico svg { width: 22px; height: 22px; }
+.vx-kpi-ico.teal { background: var(--vx-teal-light); } .vx-kpi-ico.teal svg { stroke: var(--vx-teal); }
+.vx-kpi-ico.navy { background: #E8EEF5; } .vx-kpi-ico.navy svg { stroke: var(--vx-text); }
+.vx-kpi-ico.amber { background: var(--vx-warning-light); } .vx-kpi-ico.amber svg { stroke: var(--vx-warning); }
+.vx-kpi-ico.green { background: var(--vx-success-light); } .vx-kpi-ico.green svg { stroke: var(--vx-success); }
+.vx-kpi-num { font-size: 34px; font-weight: 800; color: var(--vx-text); line-height: 1; margin-bottom: 3px; }
+.vx-kpi-lbl { font-size: 11px; color: var(--vx-muted); font-weight: 500; margin-bottom: 6px; line-height: 1.3; }
+.vx-kpi-trend { font-size: 10px; font-weight: 700; }
+.vx-kpi-trend.up { color: var(--vx-success); } .vx-kpi-trend.dn { color: var(--vx-danger); } .vx-kpi-trend.na { color: var(--vx-muted); }
+
+.vx-card { background: var(--vx-card); border-radius: var(--vx-radius); padding: 20px; box-shadow: var(--vx-shadow); }
+.vx-card-hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: 10px; flex-wrap: wrap; }
+.vx-card-hds { font-size: 10px; color: var(--vx-muted); margin-top: 3px; }
+.vx-chip { font-size: 10px; font-weight: 700; background: var(--vx-teal-light); color: var(--vx-teal); padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.vx-chip.warn { background: var(--vx-warning-light); color: var(--vx-warning); }
+
+.vx-row { display: grid; gap: 14px; margin-bottom: 14px; }
+.vx-row.c62 { grid-template-columns: 3fr 2fr; }
+.vx-row.c11 { grid-template-columns: 1fr 1fr; }
+
+.vx-barchart { display: flex; align-items: flex-end; gap: 10px; height: 140px; padding-bottom: 26px; position: relative; }
+.vx-barchart::after { content: ''; position: absolute; bottom: 26px; left: 0; right: 0; height: 1px; background: var(--vx-bg); }
+.vx-bc { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; position: relative; }
+.vx-bc-bar { width: 100%; border-radius: 6px 6px 0 0; background: #D6EBEC; position: relative; min-height: 2px; transition: background 0.2s; }
+.vx-bc-bar.cur { background: var(--vx-teal); }
+.vx-bc-val { font-size: 9px; font-weight: 700; color: var(--vx-text); position: absolute; top: -16px; width: 100%; text-align: center; left: 0; }
+.vx-bc-lbl { font-size: 9px; color: var(--vx-sb-text); position: absolute; bottom: -20px; width: 100%; text-align: center; font-weight: 500; left: 0; }
+
+/* Matches the established report-table look used throughout the app
+   (Data 1-9 etc: navy header, bordered cells, alternating stripe) instead
+   of a separate mini-table style, for visual consistency across pages. */
+.vx-vtable { width: 100%; border-collapse: collapse; margin-top: 0; font-size: 13px; }
+.vx-vtable th { background-color: var(--primary); color: #fff; padding: 8px; border: 1px solid var(--line); text-align: left; font-size: 13px; font-weight: normal; text-transform: none; letter-spacing: normal; }
+.vx-vtable td { padding: 8px; border: 1px solid var(--line); text-align: left; vertical-align: middle; font-size: 13px; color: var(--text-color); }
+.vx-vtable tr:nth-child(even) { background-color: #F6FAFC; }
+.vx-vtable tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
+.vx-util-bar { background: var(--vx-bg); border-radius: 4px; height: 5px; width: 52px; overflow: hidden; margin-top: 3px; }
+.vx-util-bar-fill { height: 100%; border-radius: 4px; background: var(--vx-teal); }
+.vx-veh-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: var(--vx-bg); color: var(--vx-muted); letter-spacing: 0.5px; }
+.vx-veh-name { font-size: 12px; font-weight: 600; color: var(--vx-text); }
+
+.vx-trip-feed { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+.vx-trip { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--vx-card-tint); border-radius: 10px; border-left: 3px solid var(--vx-teal); }
+.vx-trip.em { border-left-color: var(--vx-danger); }
+.vx-trip-info { flex: 1; min-width: 0; }
+.vx-trip-time { font-size: 10px; color: var(--vx-sb-label); margin-bottom: 2px; }
+.vx-trip-route { font-size: 12px; font-weight: 600; color: var(--vx-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vx-trip-sub { font-size: 10px; color: var(--vx-muted); }
+.vx-trip-badge { font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
+.vx-trip-badge.em { background: var(--vx-danger-light); color: var(--vx-danger); }
+.vx-trip-badge.rt { background: var(--vx-teal-light); color: var(--vx-teal); }
+
+.vx-drv-list { display: flex; flex-direction: column; gap: 10px; }
+.vx-drv { display: flex; align-items: center; gap: 10px; }
+.vx-drv-rank { width: 22px; height: 22px; border-radius: 50%; background: var(--vx-bg); font-size: 10px; font-weight: 700; color: var(--vx-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.vx-drv-rank.t { background: var(--vx-teal-light); color: var(--vx-teal); }
+.vx-drv-name { flex: 1; font-size: 12px; font-weight: 500; color: var(--vx-text); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vx-drv-n { font-size: 13px; font-weight: 800; color: var(--vx-text); flex-shrink: 0; min-width: 28px; text-align: right; }
+.vx-drv-bar-w { width: 56px; background: var(--vx-bg); border-radius: 4px; height: 5px; flex-shrink: 0; }
+.vx-drv-bar-f { height: 100%; border-radius: 4px; background: var(--vx-teal); }
+.vx-drv-summary-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--vx-muted); }
+.vx-drv-summary-row strong { color: var(--vx-text); font-weight: 700; }
+
+/* Collapsible sections */
+.vx-collapsible-hd { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; user-select: none; }
+.vx-collapsible-chevron { transition: transform 0.18s ease; flex-shrink: 0; display: flex; }
+.vx-collapsible-chevron svg { width: 15px; height: 15px; }
+.vx-collapsible.vx-expanded .vx-collapsible-chevron { transform: rotate(90deg); }
+.vx-collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+.vx-collapsible.vx-expanded .vx-collapsible-body { max-height: 4000px; }
+
+/* Buttons */
+.vx-btn { background: var(--vx-teal); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; font-size: 12px; cursor: pointer; font-family: inherit; min-height: 0; }
+.vx-btn.danger { background: var(--vx-danger); }
+.vx-btn.ghost { background: transparent; border: 1px solid var(--vx-border); color: var(--vx-text); }
+
+.vx-danger-zone { border: 2px solid var(--vx-danger); background: var(--vx-danger-light); }
+.vx-danger-zone .vx-eyebrow { color: var(--vx-danger); }
+
+/* Single-page-at-a-time navigation -- screen only, so print output (which
+   needs every Laporan card visible regardless of which page is on screen)
+   is completely unaffected; @media print never sees this rule at all. */
+@media screen {
+  .vx-page:not(.vx-page-active) { display: none !important; }
+}
+
+/* Dedicated print-hide for block-level containers -- unlike the legacy
+   .hide-print (which defaults to display:table-cell on screen, fine for
+   table cells / flex-item buttons but wrong for a plain block container),
+   this has no screen-side effect at all, only forces display:none in print. */
+.vx-print-hide { }
+@media print { .vx-print-hide { display: none !important; } }
+
+/* Inverse: the old corporate letterhead card stays exactly as-is for the
+   printed report, but is redundant on screen now that the topbar carries
+   the same branding -- hidden there only, print layout untouched. */
+@media screen { .vx-print-only { display: none !important; } }
+
+@media (max-width: 1100px) {
+  .vx-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .vx-row.c62, .vx-row.c11 { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .vx-kpi-grid { grid-template-columns: 1fr; }
+
+  /* Phone: sidebar is an overlay drawer over content, never pushes it --
+     there's no room to spare on a narrow screen. Starts closed (JS sets
+     .vx-collapsed on load below 768px); the floating toggle opens it. */
+  .vx-main-content, .vx-main-content.vx-sidebar-collapsed { margin-left: 0 !important; }
+  .vx-sidebar:not(.vx-collapsed) {
+    width: min(78vw, 280px);
+    box-shadow: 6px 0 24px rgba(0,0,0,0.3);
+  }
+}
+@media (max-width: 480px) {
+  .vx-role-badge, .vx-clock { display: none; }
+}
 </style>
 </head>
 <body>
@@ -270,11 +560,84 @@ top: 15px !important;
 
 <div id="secureDashboardWrapper">
 
-<div class="first-page-wrapper">
-<div class="kkm-corporate-header">
-<button id="btnRefreshTop" onclick="window.refreshDataSilently()" class="btn-refresh-top hide-print"> 🔄  Sync Data</button>
-<button id="btnLogout" onclick="window.doLogout()" class="btn-logout-top hide-print">Log Keluar</button>
+<header class="vx-topbar hide-print" id="vxTopbar">
+  <div class="vx-topbar-left">
+    <button class="vx-sidebar-toggle-floating hide-print" id="vxSidebarToggle" onclick="window.vxToggleSidebar()" title="Buka/Tutup menu" aria-label="Buka/Tutup menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
+    <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Hospital Pitas">
+  </div>
+  <div class="vx-topbar-title">VELOS — Admin</div>
+  <div class="vx-topbar-right">
+    <span class="vx-status-badge"><span class="vx-status-dot">●</span> Sistem Aktif</span>
+    <span class="vx-role-badge">Edisi 4 · Versi 1.0</span>
+    <span class="vx-clock" id="vxClock">--:--</span>
+    <button id="btnRefreshTop" onclick="window.refreshDataSilently()" class="vx-topbar-sync hide-print" title="Segerak semula kapasiti kenderaan"> 🔄  Sync Data</button>
+    <button id="btnLogout" onclick="window.doLogout()" class="btn-logout-top hide-print">Log Keluar</button>
+  </div>
+</header>
 
+<nav class="vx-sidebar hide-print" id="vxSidebar">
+  <button class="vx-sidebar-link" onclick="window.open('index.html','_self')" title="Laman Utama">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/><path d="M9 21v-6h6v6"/></svg></span><span class="vx-sidebar-text">Laman Utama</span>
+  </button>
+  <hr class="vx-sidebar-divider">
+
+  <div class="vx-sidebar-section-label">Portal</div>
+  <button class="vx-sidebar-link" onclick="window.open('log-pemandu.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></span><span class="vx-sidebar-text">Log Pemandu</span><span class="vx-portal-tag">01</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('borang-permohonan.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v5h5"/><path d="M8 13h8M8 17h8M8 9h3"/></svg></span><span class="vx-sidebar-text">Permohonan</span><span class="vx-portal-tag">02</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('dispatch.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg></span><span class="vx-sidebar-text">VCC</span><span class="vx-portal-tag">03</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('portal-kenderaan.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span><span class="vx-sidebar-text">Kenderaan</span><span class="vx-portal-tag">04</span>
+  </button>
+
+  <hr class="vx-sidebar-divider">
+
+  <div class="vx-sidebar-section-label">Admin</div>
+  <a href="#sec-dashboard" class="vx-sidebar-link" data-vx-section="sec-dashboard">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="vx-sidebar-text">Dashboard</span>
+  </a>
+  <a href="#sec-log-pergerakan" class="vx-sidebar-link" data-vx-section="sec-log-pergerakan">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg></span><span class="vx-sidebar-text">Log Pergerakan</span>
+  </a>
+
+  <button class="vx-sidebar-link vx-sidebar-parent" id="vxLaporanParentToggle" onclick="window.vxToggleLaporanSubmenu()">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20"/></svg></span><span class="vx-sidebar-text">Laporan &amp; Statistik</span>
+    <span class="vx-sidebar-parent-chevron vx-sidebar-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+  </button>
+  <div class="vx-sidebar-subgroup" id="vxLaporanSubgroup">
+    <a href="#sec-laporan-pesakit" class="vx-sidebar-link" data-vx-section="sec-laporan-pesakit">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></span><span class="vx-sidebar-text">Pesakit &amp; Rujukan</span>
+    </a>
+    <a href="#sec-laporan-kenderaan" class="vx-sidebar-link" data-vx-section="sec-laporan-kenderaan">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15"/><path d="M3 21h11"/><path d="M13 9h2.2L18 11.8V17a1.5 1.5 0 0 1-3 0v-1a1 1 0 0 0-1-1h-1"/><path d="M6.5 7.5h4"/></svg></span><span class="vx-sidebar-text">Kenderaan &amp; Bahan Api</span>
+    </a>
+    <a href="#sec-laporan-staf" class="vx-sidebar-link" data-vx-section="sec-laporan-staf">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg></span><span class="vx-sidebar-text">Laporan Staf</span>
+    </a>
+    <a href="#sec-laporan-vcc" class="vx-sidebar-link" data-vx-section="sec-laporan-vcc">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 13.5l2 2 4-4.5"/></svg></span><span class="vx-sidebar-text">Permohonan VCC</span>
+    </a>
+  </div>
+
+  <a href="#sec-konfigurasi" class="vx-sidebar-link" data-vx-section="sec-konfigurasi">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.5 1.5M7.1 16.9l-1.5 1.5M18.4 18.4l-1.5-1.5M7.1 7.1 5.6 5.6"/></svg></span><span class="vx-sidebar-text">Konfigurasi</span>
+  </a>
+  <a href="#sec-sistem" class="vx-sidebar-link" data-vx-section="sec-sistem">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Sistem</span>
+  </a>
+</nav>
+
+<div class="vx-main-content" id="vxMainContent">
+<div class="first-page-wrapper">
+<div class="kkm-corporate-header vx-print-only">
 <div class="header-logos-inline">
 <div class="logo-left"><img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara"></div>
 <div class="header-center-text" style="flex: 2; text-align: center; border: none; padding: 0; margin: 0;">
@@ -306,18 +669,122 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 <div class="container">
 
 <div id="viewerBanner" class="hide-print" style="display:none; background: var(--secondary); color: #fff; width: 100%; box-sizing: border-box; font-size: 13px; padding: 8px 16px; border-radius: 6px; margin-bottom: 20px; text-align: center;">⚠ Mod Paparan Sahaja — Anda log masuk sebagai pelawat. Tiada tindakan boleh dilakukan.</div>
-<div class="control-panel hide-print" style="display: flex; gap: 10px; margin-bottom: 20px; background: #e9ecef; padding: 15px; border-radius: 6px; border-left: 5px solid var(--primary); flex-wrap: wrap;">
-<button class="btn-print" onclick="window.print()"> 🖨️  Cetak Laporan Bulanan (Statistik Sahaja)</button>
-<button class="btn-export" onclick="window.downloadMasterLogCSV()"> 📁  Muat Turun CSV (Penuh Log Pergerakan)</button>
-<button id="btnClearData" class="btn-danger-action" style="margin-left: auto;" onclick="window.clearData()"> ⚠️  Padam Pangkalan Data</button>
+
+<section id="sec-dashboard" class="vx-print-hide vx-page vx-page-active">
+<div class="vx-page-header">
+<div>
+<div class="vx-eyebrow">Papan Pemuka</div>
+<div class="vx-page-title">Admin VELOS</div>
 </div>
-<div class="card log-pergerakan-section" style="border-top: 3px solid var(--success);">
-<h2 style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--success); border-bottom-color: var(--success);">
-<span>Log Pergerakan Kenderaan (Pemantauan Langsung)</span>
-<button id="btnToggleLog" class="hide-print" onclick="window.toggleLogView()" style="background:var(--success); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">Papar Semua Rekod</button>
-</h2>
-<p style="font-size: 12px; color: gray; margin-top:-10px;">Jadual ini memaparkan log mentah, dikemaskini secara langsung.
-Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak laporan penuh untuk menjimatkan kertas.</p>
+<div class="vx-month-nav">
+<button type="button" class="vx-month-nav-btn" id="vxMonthPrev" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" id="pilihanBulan">
+<button type="button" class="vx-month-nav-btn" id="vxMonthNext" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
+</div>
+
+<div class="vx-alert-strip" id="vxAlertStrip" style="display:none;">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+<div class="vx-alert-txt" id="vxAlertTxt"></div>
+</div>
+
+<div class="vx-kpi-grid">
+<div class="vx-kpi">
+<div class="vx-kpi-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></div>
+<div>
+<div class="vx-kpi-num" id="kpiTotalTrips">0</div>
+<div class="vx-kpi-lbl">Jumlah Pergerakan Bulan Ini</div>
+<div class="vx-kpi-trend na" id="kpiTotalTripsTrend">—</div>
+</div>
+</div>
+<div class="vx-kpi">
+<div class="vx-kpi-ico navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3.1-6.5 7-6.5s7 2.5 7 6.5"/></svg></div>
+<div>
+<div class="vx-kpi-num" id="kpiTotalPatients">0</div>
+<div class="vx-kpi-lbl">Pesakit Dihantar</div>
+<div class="vx-kpi-trend na" id="kpiTotalPatientsTrend">—</div>
+</div>
+</div>
+<div class="vx-kpi">
+<div class="vx-kpi-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2C9 7 6 10 6 14a6 6 0 0 0 12 0c0-4-3-7-6-12z"/></svg></div>
+<div>
+<div class="vx-kpi-num" id="kpiFuelUsed">0<span style="font-size:16px;font-weight:600;color:var(--vx-muted)">L</span></div>
+<div class="vx-kpi-lbl">Bahan Api Digunakan</div>
+<div class="vx-kpi-trend na" id="kpiFuelUsedTrend">—</div>
+</div>
+</div>
+<div class="vx-kpi">
+<div class="vx-kpi-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg></div>
+<div>
+<div class="vx-kpi-num" id="kpiMohonAktif">0</div>
+<div class="vx-kpi-lbl">Permohonan Dalam Proses</div>
+<div class="vx-kpi-trend na" id="kpiMohonAktifTrend">—</div>
+</div>
+</div>
+</div>
+
+<div class="vx-row c62">
+<div class="vx-card">
+<div class="vx-card-hd">
+<div>
+<div class="vx-section-title">Rekod Pergerakan Terkini</div>
+<div class="vx-card-hds">5 entri paling baru</div>
+</div>
+</div>
+<div class="vx-trip-feed" id="vxRecentTripsFeed"></div>
+</div>
+<div class="vx-card">
+<div class="vx-card-hd">
+<div>
+<div class="vx-section-title">Jadual Trend Pergerakan</div>
+<div class="vx-card-hds">Pergerakan bulan ini</div>
+</div>
+</div>
+<table class="vx-vtable">
+<thead><tr><th>Kenderaan</th><th>Jenis</th><th>Pergerakan</th></tr></thead>
+<tbody id="vxVehicleStatusBody"></tbody>
+</table>
+</div>
+</div>
+
+<div class="vx-row c11">
+<div class="vx-card">
+<div class="vx-card-hd">
+<div>
+<div class="vx-section-title">Trend Pergerakan</div>
+<div class="vx-card-hds">6 bulan terakhir · semua kenderaan</div>
+</div>
+<span class="vx-chip">Bulanan</span>
+</div>
+<div class="vx-barchart" id="vxTrendChart"></div>
+</div>
+<div class="vx-card">
+<div class="vx-card-hd">
+<div>
+<div class="vx-section-title">Beban Pemandu Bulan Ini</div>
+<div class="vx-card-hds" id="vxDriverBoardMonth">&nbsp;</div>
+</div>
+<span class="vx-chip" id="vxTopDriverChip" style="display:none;"></span>
+</div>
+<div class="vx-drv-list" id="vxDriverLeaderboard"></div>
+</div>
+</div>
+</section>
+
+<div id="sec-log-pergerakan" class="vx-card log-pergerakan-section vx-collapsible vx-page vx-expanded" style="margin-top:14px;">
+<div class="vx-collapsible-hd" onclick="window.vxToggleCollapsible(this.parentElement)">
+<div>
+<div class="vx-eyebrow">Pemantauan Langsung</div>
+<div class="vx-section-title">Log Pergerakan Langsung</div>
+</div>
+<div style="display:flex; align-items:center; gap:8px;" class="hide-print">
+<button id="btnToggleLog" class="vx-btn ghost" onclick="event.stopPropagation(); window.toggleLogView()">Papar Semua Rekod</button>
+<button class="vx-btn ghost" onclick="event.stopPropagation(); window.downloadMasterLogCSV()">Muat Turun CSV</button>
+<span class="vx-collapsible-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+</div>
+</div>
+<div class="vx-collapsible-body">
+<p style="font-size: 12px; color: gray; margin: 14px 0 0;">Jadual ini memaparkan log mentah, dikemaskini secara langsung. Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak laporan penuh untuk menjimatkan kertas.</p>
 <div class="table-scroll" style="max-height: 500px;">
 <table id="mainDataTable">
 <thead style="position: sticky; top:0; z-index:51;">
@@ -327,16 +794,20 @@ Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak 
 </table>
 </div>
 </div>
-<div class="card section-stats">
+</div>
+
+<div id="sec-laporan" class="card section-stats vx-page" style="margin-top:14px;">
+<div style="display:flex; justify-content:flex-end; margin-bottom:8px;" class="hide-print">
+<button class="vx-btn ghost" onclick="window.print()"> 🖨️  Cetak Laporan Bulanan (Statistik Sahaja)</button>
+</div>
 <h2 class="h2-laporan-utama">
 <span>Laporan Statistik Bulanan <span id="printMonthLabel" style="color: var(--danger);"></span></span>
-<input type="month" id="pilihanBulan" class="editable-month-input hide-print">
 </h2>
 
 <div class="stats-grid">
 <div class="stat-box"><h3 id="statTotalTrips">0</h3><p>Jumlah Pergerakan</p></div>
 <div class="stat-box"><h3 id="statTotalPatients">0</h3><p>Jumlah Pesakit Dihantar</p></div>
-<div class="stat-box" style="border-left: 5px solid #6f42c1;"><h3 id="statTotalStepdown">0</h3><p>Jumlah Pesakit Diambil</p></div>
+<div class="stat-box" style="border-left: 5px solid var(--primary);"><h3 id="statTotalStepdown">0</h3><p>Jumlah Pesakit Diambil</p></div>
 <div class="stat-box"><h3 id="statNoPatientTrips">0</h3><p>Pergerakan Tanpa Pesakit</p></div>
 </div>
 <div class="leaders-container">
@@ -345,14 +816,19 @@ Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak 
 </div>
 </div>
 <div class="container">
-<div class="card section-stats print-avoid-break">
+
+<div id="sec-laporan-pesakit" class="vx-page">
+<div class="vx-page-header" style="margin-bottom:14px;">
+<div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Pesakit &amp; Rujukan</div></div>
+</div>
+<div id="sec-data1" class="card section-stats print-avoid-break">
 <h2>
 <span>Data 1 : Pesakit Ke Fasiliti Luar</span>
 <button class="btn-table-download hide-print" onclick="window.downloadTableCSV('fasiliti_luar', this)"> ⬇️  CSV</button>
 </h2>
 <div class="table-scroll">
 <table>
-<thead><tr><th>Kenderaan</th><th>Syif</th><th>Rujukan Biasa</th><th>Rujukan Kecemasan</th><th>Temujanji</th><th style="background-color: #004494;">Jumlah Pesakit</th></tr></thead>
+<thead><tr><th>Kenderaan</th><th>Syif</th><th>Rujukan Biasa</th><th>Rujukan Kecemasan</th><th>Temujanji</th><th style="background-color: var(--primary);">Jumlah Pesakit</th></tr></thead>
 <tbody>
 <tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td><td>Pagi</td><td id="paxAmbPagiBiasa">0</td><td id="paxAmbPagiKecemasan">0</td><td id="paxAmbPagiFollowUp">0</td><td id="paxAmbPagiTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
 <tr><td>Petang</td><td id="paxAmbPetangBiasa">0</td><td id="paxAmbPetangKecemasan">0</td><td id="paxAmbPetangFollowUp">0</td><td id="paxAmbPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
@@ -367,7 +843,7 @@ id="paxJabPagiBiasa">0</td><td style="border-top: 2px solid #ddd;" id="paxJabPag
 <p id="data1LegacyNote" style="display:none; color:#C98A2E; font-size:12px; margin-top:8px;"></p>
 </div>
 </div>
-<div class="card section-stats print-avoid-break">
+<div id="sec-data2" class="card section-stats print-avoid-break">
 <h2>
 <span>Data 2 : Pecahan Kategori Pesakit Ke Fasiliti Luar</span>
 <button class="btn-table-download hide-print" onclick="window.downloadTableCSV('pecahan_kategori', this)"> ⬇️  CSV</button>
@@ -382,26 +858,32 @@ id="paxJabPagiBiasa">0</td><td style="border-top: 2px solid #ddd;" id="paxJabPag
 </div>
 </div>
 </div>
-<div class="dashboard-grid-layout section-stats print-avoid-break">
-<div class="card" style="margin-bottom: 0;">
+<div id="sec-data6" class="card section-stats print-avoid-break">
 <h2>
-<span>Data 3 : Pergerakan Kenderaan</span>
-<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('pergerakan_kenderaan', this)"> ⬇️  CSV</button>
+<span>Data 3 : Pesakit Diambil (Stepdown)</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('stepdown_luar', this)"> ⬇️  CSV</button>
 </h2>
-<div class="table-scroll">
 <table>
-<thead><tr><th>Kategori</th><th>No Plat Kenderaan</th><th style="background-color: #004494;">Jumlah Pergerakan</th></tr></thead>
-<tbody id="vehicleTripsBody"></tbody>
+<thead><tr><th>Kenderaan</th><th>Syif</th><th style="background-color: var(--primary); color: white;">Jumlah Pesakit Diambil</th></tr></thead>
+<tbody>
+<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td><td>Pagi</td><td id="stepAmbPagiTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Petang</td><td id="stepAmbPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Malam</td><td id="stepAmbMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td><td style="border-top: 2px solid #ddd;">Pagi</td><td style="border-top: 2px solid #ddd; font-weight: bold; background: #f8f9fa;"
+id="stepJabPagiTotal">0</td></tr>
+<tr><td>Petang</td><td id="stepJabPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr><td>Malam</td><td id="stepJabMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
+<tr style="font-weight: bold; background-color: #e9ecef; border-top: 3px double var(--primary);"><td colspan="2">JUMLAH KESELURUHAN PESAKIT DIAMBIL</td><td id="stepGrandTotalPatients" style="background-color: var(--primary); color: #fff; font-weight: 900;">0</td></tr>
+</tbody>
 </table>
 </div>
-</div>
-<div class="card" style="margin-bottom: 0;">
+<div id="sec-data4" class="card" style="margin-bottom: 0;">
 <h2>
 <span>Data 4 : Panggilan Kecemasan</span>
 <button class="btn-table-download hide-print" onclick="window.downloadTableCSV('panggilan_kecemasan', this)"> ⬇️  CSV</button>
 </h2>
 <table>
-<thead><tr><th>Masa Panggilan</th><th style="background-color: #004494;">Jumlah Panggilan</th><th style="background-color: #004494;">Peratusan (%)</th></tr></thead>
+<thead><tr><th>Masa Panggilan</th><th style="background-color: var(--primary);">Jumlah Panggilan</th><th style="background-color: var(--primary);">Peratusan (%)</th></tr></thead>
 <tbody>
 <tr><td>Pagi</td><td id="callKecemasanPagi" style="font-weight:bold;">0</td><td id="pctCallPagi" style="text-align:center;">0%</td></tr>
 <tr><td>Petang</td><td id="callKecemasanPetang" style="font-weight:bold;">0</td><td id="pctCallPetang" style="text-align:center;">0%</td></tr>
@@ -411,9 +893,53 @@ id="paxJabPagiBiasa">0</td><td style="border-top: 2px solid #ddd;" id="paxJabPag
 </table>
 </div>
 </div>
-<div class="card section-stats print-avoid-break">
+
+<div id="sec-laporan-kenderaan" class="vx-page" style="margin-top:28px;">
+<div class="vx-page-header" style="margin-bottom:14px;">
+<div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Kenderaan &amp; Bahan Api</div></div>
+<span class="vx-chip warn">Data Paling Kerap Digunakan</span>
+</div>
+<div id="sec-data3" class="card section-stats print-avoid-break">
 <h2>
-<span>Data 5 : Beban Tugasan Pemandu</span>
+<span>Data 5 : Pergerakan Kenderaan</span>
+<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('pergerakan_kenderaan', this)"> ⬇️  CSV</button>
+</h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>Kategori</th><th>No Plat Kenderaan</th><th style="background-color: var(--primary);">Jumlah Pergerakan</th></tr></thead>
+<tbody id="vehicleTripsBody"></tbody>
+</table>
+</div>
+</div>
+<div id="sec-data7" class="card section-stats print-avoid-break" style="border: 2px solid var(--warning);">
+<h2 style="color: var(--warning); border-bottom-color: var(--warning);">
+<span>Data 6 : Analisa Penggunaan Bahan Api</span>
+<div>
+<button class="btn-table-download hide-print" onclick="window.downloadFuelCSV()"> ⬇️  CSV</button>
+<button class="btn-table-download hide-print" style="background-color: var(--primary);" onclick="window.downloadFuelRawCSV()"> ⬇️  CSV Penuh (Rekod Mentah)</button>
+</div>
+</h2>
+<p style="font-size: 11px; color: gray; margin-top:-10px;">Klik <strong>Resit</strong> untuk memuat naik dan memaparkan resit pengisian terkini bagi kenderaan tersebut (satu-satu semakan sahaja, bukan muat turun pukal). Kapasiti tangki kini dikemaskini dari <strong>Konfigurasi</strong>.</p>
+<div class="table-scroll">
+<table>
+<thead>
+<tr><th>Kenderaan</th><th>Kapasiti (L)</th><th>Odo Awal</th><th>Odo Akhir</th><th>Jarak (b)</th><th>Penggunaan (c)</th><th style="background-color: var(--primary);">Kadar (Km/L)</th><th class="hide-print">Tindakan</th></tr>
+</thead>
+<tbody id="fuelStatsBody">
+<tr><td colspan="8" style="text-align:center; color:#999;">Memuat turun...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="sec-laporan-staf" class="vx-page" style="margin-top:28px;">
+<div class="vx-page-header" style="margin-bottom:14px;">
+<div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Laporan Staf</div></div>
+</div>
+<div id="sec-data5" class="card section-stats print-avoid-break">
+<h2>
+<span>Data 7 : Beban Tugasan Pemandu</span>
 <button class="btn-table-download hide-print" onclick="window.downloadTableCSV('beban_pemandu', this)"> ⬇️  CSV</button>
 </h2>
 <div class="dashboard-grid-layout uneven">
@@ -429,46 +955,7 @@ id="paxJabPagiBiasa">0</td><td style="border-top: 2px solid #ddd;" id="paxJabPag
 </div>
 </div>
 </div>
-<div class="card section-stats print-avoid-break">
-<h2>
-<span>Data 6 : Pesakit Diambil (Stepdown)</span>
-<button class="btn-table-download hide-print" onclick="window.downloadTableCSV('stepdown_luar', this)"> ⬇️  CSV</button>
-</h2>
-<table>
-<thead><tr><th>Kenderaan</th><th>Syif</th><th style="background-color: #6f42c1; color: white;">Jumlah Pesakit Diambil</th></tr></thead>
-<tbody>
-<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff;">Ambulans</td><td>Pagi</td><td id="stepAmbPagiTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
-<tr><td>Petang</td><td id="stepAmbPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
-<tr><td>Malam</td><td id="stepAmbMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
-<tr><td rowspan="3" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td><td style="border-top: 2px solid #ddd;">Pagi</td><td style="border-top: 2px solid #ddd; font-weight: bold; background: #f8f9fa;"
-id="stepJabPagiTotal">0</td></tr>
-<tr><td>Petang</td><td id="stepJabPetangTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
-<tr><td>Malam</td><td id="stepJabMalamTotal" style="font-weight: bold; background: #f8f9fa;">0</td></tr>
-<tr style="font-weight: bold; background-color: #e2d9f3; border-top: 3px double #6f42c1;"><td colspan="2">JUMLAH KESELURUHAN PESAKIT DIAMBIL</td><td id="stepGrandTotalPatients" style="background-color: #6f42c1; color: #fff; font-weight: 900;">0</td></tr>
-</tbody>
-</table>
-</div>
-<div class="card section-stats print-avoid-break" style="border: 2px solid var(--warning);">
-<h2 style="color: var(--warning); border-bottom-color: var(--warning);">
-<span>Data 7 : Analisa Penggunaan Bahan Api</span>
-<div>
-<button class="btn-table-download hide-print" onclick="window.downloadFuelCSV()"> ⬇️  CSV</button>
-<button class="btn-table-download hide-print" style="background-color: #17a2b8;" onclick="window.downloadFuelRawCSV()"> ⬇️  CSV Penuh (Rekod Mentah)</button>
-</div>
-</h2>
-<p style="font-size: 11px; color: gray; margin-top:-10px;">Klik <strong>Resit</strong> untuk memuat naik dan memaparkan resit pengisian terkini bagi kenderaan tersebut (satu-satu semakan sahaja, bukan muat turun pukal).</p>
-<div class="table-scroll">
-<table>
-<thead>
-<tr><th>Kenderaan</th><th>Kapasiti (L)</th><th>Odo Awal</th><th>Odo Akhir</th><th>Jarak (b)</th><th>Penggunaan (c)</th><th style="background-color: #ffc107; color: #000;">Kadar (Km/L)</th><th class="hide-print">Tindakan</th></tr>
-</thead>
-<tbody id="fuelStatsBody">
-<tr><td colspan="8" style="text-align:center; color:#999;">Memuat turun...</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="card section-stats print-avoid-break">
+<div id="sec-data8" class="card section-stats print-avoid-break">
 <h2>
 <span>Data 8 : Beban Tugas Pengiring</span>
 <button class="btn-table-download hide-print" onclick="window.downloadTableCSV('beban_pengiring', this)"> ⬇️  CSV</button>
@@ -483,39 +970,66 @@ id="stepJabPagiTotal">0</td></tr>
 </table>
 </div>
 </div>
-<div class="card section-stats print-avoid-break" style="border: 2px solid #17a2b8; background-color: #f4f8fc;">
-<h2 style="color: #17a2b8; border-bottom-color: #17a2b8;">
+</div>
+
+<div id="sec-laporan-vcc" class="vx-page" style="margin-top:28px;">
+<div class="vx-page-header" style="margin-bottom:14px;">
+<div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Permohonan VCC</div></div>
+</div>
+<div id="sec-data9" class="card section-stats print-avoid-break" style="border: 2px solid var(--line); background-color: #f4f8fc;">
+<h2 style="color: var(--primary); border-bottom-color: var(--primary);">
 <span>Data 9 : Analisa Permohonan Kenderaan (VCC)</span>
 </h2>
 <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 0;">
-<div class="stat-box" style="border-left-color: #17a2b8; background: #fff;"><h3 id="statTotalMohon" style="color:#17a2b8;">0</h3><p>Jumlah Permohonan</p></div>
+<div class="stat-box" style="border-left-color: var(--primary); background: #fff;"><h3 id="statTotalMohon" style="color:var(--primary);">0</h3><p>Jumlah Permohonan</p></div>
 <div class="stat-box" style="border-left-color: var(--warning); background: #fff;"><h3 id="statMohonProses" style="color:#d39e00;">0</h3><p>Dalam Proses<br>(Fasa 1 & 2)</p></div>
 <div class="stat-box" style="border-left-color: var(--success); background: #fff;"><h3 id="statMohonLulus" style="color:var(--success);">0</h3><p>Diluluskan / Selesai</p></div>
 <div class="stat-box" style="border-left-color: var(--danger); background: #fff;"><h3 id="statMohonTolak" style="color:var(--danger);">0</h3><p>Ditolak / Batal</p></div>
 </div>
 </div>
-<div class="signature-section section-stats">
-<div class="sig-box">
-<p class="sig-title">Disediakan Oleh :</p>
-<div class="sig-space"></div>
-<p class="sig-name">( Tandatangan & Cop Rasmi )</p>
 </div>
-<div class="sig-box">
-<p class="sig-title">Disemak Oleh :</p>
-<div class="sig-space"></div>
-<p class="sig-name">( Tandatangan & Cop Rasmi )</p>
+
+<div id="sec-konfigurasi" class="vx-print-hide vx-page" style="margin-top:28px;">
+<div class="vx-page-header" style="margin-bottom:14px;">
+<div><div class="vx-eyebrow">Konfigurasi</div><div class="vx-page-title">Tetapan Sistem</div></div>
 </div>
-<div class="sig-box">
-<p class="sig-title">Diluluskan Oleh :</p>
-<div class="sig-space"></div>
-<p class="sig-name">( Tandatangan & Cop Rasmi )</p>
+<div class="vx-card" style="margin-bottom:14px;">
+<div class="vx-card-hd">
+<div><div class="vx-section-title">Kapasiti Tangki Kenderaan</div><div class="vx-card-hds">Klik Ubah untuk kemaskini kapasiti tangki sebenar setiap kenderaan (disimpan ke awan serta-merta)</div></div>
+</div>
+<div class="table-scroll">
+<table class="vx-vtable">
+<thead><tr><th>Kenderaan</th><th>Jenis</th><th>Kapasiti (L)</th><th>Tindakan</th></tr></thead>
+<tbody id="vxCapacityBody"><tr><td colspan="4" style="color:var(--vx-muted);">Memuat turun...</td></tr></tbody>
+</table>
+</div>
+</div>
+<div class="vx-card">
+<div class="vx-card-hd">
+<div><div class="vx-section-title">Senarai Kenderaan Berdaftar</div><div class="vx-card-hds">Menambah/membuang kenderaan dari senarai ini memerlukan akses Firebase Console — belum tersedia dalam dashboard ini</div></div>
+</div>
+<div id="vxVehicleRoster" style="font-size:12px; color:var(--vx-text); line-height:1.8;"></div>
 </div>
 </div>
 
-<div class="watermark-footer hide-print">
+<div id="sec-sistem" class="vx-page" style="margin-top:28px;">
+<div class="vx-page-header vx-print-hide" style="margin-bottom:14px;">
+<div><div class="vx-eyebrow">Sistem</div><div class="vx-page-title">Sistem</div></div>
+</div>
+<div class="vx-card vx-danger-zone vx-print-hide">
+<div class="vx-card-hd">
+<div><div class="vx-eyebrow">Zon Berbahaya</div><div class="vx-section-title">Padam Pangkalan Data</div></div>
+</div>
+<p style="font-size:12px; color:var(--vx-text); margin:0 0 14px;">Tindakan ini memadam <strong>SEMUA</strong> rekod Pergerakan, Bahan Api, Resit &amp; Permohonan VCC secara kekal. Sila pastikan salinan CSV/laporan telah dimuat turun sebelum meneruskan.</p>
+<button id="btnClearData" class="vx-btn danger" onclick="window.clearData()"> ⚠️  Padam Pangkalan Data</button>
+</div>
+</div>
+
+<div class="watermark-footer vx-print-hide">
 &copy; 2026 Muhammad Shafiq Bin Mohd Raffi.<br>
 Vehicle Logistics And Operations System (VELOS)<br>
 <span style="opacity: 0.8;">VELOS Edisi 4 (Firestore), Versi 1.0 (Modul Admin) &middot; Dikemaskini 01/08/2026</span>
+</div>
 </div>
 </div>
 </div>
@@ -548,6 +1062,7 @@ import {
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
+import { pad2, todayISO, classifyLiterFill } from "./velos-utils.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -627,9 +1142,6 @@ const malayMonths = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai
 // Fuel docs carry no time field -- odoPengisian is the ascending tiebreak
 // when two fills share a date. Missing (optional field) sorts as 0.
 const fillOdoKey = x => (typeof x.odoPengisian === 'number' ? x.odoPengisian : 0);
-
-function pad2(n) { return String(n).padStart(2, '0'); }
-function todayLocalISO() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
 
 function getKenderaanCapacity(plat) {
   return (cloudTangkiCap[plat] !== undefined && cloudTangkiCap[plat] !== null) ? cloudTangkiCap[plat] : 70;
@@ -828,7 +1340,7 @@ window.lihatSemuaResit = function (plat) {
       '<td style="padding:6px 10px; border-bottom:1px solid #eee; font-weight:bold;">' + f.liter + 'L</td>' +
       '<td style="padding:6px 10px; border-bottom:1px solid #eee;">' +
         '<button onclick="window.lihatResit(\'' + f.id + '\')" ' +
-        'style="background:#6f42c1; color:white; border:none; border-radius:4px; ' +
+        'style="background:var(--primary); color:white; border:none; border-radius:4px; ' +
         'padding:4px 10px; font-size:12px; cursor:pointer; font-weight:bold;">Lihat Resit</button>' +
       '</td>' +
     '</tr>';
@@ -915,7 +1427,7 @@ window.clearData = function () {
       wipeCollection('resitBahanApi'),
       wipeCollection('permohonanVCC')
     ]).then(function () {
-      return setDoc(doc(db, 'sistemMeta', 'lastFullReset'), { tarikh: todayLocalISO() });
+      return setDoc(doc(db, 'sistemMeta', 'lastFullReset'), { tarikh: todayISO() });
     }).then(function () {
       Swal.fire('Berjaya Dikosongkan!', 'Semua rekod telah dipadam.', 'success');
     }).catch(function (err) {
@@ -1107,7 +1619,7 @@ window.updateUI = function () {
     let firstJab = true;
     jabListFixed.forEach(plat => { let count = tripStats[plat] || 0; let pct = totalFilteredTrips > 0 ? ((count / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%'; jabHTML += '<tr>' + (firstJab ? '<td rowspan="' + jabCount + '" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td>' : '') + '<td ' + (firstJab ? 'style="border-top: 2px solid #ddd;"' : '') + '>' + plat + '</td><td style="font-weight: bold; ' + (firstJab ? 'border-top: 2px solid #ddd;' : '') + '">' + count + ' kali <span style="font-weight:normal; color:#555; font-size:11px;">(' + pct + ')</span></td></tr>'; firstJab = false; });
     for (let plat in customJab) { let count = customJab[plat]; let pct = totalFilteredTrips > 0 ? ((count / totalFilteredTrips) * 100).toFixed(1) + '%' : '0%'; jabHTML += '<tr>' + (firstJab ? '<td rowspan="' + jabCount + '" style="vertical-align: middle; font-weight: bold; background: #fff; border-top: 2px solid #ddd;">Kenderaan Jabatan</td>' : '') + '<td style="color: #555; font-style: italic; ' + (firstJab ? 'border-top: 2px solid #ddd;' : '') + '">' + plat + '</td><td style="font-weight: bold; color: #555; ' + (firstJab ? 'border-top: 2px solid #ddd;' : '') + '">' + count + ' kali <span style="font-weight:normal; font-size:11px;">(' + pct + ')</span></td></tr>'; firstJab = false; }
-    vehicleTripsBody.innerHTML = ambHTML + jabHTML + '<tr style="font-weight: bold; background-color: #e9ecef; border-top: 3px double #333;"><td colspan="2">JUMLAH KESELURUHAN</td><td style="background-color: var(--secondary); color: white; font-weight: bold;">' + tripStats.grandTotal + ' kali</td></tr>';
+    vehicleTripsBody.innerHTML = ambHTML + jabHTML + '<tr style="font-weight: bold; background-color: #e9ecef; border-top: 3px double #333;"><td colspan="2">JUMLAH KESELURUHAN</td><td style="background-color: var(--primary); color: white; font-weight: bold;">' + tripStats.grandTotal + ' kali</td></tr>';
   }
   document.getElementById('callKecemasanPagi').innerText = emergencyCallStats.pagi; document.getElementById('callKecemasanPetang').innerText = emergencyCallStats.petang; document.getElementById('callKecemasanMalam').innerText = emergencyCallStats.malam; document.getElementById('callKecemasanTotal').innerText = emergencyCallStats.total;
   document.getElementById('pctCallPagi').innerText = emergencyCallStats.total > 0 ? ((emergencyCallStats.pagi / emergencyCallStats.total) * 100).toFixed(1) + '%' : '0%';
@@ -1154,12 +1666,14 @@ window.updateUI = function () {
 
   const fuelStatsBody = document.getElementById('fuelStatsBody');
   const vFuelGroup = computeFuelStatsForMonth(targetedMonth);
+  let totalFuelUsedKpi = 0;
   if (Object.keys(vFuelGroup).length === 0) {
     fuelStatsBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999;">Tiada rekod bagi bulan ini.</td></tr>';
   } else {
     fuelStatsBody.innerHTML = '';
     for (let plat in vFuelGroup) {
       let vData = vFuelGroup[plat]; let entries = vData.entries; let origPlat = vData.origPlat;
+      totalFuelUsedKpi += vData.c_guna;
       _auditFillMap[origPlat] = entries;
       const firstFillCurrent = entries.length ? entries[0].liter : 0;
       let fInfo = vData.hasFuelData
@@ -1168,13 +1682,13 @@ window.updateUI = function () {
       if (firstFillCurrent > vData.cap) {
         fInfo += ' <span style="color:red; font-weight:bold;">⚠️ Amaran: Isian pertama melebihi kapasiti tangki (&gt; ' + vData.cap + 'L) - rekod ini mungkin gabungan dua isian, sila pisahkan.</span>';
       }
-      let capDisplay = vData.cap;
-      if (cloudTangkiCap[origPlat] === undefined || cloudTangkiCap[origPlat] === null) {
-        capDisplay = '<span style="color:#d33; font-weight:bold;">' + vData.cap + '</span>' + (isViewer ? '' : ' <button class="hide-print" onclick="window.editCapacity(\'' + origPlat + '\')" style="background:none; border:none; cursor:pointer; font-size:12px; margin-left:3px;" title="Ubah Kapasiti"> ✏️ </button>');
-      }
+      // Capacity is now edited from the Konfigurasi section only -- this cell is read-only display.
+      let capDisplay = (cloudTangkiCap[origPlat] === undefined || cloudTangkiCap[origPlat] === null)
+        ? '<span style="color:#d33; font-weight:bold;">' + vData.cap + '</span>'
+        : vData.cap;
       const latestFillId = entries.length ? entries[entries.length - 1].id : null;
       const actionButtons = entries.length > 0
-        ? '<button class="btn-table-download" style="background-color:#6f42c1;" onclick="window.lihatSemuaResit(\'' + origPlat + '\')">Resit (' + entries.length + ')</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + (entries.length ? entries[entries.length-1].id : '') + '\')">Padam</button>')
+        ? '<button class="btn-table-download" style="background-color:var(--primary);" onclick="window.lihatSemuaResit(\'' + origPlat + '\')">Resit (' + entries.length + ')</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + (entries.length ? entries[entries.length-1].id : '') + '\')">Padam</button>')
         : '<span style="color:#999; font-size:11px;">Tiada Rekod</span>';
       const jarakDisplay = vData.hasTrips ? vData.jarak : '<span style="color:#999;">Tiada trip</span>';
       const minOdoDisplay = vData.hasTrips ? vData.minOdo : '-';
@@ -1214,9 +1728,7 @@ window.updateUI = function () {
       } else {
         fuelCell = fills.map(function (f) {
           const liter = Number(f.liter);
-          let cls = 'ok', prefix = '';
-          if (liter > 1000)          { cls = 'danger'; prefix = '⚠ '; }
-          else if (liter > capTangki){ cls = 'warn';   prefix = '⚠ '; }
+          const { cls, prefix } = classifyLiterFill(liter, capTangki);
           return '<span class="fb ' + cls + '">' + prefix + liter + 'L</span>';
         }).join('<br>');
       }
@@ -1232,6 +1744,7 @@ window.updateUI = function () {
   if (btnTog) btnTog.innerText = isFullLogView ? "Papar 15 Terkini Sahaja" : "Papar Semua Rekod";
 
   // --- DATA 9 : ANALISA PERMOHONAN VCC ---
+  let mProsesForDashboard = 0;
   try {
     const curMohon = permohonanData.filter(item => {
       let tarikhCheck = item.tarikhGerak || item.tarikh || null;
@@ -1260,9 +1773,187 @@ window.updateUI = function () {
     document.getElementById('statMohonProses').innerText = mProses;
     document.getElementById('statMohonLulus').innerText = mLulus;
     document.getElementById('statMohonTolak').innerText = mTolak;
+    mProsesForDashboard = mProses;
   } catch (err) {
-    console.log("Ralat memuatkan Data 9:", err);
+    console.error("Ralat memuatkan Data 9:", err);
   }
+
+  // --- DASHBOARD HOME (Phase 1 pilot) -- pure display layer, reuses the
+  // month stats / fuel stats / driver stats already computed above. No new
+  // Firestore reads; mProsesForVcc re-runs the same VCC month filter as
+  // Data 9 (permohonanData is already in memory) for the prior month only.
+  (function renderDashboardHome() {
+    const monthsBack = (mStr, n) => {
+      const [yy, mm] = mStr.split('-').map(Number);
+      const d = new Date(yy, mm - 1 - n, 1);
+      return d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+    };
+    const tripCountForMonth = (mStr) => ambulanceData.filter(item => item.tarikh && item.tarikh.startsWith(mStr)).length;
+    const fuelUsedForMonth = (mStr) => {
+      const grp = computeFuelStatsForMonth(mStr);
+      let sum = 0;
+      for (const p in grp) sum += grp[p].c_guna;
+      return sum;
+    };
+    const mohonProsesForMonth = (mStr) => {
+      let n = 0;
+      permohonanData.forEach(m => {
+        let tarikhCheck = m.tarikhGerak || m.tarikh || null;
+        if (!tarikhCheck) return;
+        const dateStr = String(tarikhCheck);
+        const [sy, sm] = mStr.split('-');
+        const sYear = parseInt(sy, 10), sMonth = parseInt(sm, 10);
+        let match = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+        let inMonth = match ? (parseInt(match[1], 10) === sYear && parseInt(match[2], 10) === sMonth) : null;
+        if (inMonth === null) { match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); inMonth = match ? (parseInt(match[3], 10) === sYear && parseInt(match[2], 10) === sMonth) : dateStr.startsWith(mStr); }
+        if (!inMonth) return;
+        const s = String(m.status).toUpperCase();
+        if (!s.includes('LULUS') && !s.includes('TOLAK')) n++;
+      });
+      return n;
+    };
+
+    const prevMonth = monthsBack(targetedMonth, 1);
+    const prevStats = computeMonthStats(prevMonth);
+    const prevFuel = fuelUsedForMonth(prevMonth);
+    const prevMohon = mohonProsesForMonth(prevMonth);
+
+    const trendEl = (id, cur, prev, unit) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (!prev) { el.textContent = 'Tiada data bulan lepas'; el.className = 'vx-kpi-trend na'; return; }
+      const pct = ((cur - prev) / prev * 100);
+      if (Math.abs(pct) < 0.5) { el.textContent = 'Tiada perubahan'; el.className = 'vx-kpi-trend na'; return; }
+      el.textContent = (pct > 0 ? '↑ ' : '↓ ') + Math.abs(pct).toFixed(0) + '% vs bulan lepas';
+      el.className = 'vx-kpi-trend ' + (pct > 0 ? 'up' : 'dn');
+    };
+
+    document.getElementById('kpiTotalTrips').textContent = totalFilteredTrips;
+    trendEl('kpiTotalTripsTrend', totalFilteredTrips, prevStats.totalFilteredTrips);
+    document.getElementById('kpiTotalPatients').textContent = totalPatients;
+    trendEl('kpiTotalPatientsTrend', totalPatients, prevStats.totalPatients);
+    document.getElementById('kpiFuelUsed').innerHTML = totalFuelUsedKpi.toFixed(0) + '<span style="font-size:16px;font-weight:600;color:var(--vx-muted)">L</span>';
+    trendEl('kpiFuelUsedTrend', totalFuelUsedKpi, prevFuel);
+    document.getElementById('kpiMohonAktif').textContent = mProsesForDashboard;
+    trendEl('kpiMohonAktifTrend', mProsesForDashboard, prevMohon);
+
+    // Idle-fleet alert -- vehicles from the fixed roster with zero trips this month.
+    const fixedFleet = [...(configKenderaan.ambulans || []), ...(configKenderaan.jabatan || [])];
+    const idle = fixedFleet.filter(p => !tripStats[p]);
+    const alertStrip = document.getElementById('vxAlertStrip');
+    const alertTxt = document.getElementById('vxAlertTxt');
+    if (idle.length > 0 && fixedFleet.length > 0) {
+      alertStrip.style.display = 'flex';
+      alertTxt.innerHTML = '<strong>' + idle.length + ' kenderaan</strong> tiada pergerakan direkodkan bulan ini: ' + idle.join(', ');
+    } else {
+      alertStrip.style.display = 'none';
+    }
+
+    // Trend Pergerakan -- last 6 months including the selected month.
+    const trendMonths = [5, 4, 3, 2, 1, 0].map(n => monthsBack(targetedMonth, n));
+    const trendCounts = trendMonths.map(tripCountForMonth);
+    const trendMax = Math.max(1, ...trendCounts);
+    const trendChartEl = document.getElementById('vxTrendChart');
+    trendChartEl.innerHTML = trendMonths.map((mStr, i) => {
+      const [yy, mm] = mStr.split('-');
+      const lbl = malayMonths[parseInt(mm, 10) - 1].slice(0, 3) + (i === trendMonths.length - 1 ? ' ▸' : '');
+      const h = Math.max(2, Math.round(trendCounts[i] / trendMax * 100));
+      const isCur = mStr === targetedMonth;
+      return '<div class="vx-bc"><div class="vx-bc-bar' + (isCur ? ' cur' : '') + '" style="height:' + h + '%"><span class="vx-bc-val">' + trendCounts[i] + '</span><span class="vx-bc-lbl">' + lbl + '</span></div></div>';
+    }).join('');
+
+    // Status Kenderaan -- trip count this month per vehicle (fuel % swapped out per discussion).
+    const vehStatusRows = [];
+    fixedFleet.forEach(p => vehStatusRows.push({ plat: p, jenis: (configKenderaan.ambulans || []).includes(p) ? 'AMBULANS' : 'VAN' }));
+    Object.keys(customAmb).forEach(p => vehStatusRows.push({ plat: p, jenis: 'AMBULANS' }));
+    Object.keys(customJab).forEach(p => vehStatusRows.push({ plat: p, jenis: 'VAN' }));
+    const countFor = (p) => tripStats[p] || customAmb[p] || customJab[p] || 0;
+    vehStatusRows.sort((a, b) => countFor(b.plat) - countFor(a.plat));
+    const maxTripCount = Math.max(1, ...vehStatusRows.map(r => countFor(r.plat)));
+    const vehBody = document.getElementById('vxVehicleStatusBody');
+    if (vehStatusRows.length === 0) {
+      vehBody.innerHTML = '<tr><td colspan="3" style="color:var(--vx-muted);">Tiada kenderaan dikonfigurasi.</td></tr>';
+    } else {
+      vehBody.innerHTML = vehStatusRows.map(r => {
+        const c = countFor(r.plat);
+        const lastTrip = filteredData.filter(t => t.kenderaan === r.plat).sort((a, b) => (b.tarikh || '').localeCompare(a.tarikh || ''))[0];
+        const lastDate = lastTrip ? lastTrip.tarikh : null;
+        const w = Math.round(c / maxTripCount * 100);
+        return '<tr><td><div class="vx-veh-name">' + r.plat + '</div><div style="font-size:10px;color:var(--vx-sb-label);">' + (lastDate || 'Tiada pergerakan') + '</div></td>' +
+          '<td><span class="vx-veh-tag">' + r.jenis + '</span></td>' +
+          '<td><div style="font-size:12px;font-weight:700;color:var(--vx-text);">' + c + ' kali</div><div class="vx-util-bar"><div class="vx-util-bar-fill" style="width:' + w + '%"></div></div></td></tr>';
+      }).join('');
+    }
+
+    // Rekod Pergerakan Terkini -- last 5 trips overall, newest first.
+    const recentTrips = filteredData.slice().sort((a, b) => ((b.tarikh || '') + 'T' + (b.masa || '')).localeCompare((a.tarikh || '') + 'T' + (a.masa || ''))).slice(0, 5);
+    const feedEl = document.getElementById('vxRecentTripsFeed');
+    if (recentTrips.length === 0) {
+      feedEl.innerHTML = '<p style="font-size:12px; color:var(--vx-muted);">Tiada rekod pergerakan bulan ini.</p>';
+    } else {
+      feedEl.innerHTML = recentTrips.map(item => {
+        const isEm = item.nota === 'Ambulance Call';
+        const combinedPemandu = [item.pemandu, item.pemandu2].filter(Boolean).join(', ');
+        const dest = (item.pesakitList && item.pesakitList[0]) ? item.pesakitList[0].destinasi : ((item.stepdownList && item.stepdownList[0]) ? 'Pitas' : (item.nota || 'Tiada tujuan'));
+        return '<div class="vx-trip' + (isEm ? ' em' : '') + '"><div class="vx-trip-info">' +
+          '<div class="vx-trip-time">' + item.tarikh + ' · ' + item.masa + '</div>' +
+          '<div class="vx-trip-route">' + dest + '</div>' +
+          '<div class="vx-trip-sub">' + item.kenderaan + ' · ' + combinedPemandu + '</div></div>' +
+          '<span class="vx-trip-badge ' + (isEm ? 'em">KECEMASAN' : 'rt">BIASA') + '</span></div>';
+      }).join('');
+    }
+
+    // Beban Pemandu Bulan Ini -- reuses overallDriverTrips already built above.
+    const driverEntries = Object.entries(overallDriverTrips).sort((a, b) => b[1] - a[1]);
+    const drvMax = Math.max(1, ...driverEntries.map(e => e[1]));
+    const boardEl = document.getElementById('vxDriverLeaderboard');
+    const topDriverChip = document.getElementById('vxTopDriverChip');
+    const [dy, dm] = targetedMonth.split('-');
+    document.getElementById('vxDriverBoardMonth').textContent = malayMonths[parseInt(dm, 10) - 1] + ' ' + dy + ' · jumlah pergerakan';
+    if (driverEntries.length === 0) {
+      boardEl.innerHTML = '<p style="font-size:12px; color:var(--vx-muted);">Tiada rekod pemandu bulan ini.</p>';
+      topDriverChip.style.display = 'none';
+    } else {
+      const totalDriverTrips = driverEntries.reduce((s, e) => s + e[1], 0);
+      const avg = (totalDriverTrips / driverEntries.length).toFixed(1);
+      topDriverChip.style.display = '';
+      topDriverChip.textContent = '🏆 ' + driverEntries[0][0];
+      boardEl.innerHTML = driverEntries.map((e, i) => {
+        const w = Math.round(e[1] / drvMax * 100);
+        return '<div class="vx-drv"><div class="vx-drv-rank' + (i < 2 ? ' t' : '') + '">' + (i + 1) + '</div>' +
+          '<div class="vx-drv-name">' + (i === 0 ? '🏆 ' : '') + e[0] + '</div>' +
+          '<div class="vx-drv-bar-w"><div class="vx-drv-bar-f" style="width:' + w + '%"></div></div>' +
+          '<div class="vx-drv-n">' + e[1] + '</div></div>';
+      }).join('') +
+        '<hr style="border:none;border-top:1px solid var(--vx-border);margin:8px 0">' +
+        '<div class="vx-drv-summary-row"><span>Jumlah pemandu aktif</span><strong>' + driverEntries.length + ' pemandu</strong></div>' +
+        '<div class="vx-drv-summary-row"><span>Purata pergerakan / pemandu</span><strong>' + avg + ' pergerakan</strong></div>';
+    }
+  })();
+
+  // --- KONFIGURASI: kapasiti tangki + senarai kenderaan (read-only roster) ---
+  (function renderKonfigurasi() {
+    const capBody = document.getElementById('vxCapacityBody');
+    const rosterEl = document.getElementById('vxVehicleRoster');
+    if (!capBody || !rosterEl) return;
+    const ambList = configKenderaan.ambulans || [];
+    const jabList = configKenderaan.jabatan || [];
+    const allVeh = [...ambList.map(p => ({ plat: p, jenis: 'Ambulans' })), ...jabList.map(p => ({ plat: p, jenis: 'Kenderaan Jabatan' }))];
+    if (allVeh.length === 0) {
+      capBody.innerHTML = '<tr><td colspan="4" style="color:var(--vx-muted);">Tiada kenderaan dikonfigurasi.</td></tr>';
+    } else {
+      capBody.innerHTML = allVeh.map(v => {
+        const cap = getKenderaanCapacity(v.plat);
+        const isDefault = cloudTangkiCap[v.plat] === undefined || cloudTangkiCap[v.plat] === null;
+        const editBtn = isViewer ? '' : ' <button class="vx-btn ghost" style="padding:4px 10px; font-size:11px;" onclick="window.editCapacity(\'' + v.plat + '\')">Ubah</button>';
+        return '<tr><td class="vx-veh-name">' + v.plat + '</td><td><span class="vx-veh-tag">' + v.jenis + '</span></td>' +
+          '<td>' + (isDefault ? '<span style="color:var(--vx-danger); font-weight:700;">' + cap + ' (lalai)</span>' : cap) + '</td>' +
+          '<td>' + editBtn + '</td></tr>';
+      }).join('');
+    }
+    rosterEl.innerHTML = '<div><strong>Ambulans (' + ambList.length + '):</strong> ' + (ambList.join(', ') || '—') + '</div>' +
+      '<div><strong>Kenderaan Jabatan (' + jabList.length + '):</strong> ' + (jabList.join(', ') || '—') + '</div>';
+  })();
 };
 
 /* ---------------------------------------------------------------------
@@ -1366,6 +2057,123 @@ window.addEventListener('beforeprint', function () {
   } else { document.title = 'Velos_Admin_Report_Keseluruhan'; }
 });
 window.addEventListener('afterprint', function () { document.title = 'VELOS — Admin Dashboard'; });
+</script>
+
+<script>
+/* navbar scroll spy */
+(function () {
+  var sidebar = document.getElementById('vxSidebar');
+  var mainContent = document.getElementById('vxMainContent');
+
+  window.vxToggleSidebar = function () {
+    if (!sidebar || !mainContent) return;
+    var collapsed = sidebar.classList.toggle('vx-collapsed');
+    mainContent.classList.toggle('vx-sidebar-collapsed', collapsed);
+  };
+
+  // Phone screens start with the sidebar closed (it's an overlay drawer
+  // there, see the @media (max-width:768px) rules) -- desktop keeps the
+  // full-expand default.
+  if (sidebar && mainContent && window.innerWidth <= 768) {
+    sidebar.classList.add('vx-collapsed');
+    mainContent.classList.add('vx-sidebar-collapsed');
+  }
+
+  var laporanToggle = document.getElementById('vxLaporanParentToggle');
+  var laporanSubgroup = document.getElementById('vxLaporanSubgroup');
+  window.vxToggleLaporanSubmenu = function () {
+    if (!laporanToggle || !laporanSubgroup) return;
+    var opening = !laporanToggle.classList.contains('vx-expanded');
+    laporanToggle.classList.toggle('vx-expanded', opening);
+    laporanSubgroup.classList.toggle('vx-expanded', opening);
+    if (opening) vxShowPage('sec-laporan-pesakit');
+  };
+
+  window.vxToggleCollapsible = function (el) {
+    if (el) el.classList.toggle('vx-expanded');
+  };
+
+  var monthInput = document.getElementById('pilihanBulan');
+  var monthPrevBtn = document.getElementById('vxMonthPrev');
+  var monthNextBtn = document.getElementById('vxMonthNext');
+  function vxStepMonth(delta) {
+    if (!monthInput || !monthInput.value) return;
+    var parts = monthInput.value.split('-');
+    var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1 + delta, 1);
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    monthInput.value = y + '-' + m;
+    monthInput.dispatchEvent(new Event('change'));
+  }
+  if (monthPrevBtn) monthPrevBtn.addEventListener('click', function () { vxStepMonth(-1); });
+  if (monthNextBtn) monthNextBtn.addEventListener('click', function () { vxStepMonth(1); });
+
+  // Single-page-at-a-time navigation: clicking a sidebar link shows only its
+  // target section (plus any accessory it shares, e.g. sec-laporan sits above
+  // all 4 Laporan sub-pages) and hides the rest. The .vx-page-active toggle
+  // is screen-only (see the @media screen rule in <style>), so printing --
+  // which needs every Laporan card regardless of which page is on screen --
+  // is completely unaffected.
+  var links = document.querySelectorAll('.vx-sidebar-link[data-vx-section]');
+  var sections = [];
+  links.forEach(function (link) {
+    var el = document.getElementById(link.getAttribute('data-vx-section'));
+    if (el) sections.push({ el: el, link: link });
+  });
+  if (!sections.length) return;
+
+  var PAGE_GROUPS = {
+    'sec-laporan-pesakit':   ['sec-laporan', 'sec-laporan-pesakit'],
+    'sec-laporan-kenderaan': ['sec-laporan', 'sec-laporan-kenderaan'],
+    'sec-laporan-staf':      ['sec-laporan', 'sec-laporan-staf'],
+    'sec-laporan-vcc':       ['sec-laporan', 'sec-laporan-vcc']
+  };
+  var allPages = document.querySelectorAll('.vx-page');
+
+  // On mobile the sidebar is an overlay drawer (see @media max-width:768px) --
+  // closing it after any navigation or tap on the content behind it is the
+  // expected drawer pattern, not just via the toggle button.
+  function vxCloseSidebarOnMobile() {
+    if (window.innerWidth > 768 || !sidebar || sidebar.classList.contains('vx-collapsed')) return;
+    sidebar.classList.add('vx-collapsed');
+    mainContent.classList.add('vx-sidebar-collapsed');
+  }
+
+  function vxShowPage(targetId) {
+    var groupIds = PAGE_GROUPS[targetId] || [targetId];
+    allPages.forEach(function (el) {
+      el.classList.toggle('vx-page-active', groupIds.indexOf(el.id) !== -1);
+    });
+    sections.forEach(function (s) {
+      s.link.classList.toggle('vx-active', s.link.getAttribute('data-vx-section') === targetId);
+    });
+    if (mainContent) mainContent.scrollTop = 0;
+    window.scrollTo(0, 0);
+    vxCloseSidebarOnMobile();
+  }
+  window.vxShowPage = vxShowPage;
+
+  sections.forEach(function (s) {
+    s.link.addEventListener('click', function (e) {
+      e.preventDefault();
+      vxShowPage(s.link.getAttribute('data-vx-section'));
+    });
+  });
+
+  if (mainContent) mainContent.addEventListener('click', vxCloseSidebarOnMobile);
+
+  vxShowPage('sec-dashboard');
+
+  var clockEl = document.getElementById('vxClock');
+  if (clockEl) {
+    var tickClock = function () {
+      var now = new Date();
+      clockEl.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    };
+    tickClock();
+    setInterval(tickClock, 1000);
+  }
+})();
 </script>
 
 </body>
