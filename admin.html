@@ -218,6 +218,8 @@ color: #333; border-top: 1px solid #ccc; padding-top: 5px; z-index: 9999; }
 h2 { font-size: 16px !important; color: var(--primary) !important; border-bottom: 2px solid var(--primary) !important; padding-bottom: 5px; margin-top: 15px; page-break-after: avoid; }
 .h2-laporan-utama { font-size: 20px !important; border-bottom: 3px solid var(--primary) !important; page-break-before: avoid; margin-bottom: 15px; }
 
+#sec-laporan-pesakit .vx-page-title, #sec-laporan-kenderaan .vx-page-title, #sec-laporan-staf .vx-page-title, #sec-laporan-vcc .vx-page-title { page-break-after: avoid; }
+
 .dashboard-grid-layout, .dashboard-grid-layout.uneven { display: block !important; width: 100% !important; }
 .dashboard-grid-layout > div { width: 100% !important; page-break-inside: avoid; margin-bottom: 25px; }
 
@@ -335,6 +337,7 @@ top: 15px !important;
   display: flex; flex-direction: column; padding-top: 8px;
 }
 .vx-sidebar.vx-collapsed { width: 0; }
+#vxBackdrop { position: fixed; inset: 0; background: transparent; z-index: 998; display: none; }
 
 /* Toggle lives in the topbar (next to the Jata Negara logo) so it's always
    visible regardless of sidebar state -- collapsed state shows nothing but
@@ -599,6 +602,15 @@ top: 15px !important;
   </button>
 
   <hr class="vx-sidebar-divider">
+  <div class="vx-sidebar-section-label">VELOS NG 999</div>
+  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-mecc','_blank','noopener')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></span><span class="vx-sidebar-text">MECC Dashboard</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-supervisor','_blank','noopener')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Supervisor Dashboard</span>
+  </button>
+
+  <hr class="vx-sidebar-divider">
 
   <div class="vx-sidebar-section-label">Admin</div>
   <a href="#sec-dashboard" class="vx-sidebar-link" data-vx-section="sec-dashboard">
@@ -634,6 +646,7 @@ top: 15px !important;
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Sistem</span>
   </a>
 </nav>
+<div id="vxBackdrop"></div>
 
 <div class="vx-main-content" id="vxMainContent">
 <div class="first-page-wrapper">
@@ -2064,12 +2077,21 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
 (function () {
   var sidebar = document.getElementById('vxSidebar');
   var mainContent = document.getElementById('vxMainContent');
+  var backdrop = document.getElementById('vxBackdrop');
+
+  function vxSyncBackdrop(collapsed) {
+    if (!backdrop) return;
+    backdrop.style.display = (!collapsed && window.innerWidth <= 768) ? 'block' : 'none';
+  }
 
   window.vxToggleSidebar = function () {
     if (!sidebar || !mainContent) return;
     var collapsed = sidebar.classList.toggle('vx-collapsed');
     mainContent.classList.toggle('vx-sidebar-collapsed', collapsed);
+    vxSyncBackdrop(collapsed);
   };
+
+  if (backdrop) backdrop.addEventListener('click', window.vxToggleSidebar);
 
   // Phone screens start with the sidebar closed (it's an overlay drawer
   // there, see the @media (max-width:768px) rules) -- desktop keeps the
@@ -2137,6 +2159,7 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
     if (window.innerWidth > 768 || !sidebar || sidebar.classList.contains('vx-collapsed')) return;
     sidebar.classList.add('vx-collapsed');
     mainContent.classList.add('vx-sidebar-collapsed');
+    vxSyncBackdrop(true);
   }
 
   function vxShowPage(targetId) {

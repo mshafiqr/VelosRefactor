@@ -33,6 +33,7 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
 /* SIDEBAR */
 .vx-sidebar{position:fixed;top:var(--navbar-header-h);left:0;bottom:0;width:var(--sidebar-w-expanded);background:var(--vx-gradient);z-index:999;overflow-x:hidden;overflow-y:auto;transition:width 0.18s ease;display:flex;flex-direction:column;padding-top:8px}
 .vx-sidebar.vx-collapsed{width:0}
+#vxBackdrop{position:fixed;inset:0;background:transparent;z-index:998;display:none}
 .vx-sidebar-section-label{color:var(--vx-sb-label);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:14px 16px 6px;white-space:nowrap}
 .vx-sidebar-divider{border:none;border-top:1px solid rgba(255,255,255,0.12);margin:8px 12px}
 .vx-sidebar-link{display:flex;align-items:center;gap:12px;padding:9px 12px;color:var(--vx-sb-text);text-decoration:none;font-size:12px;font-weight:500;background:none;border:none;width:calc(100% - 12px);margin:1px 6px;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit}
@@ -139,10 +140,10 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
 
   <hr class="vx-sidebar-divider">
   <div class="vx-sidebar-section-label">VELOS NG 999</div>
-  <button class="vx-sidebar-link" onclick="window.open('velos-mecc.html','_self')">
+  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-mecc','_blank','noopener')">
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></span><span class="vx-sidebar-text">MECC Dashboard</span>
   </button>
-  <button class="vx-sidebar-link" onclick="window.open('velos-supervisor.html','_self')">
+  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-supervisor','_blank','noopener')">
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Supervisor Dashboard</span>
   </button>
 
@@ -151,6 +152,7 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 11h1v5h1"/></svg></span><span class="vx-sidebar-text">About</span>
   </button>
 </nav>
+<div id="vxBackdrop"></div>
 
 <div class="vx-main-content" id="vxMainContent">
 <div class="hero">
@@ -232,17 +234,24 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
 (function () {
   var sidebar = document.getElementById('vxSidebar');
   var mainContent = document.getElementById('vxMainContent');
+  var backdrop = document.getElementById('vxBackdrop');
   var topbar = document.getElementById('vxTopbar');
   function syncTopbarHeight() {
     if (topbar) document.documentElement.style.setProperty('--navbar-header-h', topbar.offsetHeight + 'px');
   }
   syncTopbarHeight();
   window.addEventListener('resize', syncTopbarHeight);
+  function vxSyncBackdrop(collapsed) {
+    if (!backdrop) return;
+    backdrop.style.display = (!collapsed && window.innerWidth <= 768) ? 'block' : 'none';
+  }
   window.vxToggleSidebar = function () {
     if (!sidebar || !mainContent) return;
     var collapsed = sidebar.classList.toggle('vx-collapsed');
     mainContent.classList.toggle('vx-sidebar-collapsed', collapsed);
+    vxSyncBackdrop(collapsed);
   };
+  if (backdrop) backdrop.addEventListener('click', window.vxToggleSidebar);
   if (sidebar && mainContent && window.innerWidth <= 768) {
     sidebar.classList.add('vx-collapsed');
     mainContent.classList.add('vx-sidebar-collapsed');
