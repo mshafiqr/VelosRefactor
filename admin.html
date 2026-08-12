@@ -690,9 +690,9 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 <div class="vx-page-title">Admin VELOS</div>
 </div>
 <div class="vx-month-nav">
-<button type="button" class="vx-month-nav-btn" id="vxMonthPrev" aria-label="Bulan sebelumnya">&#8249;</button>
-<input type="month" id="pilihanBulan">
-<button type="button" class="vx-month-nav-btn" id="vxMonthNext" aria-label="Bulan seterusnya">&#8250;</button>
+<button type="button" class="vx-month-nav-btn" id="vxMonthPrev" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" id="pilihanBulan" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" id="vxMonthNext" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
 </div>
 </div>
 
@@ -791,6 +791,11 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 <div class="vx-section-title">Log Pergerakan Langsung</div>
 </div>
 <div style="display:flex; align-items:center; gap:8px;" class="hide-print">
+<div class="vx-month-nav" onclick="event.stopPropagation()">
+<button type="button" class="vx-month-nav-btn" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
 <button id="btnToggleLog" class="vx-btn ghost" onclick="event.stopPropagation(); window.toggleLogView()">Papar Semua Rekod</button>
 <button class="vx-btn ghost" onclick="event.stopPropagation(); window.downloadMasterLogCSV()">Muat Turun CSV</button>
 <span class="vx-collapsible-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -833,6 +838,11 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 <div id="sec-laporan-pesakit" class="vx-page">
 <div class="vx-page-header" style="margin-bottom:14px;">
 <div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Pesakit &amp; Rujukan</div></div>
+<div class="vx-month-nav hide-print">
+<button type="button" class="vx-month-nav-btn" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
 </div>
 <div id="sec-data1" class="card section-stats print-avoid-break">
 <h2>
@@ -911,6 +921,11 @@ id="stepJabPagiTotal">0</td></tr>
 <div class="vx-page-header" style="margin-bottom:14px;">
 <div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Kenderaan &amp; Bahan Api</div></div>
 <span class="vx-chip warn">Data Paling Kerap Digunakan</span>
+<div class="vx-month-nav hide-print">
+<button type="button" class="vx-month-nav-btn" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
 </div>
 <div id="sec-data3" class="card section-stats print-avoid-break">
 <h2>
@@ -949,6 +964,11 @@ id="stepJabPagiTotal">0</td></tr>
 <div id="sec-laporan-staf" class="vx-page" style="margin-top:28px;">
 <div class="vx-page-header" style="margin-bottom:14px;">
 <div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Laporan Staf</div></div>
+<div class="vx-month-nav hide-print">
+<button type="button" class="vx-month-nav-btn" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
 </div>
 <div id="sec-data5" class="card section-stats print-avoid-break">
 <h2>
@@ -988,6 +1008,11 @@ id="stepJabPagiTotal">0</td></tr>
 <div id="sec-laporan-vcc" class="vx-page" style="margin-top:28px;">
 <div class="vx-page-header" style="margin-bottom:14px;">
 <div><div class="vx-eyebrow">Laporan &amp; Statistik</div><div class="vx-page-title">Permohonan VCC</div></div>
+<div class="vx-month-nav hide-print">
+<button type="button" class="vx-month-nav-btn" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
 </div>
 <div id="sec-data9" class="card section-stats print-avoid-break" style="border: 2px solid var(--line); background-color: #f4f8fc;">
 <h2 style="color: var(--primary); border-bottom-color: var(--primary);">
@@ -1590,6 +1615,7 @@ window.toggleLogView = function () {
 window.updateUI = function () {
   const targetedMonth = document.getElementById('pilihanBulan').value;
   if (!targetedMonth) return;
+  document.querySelectorAll('.vx-month-sync').forEach(function (el) { if (el.value !== targetedMonth) el.value = targetedMonth; });
 
   const [y, m] = targetedMonth.split('-');
   const monthName = malayMonths[parseInt(m, 10) - 1];
@@ -2116,8 +2142,6 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
   };
 
   var monthInput = document.getElementById('pilihanBulan');
-  var monthPrevBtn = document.getElementById('vxMonthPrev');
-  var monthNextBtn = document.getElementById('vxMonthNext');
   function vxStepMonth(delta) {
     if (!monthInput || !monthInput.value) return;
     var parts = monthInput.value.split('-');
@@ -2127,8 +2151,21 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
     monthInput.value = y + '-' + m;
     monthInput.dispatchEvent(new Event('change'));
   }
-  if (monthPrevBtn) monthPrevBtn.addEventListener('click', function () { vxStepMonth(-1); });
-  if (monthNextBtn) monthNextBtn.addEventListener('click', function () { vxStepMonth(1); });
+  // Every section header carries its own month-nav control (.vx-month-nav-btn /
+  // .vx-month-sync); all of them drive the single canonical #pilihanBulan input
+  // so every page reflects and can change the same month without a trip back
+  // to the Dashboard. window.updateUI keeps the mirror inputs' displayed value
+  // in sync on every re-render.
+  document.querySelectorAll('.vx-month-nav-btn[data-vx-step]').forEach(function (btn) {
+    btn.addEventListener('click', function () { vxStepMonth(parseInt(btn.getAttribute('data-vx-step'), 10)); });
+  });
+  document.querySelectorAll('.vx-month-sync').forEach(function (inp) {
+    if (inp === monthInput) return;
+    inp.addEventListener('change', function () {
+      monthInput.value = this.value;
+      monthInput.dispatchEvent(new Event('change'));
+    });
+  });
 
   // Single-page-at-a-time navigation: clicking a sidebar link shows only its
   // target section (plus any accessory it shares, e.g. sec-laporan sits above
