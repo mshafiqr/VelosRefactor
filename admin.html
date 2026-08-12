@@ -749,7 +749,7 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 <div class="vx-card">
 <div class="vx-card-hd">
 <div>
-<div class="vx-section-title">Jadual Trend Pergerakan</div>
+<div class="vx-section-title">Pecahan Trend Pergerakan</div>
 <div class="vx-card-hds">Pergerakan bulan ini</div>
 </div>
 </div>
@@ -1877,9 +1877,9 @@ window.updateUI = function () {
 
     // Status Kenderaan -- trip count this month per vehicle (fuel % swapped out per discussion).
     const vehStatusRows = [];
-    fixedFleet.forEach(p => vehStatusRows.push({ plat: p, jenis: (configKenderaan.ambulans || []).includes(p) ? 'AMBULANS' : 'VAN' }));
-    Object.keys(customAmb).forEach(p => vehStatusRows.push({ plat: p, jenis: 'AMBULANS' }));
-    Object.keys(customJab).forEach(p => vehStatusRows.push({ plat: p, jenis: 'VAN' }));
+    fixedFleet.forEach(p => vehStatusRows.push({ plat: p, jenis: (configKenderaan.ambulans || []).includes(p) ? 'Ambulans' : 'Kenderaan Jabatan' }));
+    Object.keys(customAmb).forEach(p => vehStatusRows.push({ plat: p, jenis: 'Ambulans' }));
+    Object.keys(customJab).forEach(p => vehStatusRows.push({ plat: p, jenis: 'Kenderaan Jabatan' }));
     const countFor = (p) => tripStats[p] || customAmb[p] || customJab[p] || 0;
     vehStatusRows.sort((a, b) => countFor(b.plat) - countFor(a.plat));
     const maxTripCount = Math.max(1, ...vehStatusRows.map(r => countFor(r.plat)));
