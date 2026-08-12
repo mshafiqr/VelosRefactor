@@ -1557,8 +1557,6 @@ function computeFuelStatsForMonth(monthStr) {
   const normPlat = s => (s || '').toString().trim().toUpperCase().replace(/\s+/g, ' ');
   const firstFillOf = e => e.liter;
   let [yFuel, mFuel] = monthStr.split('-');
-  let prevDate = new Date(parseInt(yFuel), parseInt(mFuel) - 2, 1);
-  let pPrefix = prevDate.getFullYear() + '-' + String(prevDate.getMonth() + 1).padStart(2, '0');
 
   let curEntries = fuelDataLog.filter(e => e.tarikh && e.tarikh.startsWith(monthStr)).sort((a, b) => (a.tarikh || '').localeCompare(b.tarikh || '') || fillOdoKey(a) - fillOdoKey(b));
   let curTrips = ambulanceData.filter(t => t.tarikh && t.tarikh.startsWith(monthStr));
@@ -1591,12 +1589,8 @@ function computeFuelStatsForMonth(monthStr) {
     const hasFuelData = entries.length > 0;
     const iii_val = hasFuelData ? (vData.cap - firstFillOf(entries[entries.length - 1])) : null;
 
-    const prevMonthEntries = fuelDataLog.filter(e => normPlat(e.kenderaan) === plat && e.tarikh && e.tarikh.startsWith(pPrefix))
-      .sort((a, b) => (a.tarikh || '').localeCompare(b.tarikh || '') || fillOdoKey(a) - fillOdoKey(b));
-
     let i_val;
-    if (prevMonthEntries.length > 0) i_val = vData.cap - firstFillOf(prevMonthEntries[prevMonthEntries.length - 1]);
-    else if (entries.length > 0) i_val = vData.cap - firstFillOf(entries[0]);
+    if (entries.length > 0) i_val = vData.cap - firstFillOf(entries[0]);
     else i_val = 0;
 
     const c_guna = hasFuelData ? (i_val + ii_belian - iii_val) : ii_belian;
