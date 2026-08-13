@@ -1723,7 +1723,7 @@ window.updateUI = function () {
       _auditFillMap[origPlat] = entries;
       const firstFillCurrent = entries.length ? entries[0].liter : 0;
       let fInfo = vData.hasFuelData
-        ? '(i: ' + vData.i_val.toFixed(2) + ' + ii: ' + vData.ii_belian.toFixed(2) + ' - iii: ' + vData.iii_val.toFixed(2) + ')'
+        ? '(i: ' + vData.i_val.toFixed(3) + ' + ii: ' + vData.ii_belian.toFixed(3) + ' - iii: ' + vData.iii_val.toFixed(3) + ')'
         : '(Tiada Data Pengisian Bulan Ini. Guna Jum. Semasa)';
       if (firstFillCurrent > vData.cap) {
         fInfo += ' <span style="color:red; font-weight:bold;">⚠️ Amaran: Isian pertama melebihi kapasiti tangki (&gt; ' + vData.cap + 'L) - rekod ini mungkin gabungan dua isian, sila pisahkan.</span>';
