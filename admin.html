@@ -1269,7 +1269,11 @@ function initDashboard() {
   }, function (err) { console.error('Ralat langganan logPergerakan:', err); logReady = true; maybeFinishFirstSync(); });
 
   unsubFuel = onSnapshot(collection(db, 'logBahanApi'), function (snap) {
-    fuelDataLog = snap.docs.map(function (d) { return d.data(); });
+    fuelDataLog = snap.docs.map(function (d) {
+      const entry = d.data();
+      entry._docId = d.id;
+      return entry;
+    });
     fuelReady = true;
     if (firstSyncDone) window.updateUI();
     maybeFinishFirstSync();
@@ -1381,6 +1385,14 @@ window.lihatSemuaResit = function (plat) {
         'style="background:var(--primary); color:white; border:none; border-radius:4px; ' +
         'padding:4px 10px; font-size:12px; cursor:pointer; font-weight:bold;">Lihat Resit</button>' +
       '</td>' +
+      (isViewer ? '' :
+        '<td style="padding:6px 10px; border-bottom:1px solid #eee;">' +
+          '<button onclick="Swal.close(); window.deleteFuelEntry(\'' +
+            (f._docId || f.id) + '\')" ' +
+          'style="background:#C62828; color:white; border:none; ' +
+          'border-radius:4px; padding:4px 10px; font-size:12px; ' +
+          'cursor:pointer; font-weight:bold;">Padam</button>' +
+        '</td>') +
     '</tr>';
   }).join('');
   Swal.fire({
@@ -1390,12 +1402,13 @@ window.lihatSemuaResit = function (plat) {
         '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Tarikh</th>' +
         '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Liter</th>' +
         '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Resit</th>' +
+        (isViewer ? '' : '<th style="padding:6px 10px; background:#0F2A4A; color:white; text-align:left;">Tindakan</th>') +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>',
     showConfirmButton: false,
     showCloseButton: true,
-    width: 420
+    width: 540
   });
 };
 
@@ -1721,7 +1734,7 @@ window.updateUI = function () {
         : vData.cap;
       const latestFillId = entries.length ? entries[entries.length - 1].id : null;
       const actionButtons = entries.length > 0
-        ? '<button class="btn-table-download" style="background-color:var(--primary);" onclick="window.lihatSemuaResit(\'' + origPlat + '\')">Resit (' + entries.length + ')</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + (entries.length ? entries[entries.length-1].id : '') + '\')">Padam</button>')
+        ? '<button class="btn-table-download" style="background-color:var(--primary);" onclick="window.lihatSemuaResit(\'' + origPlat + '\')">Resit (' + entries.length + ')</button>' + (isViewer ? '' : ' <button class="btn-danger-action" style="padding:4px 8px; font-size:11px;" onclick="window.deleteFuelEntry(\'' + (entries.length ? (entries[entries.length-1]._docId || entries[entries.length-1].id) : '') + '\')">Padam</button>')
         : '<span style="color:#999; font-size:11px;">Tiada Rekod</span>';
       const jarakDisplay = vData.hasTrips ? vData.jarak : '<span style="color:#999;">Tiada trip</span>';
       const minOdoDisplay = vData.hasTrips ? vData.minOdo : '-';
