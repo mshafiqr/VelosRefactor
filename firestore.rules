@@ -128,6 +128,14 @@ service cloud.firestore {
       allow write: if isAdmin() || isMaster();
     }
 
+    // ---- jknsManualEntries --------------------------------------------------
+    // Manual fields for the JKNS monthly return (Sections a, c, d, fleet status)
+    // that VELOS doesn't capture on its own. One doc per month, ID = YYYY-MM.
+    match /jknsManualEntries/{monthId} {
+      allow read:  if isAdmin() || isMaster() || isViewer();
+      allow write: if isAdmin() || isMaster();
+    }
+
     // ---- Default deny ------------------------------------------------------
     // Anything not matched above is closed. Do not remove this block.
     match /{document=**} {

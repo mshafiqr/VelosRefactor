@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<title>VELOS — Laporan JKNS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #0F2A4A; --secondary: #147D82; --bg-color: #E9F1F6; --card-bg: #ffffff;
+  --text-color: #1C2530; --text-soft: #5B6774; --success: #1E8E5A; --danger: #C62828;
+  --warning: #C98A2E; --line: #DCE6ED; --radius: 12px;
+  --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
+}
+/* ============================================================
+   VELOS Design System v1
+   Shared visual language across all portals — do not modify
+   tokens without updating all portal files accordingly
+   ============================================================ */
+:root {
+  /* Chrome -- gradient matches the landing page hero exactly (index.html .hero) */
+  --vx-topbar:        #084E4E;
+  --vx-sidebar:       #0A5C5C;
+  --vx-gradient:      linear-gradient(135deg, #0F2A4A 0%, #0D4F54 50%, #147D82 100%);
+  --vx-sidebar-hover: rgba(255,255,255,0.08);
+  --vx-sidebar-active:rgba(255,255,255,0.18);
+
+  /* Brand */
+  --vx-teal:          #147D82;
+  --vx-teal-light:    #E0F4F5;
+  --vx-teal-bright:   #7FDFDF;
+
+  /* Page */
+  --vx-bg:            #EEF8F8;
+  --vx-card:          #FFFFFF;
+  --vx-card-tint:     #F0FAFA;
+  --vx-border:        #DCE6ED;
+
+  /* Text */
+  --vx-text:          #0F2A4A;
+  --vx-muted:         #5B6774;
+  --vx-sb-text:       #A8D4D4;
+  --vx-sb-label:      #5FAAAA;
+
+  /* Semantic */
+  --vx-success:       #1E8E5A;
+  --vx-success-light: #E3F4EB;
+  --vx-danger:        #C62828;
+  --vx-danger-light:  #FDEAEA;
+  --vx-warning:       #C98A2E;
+  --vx-warning-light: #FDF3E0;
+
+  /* Elevation */
+  --vx-shadow:        0 1px 3px rgba(15,42,74,0.05), 0 4px 14px rgba(15,42,74,0.08);
+  --vx-radius:        16px;
+  --vx-radius-sm:     10px;
+}
+body {
+  font-family: 'Public Sans', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* ==================== AUTH GATE ==================== */
+#loginView {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.auth-card {
+  max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 16px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+  border-top: 4px solid var(--primary);
+}
+.auth-logo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #e9ecef;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
+.auth-password-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #DCE6ED; border-radius: 8px;
+  font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px;
+}
+.auth-password-input:focus { outline: none; border-color: var(--secondary); }
+.auth-submit-btn {
+  width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
+
+/* ==================== PAGE ==================== */
+#secureDashboardWrapper { display: none; padding: 20px; }
+.container { max-width: 1600px; margin: auto; display: block; }
+
+.card { background: var(--card-bg); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px; }
+.print-avoid-break { page-break-inside: avoid; }
+
+h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; display: flex; align-items: center; justify-content: space-between;
+flex-wrap: wrap; gap: 10px;}
+
+button.btn-table-download { background-color: #6c757d; color: white; border: none; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
+
+/* ==================== TEAL AS INTERACTION COLOR ==================== */
+button, .btn-table-download, .auth-submit-btn {
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-table-download:hover, .auth-submit-btn:hover:not(:disabled) {
+  background-color: var(--secondary) !important;
+}
+a:not(.vx-sidebar-link):hover { color: var(--secondary); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .vx-sidebar-link:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+th, td { padding: 8px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background-color: var(--primary); color: white; }
+tr:nth-child(even) { background-color: #F6FAFC; }
+tbody tr:hover {
+  background-color: rgba(20, 125, 130, 0.08);
+  transition: background-color 0.15s ease;
+}
+
+.hide-print { display: table-cell; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
+.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
+.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
+.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
+.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+
+/* ======================================================== */
+/* PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)                 */
+/* ======================================================== */
+button, select, .btn-table-download {
+touch-action: manipulation !important;
+-webkit-tap-highlight-color: transparent !important;
+position: relative !important;
+z-index: 50 !important;
+cursor: pointer !important;
+pointer-events: auto !important;
+user-select: none !important;
+min-height: 40px;
+}
+
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  #secureDashboardWrapper { padding: 0; }
+  .vx-topbar-title { display: none; }
+}
+
+/* ==================== NAVBAR ==================== */
+:root {
+  --navbar-header-h: 52px;
+  --sidebar-w-collapsed: 52px;
+  --sidebar-w-expanded: 250px;
+}
+.vx-topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--navbar-header-h);
+  background: var(--vx-gradient); color: #fff; z-index: 1000;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 16px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.vx-topbar-left { display: flex; align-items: center; gap: 10px; }
+.vx-topbar-left img { height: 32px; width: auto; object-fit: contain; }
+.vx-topbar-title { font-weight: 700; font-size: 15px; letter-spacing: 1px; white-space: nowrap; text-align: center; }
+.vx-topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.vx-status-badge { font-size: 11px; font-weight: 600; color: var(--vx-teal-bright); background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.vx-status-dot { color: #4ADE80; font-size: 8px; display: inline-block; animation: vxBlink 2s infinite; }
+@keyframes vxBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.vx-role-badge { font-size: 11px; font-weight: 600; color: var(--vx-sb-text); background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+.vx-clock { font-size: 12px; font-weight: 600; color: var(--vx-sb-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vx-topbar-right .btn-logout-top {
+  position: static !important; top: auto !important; right: auto !important;
+  box-shadow: none !important; padding: 6px 14px !important; min-height: 0 !important; font-size: 11px !important;
+  background: var(--vx-danger) !important; border-radius: 6px !important; font-weight: 600 !important; color: #fff !important; border: none !important;
+}
+.vx-topbar-right .vx-topbar-sync {
+  position: static !important; box-shadow: none !important; min-height: 0 !important;
+  padding: 6px 12px !important; font-size: 11px !important; font-weight: 600 !important;
+  background: rgba(255,255,255,0.12) !important; color: #fff !important; border: none !important; border-radius: 20px !important;
+}
+
+/* Sidebar: full-expand is the one stable state (default, no hover-driven
+   resize). The toggle button is the only way to collapse it to an icon-only
+   rail -- deliberate click, never automatic. */
+.vx-sidebar {
+  position: fixed; top: var(--navbar-header-h); left: 0; bottom: 0;
+  width: var(--sidebar-w-expanded); background: var(--vx-gradient);
+  z-index: 999; overflow-x: hidden; overflow-y: auto; transition: width 0.18s ease;
+  display: flex; flex-direction: column; padding-top: 8px;
+}
+.vx-sidebar.vx-collapsed { width: 0; }
+#vxBackdrop { position: fixed; inset: 0; background: transparent; z-index: 998; display: none; }
+
+.vx-sidebar-toggle-floating {
+  width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.12); color: #fff; border: none; border-radius: 8px;
+  cursor: pointer; min-height: 0 !important; padding: 0 !important; box-shadow: none !important;
+}
+.vx-sidebar-toggle-floating:hover { background: rgba(255,255,255,0.22); }
+.vx-sidebar-toggle-floating svg { width: 18px; height: 18px; display: block; }
+.vx-sidebar-section-label {
+  color: var(--vx-sb-label); font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; padding: 14px 16px 6px; white-space: nowrap; overflow: hidden;
+  opacity: 1; transition: opacity 0.12s ease;
+}
+.vx-sidebar.vx-collapsed .vx-sidebar-section-label { opacity: 0; }
+.vx-sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 8px 12px; flex-shrink: 0; opacity: 1; transition: opacity 0.12s ease; }
+.vx-sidebar.vx-collapsed .vx-sidebar-divider { opacity: 0; }
+.vx-sidebar-toggle, .vx-sidebar-link, .vx-sidebar-section-label, .vx-sidebar-subgroup { flex-shrink: 0; }
+.vx-sidebar-link {
+  display: flex; align-items: flex-start; gap: 12px; padding: 9px 12px; color: var(--vx-sb-text);
+  text-decoration: none; font-size: 12px; font-weight: 500;
+  overflow: visible; background: none; border: none; width: calc(100% - 12px); margin: 1px 6px; border-radius: 8px;
+  text-align: left; cursor: pointer; font-family: inherit; box-shadow: none !important; min-height: 0 !important;
+}
+.vx-sidebar.vx-collapsed .vx-sidebar-link { overflow: hidden; }
+.vx-sidebar-link:hover { background: var(--vx-sidebar-hover); color: #CBD5E0; }
+.vx-sidebar-link.vx-active { background: var(--vx-sidebar-active); color: var(--vx-teal-bright); }
+.vx-sidebar-icon { flex: 0 0 20px; display: inline-flex; align-items: center; justify-content: center; opacity: 1; margin-top: 2px; transition: opacity 0.12s ease; }
+.vx-sidebar.vx-collapsed .vx-sidebar-icon { opacity: 0.72; margin-top: 0; }
+.vx-sidebar-icon svg { width: 17px; height: 17px; display: block; }
+.vx-sidebar-text {
+  opacity: 1; transition: opacity 0.12s ease; flex: 1 1 auto; min-width: 0; display: block;
+  white-space: normal; overflow: visible; word-break: break-word; line-height: 1.35; padding: 2px 0;
+}
+.vx-sidebar.vx-collapsed .vx-sidebar-text { opacity: 0; }
+.vx-portal-tag { font-size: 9px; font-weight: 700; color: var(--vx-sb-label); margin-left: auto; flex-shrink: 0; opacity: 1; margin-top: 2px; transition: opacity 0.12s ease; }
+.vx-sidebar.vx-collapsed .vx-portal-tag { opacity: 0; }
+
+/* Sidebar submenu (Laporan & Statistik expandable group) */
+.vx-sidebar-parent { justify-content: space-between; }
+.vx-sidebar-parent-chevron { flex: 0 0 auto; transition: transform 0.18s ease, opacity 0.12s ease; margin-left: auto; opacity: 1; margin-top: 2px; }
+.vx-sidebar.vx-collapsed .vx-sidebar-parent-chevron { opacity: 0; }
+.vx-sidebar-parent-chevron svg { width: 13px; height: 13px; display: block; }
+.vx-sidebar-parent.vx-expanded .vx-sidebar-parent-chevron { transform: rotate(90deg); }
+.vx-sidebar-subgroup { max-height: 0; overflow: hidden; transition: max-height 0.2s ease; }
+.vx-sidebar-subgroup.vx-expanded { max-height: 400px; }
+.vx-sidebar-subgroup .vx-sidebar-link { padding-left: 30px; }
+.vx-sidebar.vx-collapsed .vx-sidebar-subgroup .vx-sidebar-link { padding-left: 12px; }
+
+.vx-main-content { padding-top: var(--navbar-header-h); margin-left: var(--sidebar-w-expanded); transition: margin-left 0.18s ease; }
+.vx-main-content.vx-sidebar-collapsed { margin-left: 0; }
+
+/* ==================== SHARED COMPONENTS ==================== */
+.vx-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--vx-teal); margin-bottom: 4px; }
+.vx-page-title { font-size: 22px; font-weight: 800; color: var(--vx-text); }
+
+.vx-page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.vx-month-nav { display: flex; align-items: center; gap: 4px; }
+.vx-month-nav-btn { background: #fff; border: 1px solid var(--vx-border); color: var(--vx-teal); font-size: 15px; font-weight: 700; border-radius: 8px; padding: 6px 12px; cursor: pointer; min-height: 0; }
+.vx-month-nav input[type="month"] { border: 1px solid var(--vx-border); border-radius: 8px; padding: 6px 10px; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--vx-text); background: #fff; cursor: pointer; }
+
+/* Buttons */
+.vx-btn { background: var(--vx-teal); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; font-size: 12px; cursor: pointer; font-family: inherit; min-height: 0; }
+.vx-btn.ghost { background: transparent; border: 1px solid var(--vx-border); color: var(--vx-text); }
+
+/* Manual entry fields (Sections A, C, D, Fleet Status) */
+.jkns-input { width: 100%; box-sizing: border-box; border: 1px solid var(--vx-border); border-radius: 6px; padding: 6px 8px; font-family: inherit; font-size: 13px; text-align: center; }
+.jkns-input:focus { outline: none; border-color: var(--secondary); }
+.jkns-field { display: flex; flex-direction: column; gap: 4px; }
+.jkns-field-label { font-size: 11px; color: var(--vx-muted); }
+.jkns-field-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+
+@media (max-width: 768px) {
+  .vx-main-content, .vx-main-content.vx-sidebar-collapsed { margin-left: 0 !important; }
+  .vx-sidebar:not(.vx-collapsed) {
+    width: min(78vw, 280px);
+    box-shadow: 6px 0 24px rgba(0,0,0,0.3);
+  }
+}
+@media (max-width: 480px) {
+  .vx-role-badge, .vx-clock { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="loginView">
+  <div class="auth-card">
+    <div class="auth-logo-row">
+      <div class="auth-logo-left">
+        <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara">
+      </div>
+      <div class="auth-logo-center">
+        <div class="auth-org-line1">Hospital Pitas, Sabah</div>
+        <div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
+      </div>
+      <div class="auth-logo-right">
+        <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas">
+      </div>
+    </div>
+
+    <div class="auth-brand">
+      <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+      <div class="auth-brand-line2">(VELOS)</div>
+    </div>
+
+    <p class="auth-portal-label">Admin Dashboard</p>
+
+    <form id="loginForm" novalidate>
+      <input type="password" id="passwordInput" class="auth-password-input" placeholder="Kata Laluan" autocomplete="current-password" required>
+      <button type="submit" id="loginSubmitBtn" class="auth-submit-btn">Log Masuk</button>
+      <p id="loginError" class="auth-error"></p>
+    </form>
+  </div>
+</div>
+
+<div id="secureDashboardWrapper">
+
+<header class="vx-topbar hide-print" id="vxTopbar">
+  <div class="vx-topbar-left">
+    <button class="vx-sidebar-toggle-floating hide-print" id="vxSidebarToggle" onclick="window.vxToggleSidebar()" title="Buka/Tutup menu" aria-label="Buka/Tutup menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
+    <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Hospital Pitas">
+  </div>
+  <div class="vx-topbar-title">VELOS — Laporan JKNS</div>
+  <div class="vx-topbar-right">
+    <span class="vx-status-badge"><span class="vx-status-dot">●</span> Sistem Aktif</span>
+    <span class="vx-role-badge">Edisi 4 · Versi 1.0</span>
+    <span class="vx-clock" id="vxClock">--:--</span>
+    <button id="btnLogout" onclick="window.doLogout()" class="btn-logout-top hide-print">Log Keluar</button>
+  </div>
+</header>
+
+<nav class="vx-sidebar hide-print" id="vxSidebar">
+  <button class="vx-sidebar-link" onclick="window.open('index.html','_self')" title="Laman Utama">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/><path d="M9 21v-6h6v6"/></svg></span><span class="vx-sidebar-text">Laman Utama</span>
+  </button>
+  <hr class="vx-sidebar-divider">
+
+  <div class="vx-sidebar-section-label">Portal</div>
+  <button class="vx-sidebar-link" onclick="window.open('log-pemandu.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></span><span class="vx-sidebar-text">Log Pemandu</span><span class="vx-portal-tag">01</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('borang-permohonan.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v5h5"/><path d="M8 13h8M8 17h8M8 9h3"/></svg></span><span class="vx-sidebar-text">Permohonan</span><span class="vx-portal-tag">02</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('dispatch.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg></span><span class="vx-sidebar-text">VCC</span><span class="vx-portal-tag">03</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('portal-kenderaan.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span><span class="vx-sidebar-text">Kenderaan</span><span class="vx-portal-tag">04</span>
+  </button>
+
+  <hr class="vx-sidebar-divider">
+  <div class="vx-sidebar-section-label">VELOS NG 999</div>
+  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-mecc.html','_blank','noopener')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></span><span class="vx-sidebar-text">MECC Dashboard</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-supervisor.html','_blank','noopener')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Supervisor Dashboard</span>
+  </button>
+
+  <hr class="vx-sidebar-divider">
+
+  <div class="vx-sidebar-section-label">Admin</div>
+  <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="vx-sidebar-text">Dashboard</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg></span><span class="vx-sidebar-text">Log Pergerakan</span>
+  </button>
+
+  <button class="vx-sidebar-link vx-sidebar-parent vx-expanded" id="vxLaporanParentToggle" onclick="window.vxToggleLaporanSubmenu()">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20"/></svg></span><span class="vx-sidebar-text">Laporan &amp; Statistik</span>
+    <span class="vx-sidebar-parent-chevron vx-sidebar-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+  </button>
+  <div class="vx-sidebar-subgroup vx-expanded" id="vxLaporanSubgroup">
+    <button class="vx-sidebar-link" onclick="window.open('admin-yearly.html','_self')">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></span><span class="vx-sidebar-text">Statistik Tahunan</span>
+    </button>
+    <button class="vx-sidebar-link vx-active" onclick="window.open('admin-jkns.html','_self')">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h6l4 4v14H6V3z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span><span class="vx-sidebar-text">Laporan JKNS</span>
+    </button>
+    <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></span><span class="vx-sidebar-text">Pesakit &amp; Rujukan</span>
+    </button>
+    <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15"/><path d="M3 21h11"/><path d="M13 9h2.2L18 11.8V17a1.5 1.5 0 0 1-3 0v-1a1 1 0 0 0-1-1h-1"/><path d="M6.5 7.5h4"/></svg></span><span class="vx-sidebar-text">Kenderaan &amp; Bahan Api</span>
+    </button>
+    <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg></span><span class="vx-sidebar-text">Laporan Staf</span>
+    </button>
+    <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 13.5l2 2 4-4.5"/></svg></span><span class="vx-sidebar-text">Permohonan VCC</span>
+    </button>
+  </div>
+
+  <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.5 1.5M7.1 16.9l-1.5 1.5M18.4 18.4l-1.5-1.5M7.1 7.1 5.6 5.6"/></svg></span><span class="vx-sidebar-text">Konfigurasi</span>
+  </button>
+  <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Sistem</span>
+  </button>
+</nav>
+<div id="vxBackdrop"></div>
+
+<div class="vx-main-content" id="vxMainContent">
+<div class="container">
+
+<div class="vx-page-header">
+<div>
+<div class="vx-eyebrow">Laporan &amp; Statistik</div>
+<div class="vx-page-title">Laporan JKNS</div>
+</div>
+<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+<div class="vx-month-nav hide-print">
+<button type="button" class="vx-month-nav-btn" id="jknsMonthPrev" aria-label="Bulan sebelumnya">&#8249;</button>
+<input type="month" id="jknsMonth" class="vx-month-sync">
+<button type="button" class="vx-month-nav-btn" id="jknsMonthNext" aria-label="Bulan seterusnya">&#8250;</button>
+</div>
+<button type="button" class="vx-btn" id="btnSimpanManual">Simpan Manual</button>
+<button type="button" class="vx-btn ghost" id="btnMuatTurunCSV">Muat Turun CSV (Format JKNS)</button>
+</div>
+</div>
+
+<div class="card section-stats print-avoid-break">
+<h2><span>Seksyen A : Jumlah Panggilan Kecemasan (Manual)</span></h2>
+<div class="table-scroll">
+<table>
+<thead><tr><th>Syif</th><th>Talian 999</th><th>Talian Terus (Hospital)</th></tr></thead>
+<tbody>
+<tr><td>Pagi</td><td><input type="number" class="jkns-input" id="jknsA999Pagi" min="0"></td><td><input type="number" class="jkns-input" id="jknsATerusPagi" min="0"></td></tr>
+<tr><td>Petang</td><td><input type="number" class="jkns-input" id="jknsA999Petang" min="0"></td><td><input type="number" class="jkns-input" id="jknsATerusPetang" min="0"></td></tr>
+<tr><td>Malam</td><td><input type="number" class="jkns-input" id="jknsA999Malam" min="0"></td><td><input type="number" class="jkns-input" id="jknsATerusMalam" min="0"></td></tr>
+<tr style="font-weight: bold; background: #f8f9fa;"><td>Jumlah</td><td><input type="number" class="jkns-input" id="jknsA999Jumlah" min="0"></td><td><input type="number" class="jkns-input" id="jknsATerusJumlah" min="0"></td></tr>
+</tbody>
+</table>
+</div>
+<div class="jkns-field" style="max-width: 220px; margin-top: 14px;">
+<label class="jkns-field-label" for="jknsAJumlah">Jumlah (a) [a1 + a2]</label>
+<input type="number" class="jkns-input" id="jknsAJumlah" min="0">
+</div>
+</div>
+
+<div class="card section-stats print-avoid-break" style="border: 2px solid var(--secondary);">
+<h2 style="color: var(--secondary); border-bottom-color: var(--secondary);"><span>Seksyen B — Data Auto dari VELOS</span></h2>
+<div class="table-scroll">
+<table>
+<thead>
+<tr>
+<th colspan="7" style="text-align:center;">Pagi</th>
+<th colspan="7" style="text-align:center;">Petang</th>
+<th colspan="7" style="text-align:center;">Malam</th>
+<th rowspan="3" style="background-color: var(--primary); text-align:center; vertical-align:middle;">Jumlah (b)</th>
+</tr>
+<tr>
+<th colspan="2" style="text-align:center;">Kecemasan</th>
+<th colspan="2" style="text-align:center;">Biasa</th>
+<th colspan="2" style="text-align:center;">Temujanji</th>
+<th rowspan="2" style="text-align:center; vertical-align:middle;">Jumlah (i)</th>
+<th colspan="2" style="text-align:center;">Kecemasan</th>
+<th colspan="2" style="text-align:center;">Biasa</th>
+<th colspan="2" style="text-align:center;">Temujanji</th>
+<th rowspan="2" style="text-align:center; vertical-align:middle;">Jumlah (ii)</th>
+<th colspan="2" style="text-align:center;">Kecemasan</th>
+<th colspan="2" style="text-align:center;">Biasa</th>
+<th colspan="2" style="text-align:center;">Temujanji</th>
+<th rowspan="2" style="text-align:center; vertical-align:middle;">Jumlah (iii)</th>
+</tr>
+<tr>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+<th>Ambulan</th><th>Bukan Ambulan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td id="sbPagiKecemasanAmb" style="text-align:center;">0</td><td id="sbPagiKecemasanBukan" style="text-align:center;">0</td>
+<td id="sbPagiBiasaAmb" style="text-align:center;">0</td><td id="sbPagiBiasaBukan" style="text-align:center;">0</td>
+<td id="sbPagiTemujanjiAmb" style="text-align:center;">0</td><td id="sbPagiTemujanjiBukan" style="text-align:center;">0</td>
+<td id="sbPagiJumlah" style="text-align:center; font-weight:bold; background:#f8f9fa;">0</td>
+<td id="sbPetangKecemasanAmb" style="text-align:center;">0</td><td id="sbPetangKecemasanBukan" style="text-align:center;">0</td>
+<td id="sbPetangBiasaAmb" style="text-align:center;">0</td><td id="sbPetangBiasaBukan" style="text-align:center;">0</td>
+<td id="sbPetangTemujanjiAmb" style="text-align:center;">0</td><td id="sbPetangTemujanjiBukan" style="text-align:center;">0</td>
+<td id="sbPetangJumlah" style="text-align:center; font-weight:bold; background:#f8f9fa;">0</td>
+<td id="sbMalamKecemasanAmb" style="text-align:center;">0</td><td id="sbMalamKecemasanBukan" style="text-align:center;">0</td>
+<td id="sbMalamBiasaAmb" style="text-align:center;">0</td><td id="sbMalamBiasaBukan" style="text-align:center;">0</td>
+<td id="sbMalamTemujanjiAmb" style="text-align:center;">0</td><td id="sbMalamTemujanjiBukan" style="text-align:center;">0</td>
+<td id="sbMalamJumlah" style="text-align:center; font-weight:bold; background:#f8f9fa;">0</td>
+<td id="sbJumlahB" style="text-align:center; font-weight:bold; background-color:var(--warning); color:#000;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card section-stats print-avoid-break">
+<h2><span>Seksyen C &amp; D + Jumlah Keseluruhan (Manual)</span></h2>
+<div class="jkns-field-grid">
+<div class="jkns-field"><label class="jkns-field-label" for="jknsC">Jumlah Pasukan Perubatan (c)</label><input type="number" class="jkns-input" id="jknsC" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsD">AOR / Discaj / Lain-lain (d)</label><input type="number" class="jkns-input" id="jknsD" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsAI">Jumlah (a+b+c+d)</label><input type="number" class="jkns-input" id="jknsAI" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsAJ">Jumlah Ambulans Terlibat Kemalangan</label><input type="number" class="jkns-input" id="jknsAJ" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsAK">Jumlah Kematian dalam Ambulans</label><input type="number" class="jkns-input" id="jknsAK" min="0"></div>
+</div>
+</div>
+
+<div class="card section-stats print-avoid-break" style="border: 2px solid var(--line); background-color: #f4f8fc;">
+<h2 style="color: var(--primary); border-bottom-color: var(--primary);"><span>Status Ambulans Terkini (Manual)</span></h2>
+<div class="jkns-field-grid">
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetMelebihi5">Melebihi 5 Tahun</label><input type="number" class="jkns-input" id="jknsFleetMelebihi5" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetKategoriA">Kategori A</label><input type="number" class="jkns-input" id="jknsFleetKategoriA" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetKategoriB">Kategori B</label><input type="number" class="jkns-input" id="jknsFleetKategoriB" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetBerfungsi">Berfungsi (e)</label><input type="number" class="jkns-input" id="jknsFleetBerfungsi" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetTidakBerfungsi">Tidak Berfungsi (f)</label><input type="number" class="jkns-input" id="jknsFleetTidakBerfungsi" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetProsesBER">Proses BER</label><input type="number" class="jkns-input" id="jknsFleetProsesBER" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetBER">BER</label><input type="number" class="jkns-input" id="jknsFleetBER" min="0"></div>
+<div class="jkns-field"><label class="jkns-field-label" for="jknsFleetJumlah">Jumlah Ambulans (e)+(f)</label><input type="number" class="jkns-input" id="jknsFleetJumlah" min="0"></div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+import { pad2 } from "./velos-utils.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const PORTAL_EMAIL = "admin@pitas.velos";
+const MASTER_EMAIL = "master@pitas.velos";
+const VISITOR_EMAIL = "visitor@pitas.velos";
+
+/* ---------------------------------------------------------------------
+   AUTH GATE — identical sign-in fallback chain and account whitelist
+   as admin.html (admin -> master -> visitor).
+--------------------------------------------------------------------- */
+const loginView = document.getElementById('loginView');
+const secureDashboardWrapper = document.getElementById('secureDashboardWrapper');
+const loginForm = document.getElementById('loginForm');
+const passwordInput = document.getElementById('passwordInput');
+const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+const loginError = document.getElementById('loginError');
+
+onAuthStateChanged(auth, function (user) {
+  if (user) {
+    loginView.style.display = 'none';
+    secureDashboardWrapper.style.display = 'block';
+    initPage();
+  } else {
+    loginView.style.display = 'flex';
+    secureDashboardWrapper.style.display = 'none';
+  }
+});
+
+loginForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  loginError.textContent = '';
+  loginSubmitBtn.disabled = true;
+  loginSubmitBtn.textContent = 'Mengesahkan...';
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    try {
+      await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+    } catch (err) {
+      try {
+        await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+      } catch (err2) {
+        await signInWithEmailAndPassword(auth, VISITOR_EMAIL, passwordInput.value);
+      }
+    }
+  } catch (err) {
+    loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
+    loginError.style.display = 'block';
+  } finally {
+    loginSubmitBtn.disabled = false;
+    loginSubmitBtn.textContent = 'Log Masuk';
+    passwordInput.value = '';
+  }
+});
+
+window.doLogout = function () { signOut(auth); };
+
+/* ---------------------------------------------------------------------
+   STATE
+--------------------------------------------------------------------- */
+let pageInitialized = false;
+let ambulansList = [];
+
+const MALAY_MONTHS = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
+
+// Section B ({period} x {jenisKes} x {Ambulan/Bukan Ambulan}) is the only
+// part of the JKNS monthly return that VELOS actually captures -- everything
+// else in the template (Sections a, c, d, fleet status) has no corresponding
+// Firestore field, so it stays manual and is stored separately.
+const SECTION_B_IDS = [
+  'sbPagiKecemasanAmb', 'sbPagiKecemasanBukan', 'sbPagiBiasaAmb', 'sbPagiBiasaBukan', 'sbPagiTemujanjiAmb', 'sbPagiTemujanjiBukan', 'sbPagiJumlah',
+  'sbPetangKecemasanAmb', 'sbPetangKecemasanBukan', 'sbPetangBiasaAmb', 'sbPetangBiasaBukan', 'sbPetangTemujanjiAmb', 'sbPetangTemujanjiBukan', 'sbPetangJumlah',
+  'sbMalamKecemasanAmb', 'sbMalamKecemasanBukan', 'sbMalamBiasaAmb', 'sbMalamBiasaBukan', 'sbMalamTemujanjiAmb', 'sbMalamTemujanjiBukan', 'sbMalamJumlah',
+  'sbJumlahB'
+];
+
+// { input element id, Firestore field key } for every manually-entered cell.
+// Drives save, load, and CSV export off one list instead of three.
+const MANUAL_FIELDS = [
+  { id: 'jknsA999Pagi', key: 'a999Pagi' },
+  { id: 'jknsA999Petang', key: 'a999Petang' },
+  { id: 'jknsA999Malam', key: 'a999Malam' },
+  { id: 'jknsA999Jumlah', key: 'a999Jumlah' },
+  { id: 'jknsATerusPagi', key: 'aTerusPagi' },
+  { id: 'jknsATerusPetang', key: 'aTerusPetang' },
+  { id: 'jknsATerusMalam', key: 'aTerusMalam' },
+  { id: 'jknsATerusJumlah', key: 'aTerusJumlah' },
+  { id: 'jknsAJumlah', key: 'aJumlah' },
+  { id: 'jknsC', key: 'pasukanPerubatan' },
+  { id: 'jknsD', key: 'aorDiscajLain' },
+  { id: 'jknsAI', key: 'jumlahABCD' },
+  { id: 'jknsAJ', key: 'ambulansKemalangan' },
+  { id: 'jknsAK', key: 'kematianDalamAmbulans' },
+  { id: 'jknsFleetMelebihi5', key: 'fleetMelebihi5Tahun' },
+  { id: 'jknsFleetKategoriA', key: 'fleetKategoriA' },
+  { id: 'jknsFleetKategoriB', key: 'fleetKategoriB' },
+  { id: 'jknsFleetBerfungsi', key: 'fleetBerfungsi' },
+  { id: 'jknsFleetTidakBerfungsi', key: 'fleetTidakBerfungsi' },
+  { id: 'jknsFleetProsesBER', key: 'fleetProsesBER' },
+  { id: 'jknsFleetBER', key: 'fleetBER' },
+  { id: 'jknsFleetJumlah', key: 'fleetJumlah' }
+];
+
+// Column headers for the CSV, in the exact order of the JKNS template (A-AS).
+const JKNS_CSV_HEADERS = [
+  'Bulan',
+  'Pagi (999)', 'Petang (999)', 'Malam (999)', 'Jumlah (a1)',
+  'Pagi (Talian Terus)', 'Petang (Talian Terus)', 'Malam (Talian Terus)', 'Jumlah (a2)',
+  'Jumlah (a)',
+  'Pagi - Kecemasan - Ambulan', 'Pagi - Kecemasan - Bukan Ambulan',
+  'Pagi - Biasa - Ambulan', 'Pagi - Biasa - Bukan Ambulan',
+  'Pagi - Temujanji - Ambulan', 'Pagi - Temujanji - Bukan Ambulan',
+  'Jumlah (i)',
+  'Petang - Kecemasan - Ambulan', 'Petang - Kecemasan - Bukan Ambulan',
+  'Petang - Biasa - Ambulan', 'Petang - Biasa - Bukan Ambulan',
+  'Petang - Temujanji - Ambulan', 'Petang - Temujanji - Bukan Ambulan',
+  'Jumlah (ii)',
+  'Malam - Kecemasan - Ambulan', 'Malam - Kecemasan - Bukan Ambulan',
+  'Malam - Biasa - Ambulan', 'Malam - Biasa - Bukan Ambulan',
+  'Malam - Temujanji - Ambulan', 'Malam - Temujanji - Bukan Ambulan',
+  'Jumlah (iii)',
+  'Jumlah (b)',
+  'Jumlah Pasukan Perubatan (c)', 'AOR/Discaj/Lain-lain (d)',
+  'Jumlah (a+b+c+d)', 'Jumlah Ambulans Terlibat Kemalangan', 'Jumlah Kematian dalam Ambulans',
+  'Melebihi 5 Tahun', 'Kategori A', 'Kategori B', 'Berfungsi (e)', 'Tidak Berfungsi (f)', 'Proses BER', 'BER', 'Jumlah Ambulans (e)+(f)'
+];
+
+/* ---------------------------------------------------------------------
+   FIRESTORE FETCH HELPERS
+--------------------------------------------------------------------- */
+// tarikh is stored as yyyy-MM-dd (sortable), so a calendar-month window is
+// expressed as a >= / < range rather than a literal prefix match, which
+// Firestore's `where` doesn't support directly.
+async function fetchMonthLogPergerakan(monthStr) {
+  const [year, month] = monthStr.split('-').map(Number);
+  const start = monthStr + '-01';
+  const end = (month === 12) ? (year + 1) + '-01-01' : year + '-' + pad2(month + 1) + '-01';
+  const snap = await getDocs(query(collection(db, 'logPergerakan'), where('tarikh', '>=', start), where('tarikh', '<', end)));
+  return snap.docs.map(d => d.data());
+}
+
+async function loadKenderaanConfig() {
+  try {
+    const snap = await getDoc(doc(db, 'konfigurasi', 'kenderaan'));
+    if (snap.exists()) ambulansList = snap.data().ambulans || [];
+  } catch (err) {
+    console.error('Ralat memuat konfigurasi kenderaan:', err);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SECTION B — auto-computed from logPergerakan, same syif / jenisKes /
+   Ambulans-classification fields admin.html's computeMonthStats uses.
+--------------------------------------------------------------------- */
+function computeSectionB(records) {
+  const emptyCaseType = () => ({ amb: 0, bukan: 0 });
+  const grid = {
+    pagi: { kecemasan: emptyCaseType(), biasa: emptyCaseType(), temujanji: emptyCaseType() },
+    petang: { kecemasan: emptyCaseType(), biasa: emptyCaseType(), temujanji: emptyCaseType() },
+    malam: { kecemasan: emptyCaseType(), biasa: emptyCaseType(), temujanji: emptyCaseType() }
+  };
+  records.forEach(item => {
+    if (!item.pesakitList || !item.pesakitList.length) return;
+    const sKey = item.syif ? item.syif.toLowerCase() : 'pagi';
+    if (!grid[sKey]) return;
+    const isAmbulan = (item.kategoriKenderaan === 'Ambulans' || ambulansList.includes(item.kenderaan));
+    const col = isAmbulan ? 'amb' : 'bukan';
+    item.pesakitList.forEach(p => {
+      if (p.jenisKes === 'Rujukan Kecemasan') grid[sKey].kecemasan[col]++;
+      else if (p.jenisKes === 'Rujukan Biasa') grid[sKey].biasa[col]++;
+      else if (p.jenisKes === 'Temujanji') grid[sKey].temujanji[col]++;
+    });
+  });
+  return grid;
+}
+
+function renderSectionB(records) {
+  const grid = computeSectionB(records);
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  let jumlahB = 0;
+  ['pagi', 'petang', 'malam'].forEach(period => {
+    const prefix = 'sb' + period.charAt(0).toUpperCase() + period.slice(1);
+    const g = grid[period];
+    let periodTotal = 0;
+    [['Kecemasan', g.kecemasan], ['Biasa', g.biasa], ['Temujanji', g.temujanji]].forEach(([label, ct]) => {
+      set(prefix + label + 'Amb', ct.amb);
+      set(prefix + label + 'Bukan', ct.bukan);
+      periodTotal += ct.amb + ct.bukan;
+    });
+    set(prefix + 'Jumlah', periodTotal);
+    jumlahB += periodTotal;
+  });
+  set('sbJumlahB', jumlahB);
+}
+
+/* ---------------------------------------------------------------------
+   MANUAL FIELDS — Sections a, c, d, fleet status. Saved to
+   jknsManualEntries/{YYYY-MM}, one doc per month, merge:true.
+--------------------------------------------------------------------- */
+function collectManualFields() {
+  const data = {};
+  MANUAL_FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    data[f.key] = (el && el.value !== '') ? Number(el.value) : 0;
+  });
+  return data;
+}
+
+function populateManualFields(data) {
+  MANUAL_FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (!el) return;
+    const val = data[f.key];
+    el.value = (val !== undefined && val !== null) ? val : '';
+  });
+}
+
+async function simpanManual() {
+  const monthVal = document.getElementById('jknsMonth').value;
+  if (!monthVal) { Swal.fire('Ralat', 'Sila pilih bulan dahulu.', 'error'); return; }
+  const data = collectManualFields();
+  try {
+    await setDoc(doc(db, 'jknsManualEntries', monthVal), data, { merge: true });
+    Swal.fire('Disimpan!', 'Data manual JKNS bagi ' + monthVal + ' telah disimpan.', 'success');
+  } catch (err) {
+    console.error('Ralat menyimpan data manual JKNS:', err);
+    Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   MONTH CHANGE — loads Section B (VELOS) + saved manual fields together.
+--------------------------------------------------------------------- */
+async function onMonthChange() {
+  const monthVal = document.getElementById('jknsMonth').value;
+  if (!monthVal) return;
+  Swal.fire({ title: 'Memuatkan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+  // Independent try/catch per source: a rules/permission issue on one
+  // (e.g. jknsManualEntries before its Firestore rules are added) must not
+  // block the other from loading and rendering.
+  const [manualResult, recordsResult] = await Promise.allSettled([
+    getDoc(doc(db, 'jknsManualEntries', monthVal)),
+    fetchMonthLogPergerakan(monthVal)
+  ]);
+
+  if (manualResult.status === 'fulfilled') {
+    populateManualFields(manualResult.value.exists() ? manualResult.value.data() : {});
+  } else {
+    console.error('Ralat memuat data manual JKNS:', manualResult.reason);
+  }
+
+  if (recordsResult.status === 'fulfilled') {
+    renderSectionB(recordsResult.value);
+  } else {
+    console.error('Ralat memuat data VELOS untuk Seksyen B:', recordsResult.reason);
+  }
+
+  Swal.close();
+  if (manualResult.status === 'rejected' || recordsResult.status === 'rejected') {
+    Swal.fire('Ralat', 'Sebahagian data gagal dimuat. Sila semak konsol untuk butiran.', 'error');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   CSV EXPORT — single row (selected month only), columns in exact
+   JKNS template order.
+--------------------------------------------------------------------- */
+function buildJknsRow() {
+  const monthVal = document.getElementById('jknsMonth').value;
+  const month = Number(monthVal.split('-')[1]);
+  const bulan = MALAY_MONTHS[month - 1].toUpperCase();
+  const textOf = id => { const el = document.getElementById(id); return el ? el.textContent : '0'; };
+  const valueOf = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+
+  const manualValues = MANUAL_FIELDS.map(f => valueOf(f.id));
+  const sectionBValues = SECTION_B_IDS.map(id => textOf(id));
+
+  return [bulan]
+    .concat(manualValues.slice(0, 9))   // a999Pagi..aTerusJumlah, aJumlah
+    .concat(sectionBValues)             // Section B (22 values)
+    .concat(manualValues.slice(9));     // c, d, AI, AJ, AK, fleet (13 values)
+}
+
+window.downloadJknsCSV = function () {
+  const monthVal = document.getElementById('jknsMonth').value;
+  if (!monthVal) { Swal.fire('Ralat', 'Sila pilih bulan dahulu.', 'error'); return; }
+  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const headerRow = JKNS_CSV_HEADERS.map(esc).join(',');
+  const dataRow = buildJknsRow().map(esc).join(',');
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), headerRow + '\n' + dataRow], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
+  a.download = 'Laporan_JKNS_' + monthVal + '.csv'; a.click();
+};
+
+/* ---------------------------------------------------------------------
+   INIT
+--------------------------------------------------------------------- */
+function initPage() {
+  if (pageInitialized) return;
+  pageInitialized = true;
+
+  const monthInput = document.getElementById('jknsMonth');
+  const now = new Date();
+  monthInput.value = now.getFullYear() + '-' + pad2(now.getMonth() + 1);
+  monthInput.addEventListener('change', onMonthChange);
+
+  document.getElementById('jknsMonthPrev').addEventListener('click', function () { stepMonth(-1); });
+  document.getElementById('jknsMonthNext').addEventListener('click', function () { stepMonth(1); });
+  document.getElementById('btnSimpanManual').addEventListener('click', simpanManual);
+  document.getElementById('btnMuatTurunCSV').addEventListener('click', window.downloadJknsCSV);
+
+  loadKenderaanConfig().then(onMonthChange);
+}
+
+function stepMonth(delta) {
+  const monthInput = document.getElementById('jknsMonth');
+  if (!monthInput.value) return;
+  const [y, m] = monthInput.value.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  monthInput.value = d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+  monthInput.dispatchEvent(new Event('change'));
+}
+</script>
+
+<script>
+(function () {
+  var sidebar = document.getElementById('vxSidebar');
+  var mainContent = document.getElementById('vxMainContent');
+  var backdrop = document.getElementById('vxBackdrop');
+
+  function vxSyncBackdrop(collapsed) {
+    if (!backdrop) return;
+    backdrop.style.display = (!collapsed && window.innerWidth <= 768) ? 'block' : 'none';
+  }
+
+  window.vxToggleSidebar = function () {
+    if (!sidebar || !mainContent) return;
+    var collapsed = sidebar.classList.toggle('vx-collapsed');
+    mainContent.classList.toggle('vx-sidebar-collapsed', collapsed);
+    vxSyncBackdrop(collapsed);
+  };
+
+  if (backdrop) backdrop.addEventListener('click', window.vxToggleSidebar);
+
+  if (sidebar && mainContent && window.innerWidth <= 768) {
+    sidebar.classList.add('vx-collapsed');
+    mainContent.classList.add('vx-sidebar-collapsed');
+  }
+
+  window.vxToggleLaporanSubmenu = function () {
+    var toggle = document.getElementById('vxLaporanParentToggle');
+    var subgroup = document.getElementById('vxLaporanSubgroup');
+    if (!toggle || !subgroup) return;
+    var opening = !toggle.classList.contains('vx-expanded');
+    toggle.classList.toggle('vx-expanded', opening);
+    subgroup.classList.toggle('vx-expanded', opening);
+  };
+
+  var clockEl = document.getElementById('vxClock');
+  if (clockEl) {
+    var tickClock = function () {
+      var now = new Date();
+      clockEl.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    };
+    tickClock();
+    setInterval(tickClock, 1000);
+  }
+})();
+</script>
+
+</body>
+</html>
