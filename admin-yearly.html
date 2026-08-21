@@ -636,19 +636,28 @@ const IFT_HISTORICAL = {
   2021: 1033, 2022: 897, 2023: 829, 2024: 787, 2025: 1184
 };
 
-// VELOS Firestore only has records from 1 Aug 2026 (go-live) onward, so a
-// live query for 2026 alone would undercount the year -- this covers the
-// Jan-Jul 2026 gap from the old (pre-VELOS) system.
+// Manually tallied from the PPTX, Jan-Jul 2026 cumulative. VELOS was
+// actually recording real trips from 1 Jun 2026 onward (soft-launch, ahead
+// of the official 1 Aug go-live), so Jun/Jul already exist as live Firestore
+// data too -- IFT_2026_LIVE_CUTOFF below excludes them from the live count
+// to avoid double-counting against this baseline.
 const IFT_2026_PRE_VELOS_BASELINE = 815;
+const IFT_2026_LIVE_CUTOFF = '2026-08-01';
 
 const normPlat = s => (s || '').toString().trim().toUpperCase().replace(/\s+/g, ' ');
 
-// IFT is counted by patient (Pesakit Dihantar), not by trip -- a single
-// Ambulans trip can carry more than one patient.
-function countAmbulansPatients(trips) {
-  return trips
-    .filter(t => t.kategoriKenderaan === 'Ambulans')
-    .reduce((sum, t) => sum + (t.pesakitList ? t.pesakitList.length : 0), 0);
+// IFT (Interfacility Transfer) is counted by patient (Pesakit Dihantar), not
+// by trip -- a single trip can carry more than one patient. Counts every
+// vehicle category (Ambulans and Kenderaan Jabatan both do IFT runs).
+function countPatients(trips) {
+  return trips.reduce((sum, t) => sum + (t.pesakitList ? t.pesakitList.length : 0), 0);
+}
+
+// Only 2026 needs the live-vs-baseline cutoff -- it's the one transition
+// year with a manual pre-VELOS count still on record. Other years have no
+// baseline to double-count against, so their live data is used in full.
+function filterForIFTLive(trips, year) {
+  return year === 2026 ? trips.filter(t => t.tarikh >= IFT_2026_LIVE_CUTOFF) : trips;
 }
 
 /* ---------------------------------------------------------------------
@@ -753,7 +762,7 @@ async function loadCurrentYearIFT() {
   if (currentYear < 2026) { renderIFTChart(); return; }
   try {
     const trips = await fetchYearLogPergerakan(currentYear);
-    iftYearlyCounts[currentYear] = countAmbulansPatients(trips);
+    iftYearlyCounts[currentYear] = countPatients(filterForIFTLive(trips, currentYear));
   } catch (err) {
     console.error('Ralat memuat data IFT tahun semasa:', err);
   } finally {
@@ -978,7 +987,7 @@ async function muatDataTahunan() {
     renderData9(vcc);
     // Opportunistic refresh: the trips just fetched already cover the whole
     // year, so the trend chart's bar for this year can be updated for free.
-    iftYearlyCounts[year] = countAmbulansPatients(trips);
+    iftYearlyCounts[year] = countPatients(filterForIFTLive(trips, year));
     renderIFTChart();
     Swal.close();
   } catch (err) {
