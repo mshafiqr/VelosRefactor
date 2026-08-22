@@ -376,7 +376,7 @@ import {
   setPersistence, browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
-  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, query, orderBy
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, query, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -818,7 +818,7 @@ tabRecordsBtn.addEventListener('click', showRecordsTab);
 
 async function fetchAllSubmissions() {
   if (allSubmissionsCache) return allSubmissionsCache;
-  const snap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc')));
+  const snap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc'), limit(200)));
   allSubmissionsCache = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
   return allSubmissionsCache;
 }

@@ -413,7 +413,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc,
-  query, orderBy, arrayUnion
+  query, orderBy, limit, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -544,7 +544,7 @@ async function loadAllData() {
     vehicleProfiles = {};
     vpSnap.forEach(d => { vehicleProfiles[d.id] = d.data(); });
 
-    const subSnap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc')));
+    const subSnap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc'), limit(200)));
     allSubmissions = subSnap.docs.map(d => {
       const data = d.data();
       return Object.assign({}, data, {
