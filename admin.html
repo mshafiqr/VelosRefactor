@@ -1106,6 +1106,7 @@ import {
   onSnapshot,
   query,
   where,
+  documentId,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
@@ -1288,14 +1289,22 @@ function initDashboard() {
     maybeFinishFirstSync();
   }).catch(function () { cloudTangkiCap = {}; capReady = true; maybeFinishFirstSync(); });
 
-  unsubLog = onSnapshot(collection(db, 'logPergerakan'), function (snap) {
+  // Year-scoped listeners — current calendar year only. Keeps reads flat
+  // as collections grow. For data from previous years, use admin-yearly.html.
+  const _yr = new Date().getFullYear();
+  const _yrStart = String(_yr) + '-01-01';
+  const _yrEnd = String(_yr + 1) + '-01-01';
+  const _yyNow = String(_yr).slice(2);
+  const _yyNext = String(_yr + 1).slice(2);
+
+  unsubLog = onSnapshot(query(collection(db, 'logPergerakan'), where('tarikh', '>=', _yrStart), where('tarikh', '<', _yrEnd)), function (snap) {
     ambulanceData = snap.docs.map(function (d) { return d.data(); });
     logReady = true;
     if (firstSyncDone) window.updateUI();
     maybeFinishFirstSync();
   }, function (err) { console.error('Ralat langganan logPergerakan:', err); logReady = true; maybeFinishFirstSync(); });
 
-  unsubFuel = onSnapshot(collection(db, 'logBahanApi'), function (snap) {
+  unsubFuel = onSnapshot(query(collection(db, 'logBahanApi'), where('tarikh', '>=', _yrStart), where('tarikh', '<', _yrEnd)), function (snap) {
     fuelDataLog = snap.docs.map(function (d) {
       const entry = d.data();
       entry._docId = d.id;
@@ -1306,7 +1315,7 @@ function initDashboard() {
     maybeFinishFirstSync();
   }, function (err) { console.error('Ralat langganan logBahanApi:', err); fuelReady = true; maybeFinishFirstSync(); });
 
-  unsubMohon = onSnapshot(collection(db, 'permohonanVCC'), function (snap) {
+  unsubMohon = onSnapshot(query(collection(db, 'permohonanVCC'), where(documentId(), '>=', 'VCC-' + _yyNow + '0101'), where(documentId(), '<', 'VCC-' + _yyNext + '0101')), function (snap) {
     permohonanData = snap.docs.map(function (d) { return d.data(); });
     mohonReady = true;
     if (firstSyncDone) window.updateUI();
