@@ -315,8 +315,8 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
     </div>
     <div class="vx-table-scroll">
       <table>
-        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Ringkasan Penemuan Kerosakan &amp; Tindakan</th><th>Adakah Kenderaan Boleh Digunakan?</th></tr></thead>
-        <tbody id="laporanBody"><tr><td colspan="5" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan laporan.</td></tr></tbody>
+        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Ringkasan Penemuan Kerosakan &amp; Tindakan</th><th>Adakah Kenderaan Boleh Digunakan?</th><th>Tindakan Admin</th></tr></thead>
+        <tbody id="laporanBody"><tr><td colspan="6" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan laporan.</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -786,10 +786,11 @@ document.getElementById('btnRekodFilter').addEventListener('click', function () 
 function showButiranModal(sub) {
   let itemsHtml = '<p style="color:#5B6774;">Tiada item senarai semak (kenderaan tidak standby).</p>';
   if (Array.isArray(sub.items) && sub.items.length) {
-    itemsHtml = '<table style="width:100%; font-size:12px;"><thead><tr><th>Item</th><th>Status</th><th>Catatan</th></tr></thead><tbody>' +
+    itemsHtml = '<table style="width:100%; font-size:12px;"><thead><tr><th>Item</th><th>Status</th><th>Catatan</th><th>Catatan Admin</th></tr></thead><tbody>' +
       sub.items.map(it => {
         const badge = it.status === 'ok' ? '<span class="fb ok">OK</span>' : it.status === 'tidakOk' ? `<span class="fb danger">Tidak OK${it.flag ? ' · ' + it.flag : ''}</span>` : '<span class="fb warn">N/A</span>';
-        return `<tr><td style="text-align:left;">${esc(it.label)}</td><td>${badge}</td><td style="text-align:left;">${esc(it.perihal || '—')}</td></tr>`;
+        const adminRemark = (sub.adminRemarks && sub.adminRemarks[it.id]) || '';
+        return `<tr><td style="text-align:left;">${esc(it.label)}</td><td>${badge}</td><td style="text-align:left;">${esc(it.perihal || '—')}</td><td style="text-align:left;">${esc(adminRemark || '—')}</td></tr>`;
       }).join('') + '</tbody></table>';
   }
   Swal.fire({
@@ -807,6 +808,14 @@ function showButiranModal(sub) {
     width: 700,
     confirmButtonText: 'Tutup'
   });
+}
+
+function adminRemarksSummary(sub) {
+  if (!sub.adminRemarks || !Array.isArray(sub.items)) return '';
+  return sub.items
+    .filter(it => sub.adminRemarks[it.id] && sub.adminRemarks[it.id].trim())
+    .map(it => `${it.label}: ${sub.adminRemarks[it.id]}`)
+    .join('; ');
 }
 
 function csvEscape(v) {
@@ -845,7 +854,7 @@ document.getElementById('btnLaporanFilter').addEventListener('click', function (
   currentLaporanFiltered = filterSubmissions('', month);
   const tbody = document.getElementById('laporanBody');
   if (!currentLaporanFiltered.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="vx-empty-row">Tiada rekod untuk bulan ini.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="vx-empty-row">Tiada rekod untuk bulan ini.</td></tr>';
     return;
   }
   tbody.innerHTML = currentLaporanFiltered.map(sub => `
@@ -855,13 +864,14 @@ document.getElementById('btnLaporanFilter').addEventListener('click', function (
       <td>${esc(sub.kenderaan)}</td>
       <td>${esc(sub.ringkasan)}</td>
       <td>${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}</td>
+      <td>${esc(adminRemarksSummary(sub) || '—')}</td>
     </tr>`).join('');
 });
 
 document.getElementById('btnLaporanExport').addEventListener('click', function () {
   if (!currentLaporanFiltered.length) return Swal.fire('Perhatian', 'Tiada rekod untuk dieksport. Sila tapis dahulu.', 'warning');
-  const rows = [['Tarikh', 'Masa', 'Kenderaan', 'Ringkasan Penemuan Kerosakan & Tindakan', 'Adakah Kenderaan Boleh Digunakan?']];
-  currentLaporanFiltered.forEach(sub => rows.push([sub.tarikh, sub.masa, sub.kenderaan, sub.ringkasan, BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan]));
+  const rows = [['Tarikh', 'Masa', 'Kenderaan', 'Ringkasan Penemuan Kerosakan & Tindakan', 'Adakah Kenderaan Boleh Digunakan?', 'Tindakan Admin']];
+  currentLaporanFiltered.forEach(sub => rows.push([sub.tarikh, sub.masa, sub.kenderaan, sub.ringkasan, BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan, adminRemarksSummary(sub)]));
   downloadCsv('laporan-bulanan-kenderaan.csv', rows);
 });
 
