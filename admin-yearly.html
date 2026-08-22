@@ -557,6 +557,7 @@ import {
   getFirestore,
   collection,
   doc,
+  documentId,
   getDoc,
   getDocs,
   query,
@@ -686,18 +687,21 @@ async function fetchYearLogPergerakan(year) {
 }
 
 async function fetchYearLogBahanApi(year) {
-  const yearStr = String(year);
-  const snap = await getDocs(collection(db, 'logBahanApi'));
-  return snap.docs.map(d => d.data()).filter(e => e.tarikh && e.tarikh.startsWith(yearStr));
+  const start = year + '-01-01';
+  const end = (year + 1) + '-01-01';
+  const snap = await getDocs(query(collection(db, 'logBahanApi'), where('tarikh', '>=', start), where('tarikh', '<', end)));
+  return snap.docs.map(d => d.data());
 }
 
 async function fetchYearPermohonanVCC(year) {
-  const yearStr = String(year);
-  const snap = await getDocs(collection(db, 'permohonanVCC'));
-  return snap.docs.map(d => d.data()).filter(m => {
-    const tarikhCheck = m.tarikhGerak || m.tarikh || '';
-    return String(tarikhCheck).startsWith(yearStr);
-  });
+  const yy = String(year).slice(2);
+  const nextYY = String(year + 1).slice(2);
+  const snap = await getDocs(query(
+    collection(db, 'permohonanVCC'),
+    where(documentId(), '>=', 'VCC-' + yy + '0101'),
+    where(documentId(), '<', 'VCC-' + nextYY + '0101')
+  ));
+  return snap.docs.map(d => d.data());
 }
 
 async function loadKenderaanConfig() {
