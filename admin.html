@@ -475,14 +475,6 @@ top: 15px !important;
 .vx-drv-summary-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--vx-muted); }
 .vx-drv-summary-row strong { color: var(--vx-text); font-weight: 700; }
 
-/* Collapsible sections */
-.vx-collapsible-hd { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; user-select: none; }
-.vx-collapsible-chevron { transition: transform 0.18s ease; flex-shrink: 0; display: flex; }
-.vx-collapsible-chevron svg { width: 15px; height: 15px; }
-.vx-collapsible.vx-expanded .vx-collapsible-chevron { transform: rotate(90deg); }
-.vx-collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
-.vx-collapsible.vx-expanded .vx-collapsible-body { max-height: 4000px; }
-
 /* Buttons */
 .vx-btn { background: var(--vx-teal); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; font-size: 12px; cursor: pointer; font-family: inherit; min-height: 0; }
 .vx-btn.danger { background: var(--vx-danger); }
@@ -793,24 +785,22 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 </div>
 </section>
 
-<div id="sec-log-pergerakan" class="vx-card log-pergerakan-section vx-collapsible vx-page vx-expanded" style="margin-top:14px;">
-<div class="vx-collapsible-hd" onclick="window.vxToggleCollapsible(this.parentElement)">
+<div id="sec-log-pergerakan" class="vx-card log-pergerakan-section vx-page" style="margin-top:14px;">
+<div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
 <div>
 <div class="vx-eyebrow">Pemantauan Langsung</div>
 <div class="vx-section-title">Log Pergerakan Langsung</div>
 </div>
 <div style="display:flex; align-items:center; gap:8px;" class="hide-print">
-<div class="vx-month-nav" onclick="event.stopPropagation()">
+<div class="vx-month-nav">
 <button type="button" class="vx-month-nav-btn" data-vx-step="-1" aria-label="Bulan sebelumnya">&#8249;</button>
 <input type="month" class="vx-month-sync">
 <button type="button" class="vx-month-nav-btn" data-vx-step="1" aria-label="Bulan seterusnya">&#8250;</button>
 </div>
-<button id="btnToggleLog" class="vx-btn ghost" onclick="event.stopPropagation(); window.toggleLogView()">Papar Semua Rekod</button>
-<button class="vx-btn ghost" onclick="event.stopPropagation(); window.downloadMasterLogCSV()">Muat Turun CSV</button>
-<span class="vx-collapsible-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+<button id="btnToggleLog" class="vx-btn ghost" onclick="window.toggleLogView()">Papar Semua Rekod</button>
+<button class="vx-btn ghost" onclick="window.downloadMasterLogCSV()">Muat Turun CSV</button>
 </div>
 </div>
-<div class="vx-collapsible-body">
 <p style="font-size: 12px; color: gray; margin: 14px 0 0;">Jadual ini memaparkan log mentah, dikemaskini secara langsung. Jadual ini secara automatik <strong>dikecualikan</strong> apabila anda mencetak laporan penuh untuk menjimatkan kertas.</p>
 <div class="table-scroll" style="max-height: 500px;">
 <table id="mainDataTable">
@@ -819,7 +809,6 @@ Muhammad Shafiq Bin Mohd Raffi, Penolong Pegawai Perubatan, Hospital Pitas
 </thead>
 <tbody id="dataTableBody"><tr><td colspan="15" style="text-align:center; color:gray;">Memuat turun data awan...</td></tr></tbody>
 </table>
-</div>
 </div>
 </div>
 
@@ -2185,10 +2174,6 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
     laporanToggle.classList.toggle('vx-expanded', opening);
     laporanSubgroup.classList.toggle('vx-expanded', opening);
     if (opening) vxShowPage('sec-laporan-pesakit');
-  };
-
-  window.vxToggleCollapsible = function (el) {
-    if (el) el.classList.toggle('vx-expanded');
   };
 
   var monthInput = document.getElementById('pilihanBulan');
