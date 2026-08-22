@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root {
   --vx-topbar:        #084E4E;
@@ -806,8 +808,52 @@ function showButiranModal(sub) {
       ${itemsHtml}
     `,
     width: 700,
-    confirmButtonText: 'Tutup'
+    confirmButtonText: 'Tutup',
+    showDenyButton: true,
+    denyButtonText: 'Muat Turun PDF',
+    denyButtonColor: '#147D82'
+  }).then(result => {
+    if (result.isDenied) downloadButiranPDF(sub);
   });
+}
+
+function downloadButiranPDF(sub) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(14);
+  doc.text(`Senarai Semak Kenderaan — ${sub.kenderaan}`, 14, 16);
+
+  doc.setFontSize(10);
+  doc.text(`Tarikh: ${sub.tarikh}    Masa: ${sub.masa}`, 14, 25);
+  doc.text(`Pemandu: ${sub.pemandu}    Odometer: ${sub.odometer} km`, 14, 31);
+  doc.text(`Status Kenderaan: ${statusLabelOf(sub)}`, 14, 37);
+  doc.text(`Boleh Digunakan: ${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}`, 14, 43);
+  doc.text(`Pegawai Mengesahkan: ${sub.pegawaiMengesah || '-'}`, 14, 49);
+  const ringkasanLines = doc.splitTextToSize(`Ringkasan: ${sub.ringkasan || '-'}`, 180);
+  doc.text(ringkasanLines, 14, 55);
+  let startY = 55 + ringkasanLines.length * 5 + 5;
+
+  if (Array.isArray(sub.items) && sub.items.length) {
+    const rows = sub.items.map(it => [
+      it.label,
+      it.status === 'ok' ? 'OK' : it.status === 'tidakOk' ? ('Tidak OK' + (it.flag ? ' · ' + it.flag : '')) : 'N/A',
+      it.perihal || '-',
+      (sub.adminRemarks && sub.adminRemarks[it.id]) || '-'
+    ]);
+    doc.autoTable({
+      startY,
+      head: [['Item', 'Status', 'Catatan', 'Catatan Admin']],
+      body: rows,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [15, 42, 74] },
+      columnStyles: { 0: { cellWidth: 55 } }
+    });
+  } else {
+    doc.text('Tiada item senarai semak (kenderaan tidak standby).', 14, startY);
+  }
+
+  doc.save(`kenderaan-${sub.kenderaan}-${sub.tarikh}.pdf`);
 }
 
 function adminRemarksSummary(sub) {
