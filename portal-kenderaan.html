@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<title>VELOS — Portal Kenderaan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<style>
+:root {
+  --vx-topbar:        #084E4E;
+  --vx-sidebar:       #0A5C5C;
+  --vx-gradient:      linear-gradient(135deg, #0F2A4A 0%, #0D4F54 50%, #147D82 100%);
+  --vx-teal:          #147D82;
+  --vx-teal-light:    #E0F4F5;
+  --vx-bg:            #EEF8F8;
+  --vx-card:          #FFFFFF;
+  --vx-border:        #DCE6ED;
+  --vx-text:          #0F2A4A;
+  --vx-muted:         #5B6774;
+  --vx-success:       #1E8E5A;
+  --vx-success-light: #E3F4EB;
+  --vx-danger:        #C62828;
+  --vx-danger-light:  #FDEAEA;
+  --vx-warning:       #C98A2E;
+  --vx-warning-light: #FDF3E0;
+  --vx-grey:          #9AA5AD;
+  --vx-grey-light:    #F0F2F4;
+  --vx-shadow:        0 1px 3px rgba(15,42,74,0.05), 0 4px 14px rgba(15,42,74,0.08);
+  --vx-radius:        16px;
+  --vx-radius-sm:     10px;
+  --navbar-header-h:  56px;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Public Sans', sans-serif;
+  background: var(--vx-bg);
+  color: var(--vx-text);
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* ==================== AUTH GATE ==================== */
+#loginView { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+.auth-card { max-width: 440px; width: 100%; box-sizing: border-box; background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 32px; border-top: 4px solid var(--vx-text); }
+.auth-logo-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 15px; }
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--vx-text); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--vx-text); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 15px; color: var(--vx-muted); text-align: center; margin-bottom: 22px; font-weight: 600; }
+.auth-password-input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--vx-border); border-radius: 10px; font-size: 17px; font-family: inherit; box-sizing: border-box; margin-bottom: 12px; }
+.auth-password-input:focus { outline: none; border-color: var(--vx-teal); }
+.auth-submit-btn { width: 100%; background: var(--vx-text); color: #fff; padding: 15px; border: none; border-radius: 10px; font-size: 17px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.auth-submit-btn:hover:not(:disabled) { background: var(--vx-teal); }
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--vx-danger); font-size: 14px; text-align: center; margin-top: 10px; font-weight: 600; }
+.auth-back-link { display: block; text-align: center; margin-top: 18px; font-size: 14px; color: var(--vx-teal); text-decoration: none; font-weight: 600; }
+.auth-back-link:hover { text-decoration: underline; }
+
+/* ==================== TOPBAR ==================== */
+#appWrapper { display: none; }
+.vx-topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--navbar-header-h);
+  background: var(--vx-gradient); color: #fff; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.vx-topbar-left { display: flex; align-items: center; gap: 10px; }
+.vx-topbar-left img { height: 34px; width: auto; object-fit: contain; }
+.vx-topbar-title { font-weight: 700; font-size: 16px; letter-spacing: 0.5px; white-space: nowrap; }
+.vx-topbar-sub { font-size: 11px; color: #A8D4D4; font-weight: 500; }
+.btn-logout-top { background: var(--vx-danger); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+.btn-logout-top:hover { background: #A82121; }
+
+.vx-main { padding: calc(var(--navbar-header-h) + 18px) 14px 60px; max-width: 640px; margin: 0 auto; }
+
+/* ==================== NO VEHICLE STATE ==================== */
+.vx-empty-state { background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 40px 26px; text-align: center; margin-top: 40px; }
+.vx-empty-state p { font-size: 17px; font-weight: 600; color: var(--vx-muted); line-height: 1.5; }
+
+/* ==================== STEP INDICATOR ==================== */
+.vx-step-indicator { text-align: center; font-size: 13px; font-weight: 700; color: var(--vx-teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+
+/* ==================== CARD / FORM ==================== */
+.vx-card { background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 24px 20px; margin-bottom: 18px; }
+.vx-card-title { font-size: 20px; font-weight: 800; color: var(--vx-text); margin: 0 0 18px; }
+.vx-field { margin-bottom: 20px; }
+.vx-field label { display: block; font-size: 15px; font-weight: 700; color: var(--vx-text); margin-bottom: 8px; }
+.vx-field input[type="text"], .vx-field input[type="date"], .vx-field input[type="time"], .vx-field input[type="number"], .vx-field select, .vx-field textarea {
+  width: 100%; padding: 14px 16px; font-size: 17px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 10px; background: #fff; color: var(--vx-text); box-sizing: border-box;
+}
+.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus { outline: none; border-color: var(--vx-teal); }
+.vx-field textarea { min-height: 110px; resize: vertical; font-family: inherit; }
+.vx-hint { font-size: 13px; color: var(--vx-muted); margin-top: 6px; }
+
+/* Big choice buttons (status, boleh digunakan) */
+.vx-choice-btn { display: flex; align-items: center; width: 100%; padding: 18px 20px; margin-bottom: 12px; border-radius: 14px; border: 2px solid var(--vx-border); background: #fff; font-size: 17px; font-weight: 700; color: var(--vx-text); cursor: pointer; text-align: left; font-family: inherit; transition: border-color .15s, background .15s; }
+.vx-choice-btn:last-child { margin-bottom: 0; }
+.vx-choice-btn .vx-ico { flex-shrink: 0; margin-right: 14px; display: flex; }
+.vx-choice-btn .vx-ico svg { width: 24px; height: 24px; display: block; }
+.vx-choice-btn.active.c-success { border-color: var(--vx-success); background: var(--vx-success-light); color: #146641; }
+.vx-choice-btn.active.c-warning { border-color: var(--vx-warning); background: var(--vx-warning-light); color: #7A4F0A; }
+.vx-choice-btn.active.c-danger { border-color: var(--vx-danger); background: var(--vx-danger-light); color: #8E1F1F; }
+.vx-choice-btn.active.c-info { border-color: var(--vx-teal); background: var(--vx-teal-light); color: #0F5458; }
+.vx-choice-btn.active.c-neutral { border-color: var(--vx-grey); background: var(--vx-grey-light); color: var(--vx-text); }
+.vx-inline-field { display: none; margin: -4px 0 14px; }
+.vx-inline-field.open { display: block; }
+.vx-inline-field input { width: 100%; padding: 13px 16px; font-size: 16px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 10px; box-sizing: border-box; }
+.vx-inline-field input:focus { outline: none; border-color: var(--vx-teal); }
+
+/* Checklist groups */
+.vx-group-hd { font-size: 13px; font-weight: 800; color: var(--vx-teal); text-transform: uppercase; letter-spacing: 1px; margin: 26px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--vx-teal-light); }
+.vx-group-hd:first-child { margin-top: 0; }
+.vx-item { border: 1.5px solid var(--vx-border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+.vx-item-label { font-size: 16px; font-weight: 700; color: var(--vx-text); margin-bottom: 12px; }
+.vx-item-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.vx-item-btn { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 13px 6px; border-radius: 10px; border: 2px solid var(--vx-border); background: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--vx-muted); }
+.vx-item-btn svg { width: 17px; height: 17px; flex-shrink: 0; display: block; }
+.vx-item-btn.ok.active { background: var(--vx-success); border-color: var(--vx-success); color: #fff; }
+.vx-item-btn.tidakOk.active { background: var(--vx-danger); border-color: var(--vx-danger); color: #fff; }
+.vx-item-btn.na.active { background: var(--vx-grey); border-color: var(--vx-grey); color: #fff; }
+.vx-item-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1.5px dashed var(--vx-border); }
+.vx-item-detail.open { display: block; }
+.vx-item-detail textarea { width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 10px; box-sizing: border-box; min-height: 70px; margin-bottom: 10px; }
+.vx-flag-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.vx-flag-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 8px; border-radius: 10px; border: 2px solid var(--vx-border); background: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--vx-muted); }
+.vx-flag-btn svg { width: 17px; height: 17px; flex-shrink: 0; display: block; }
+.vx-flag-btn.minor.active { background: var(--vx-warning); border-color: var(--vx-warning); color: #fff; }
+.vx-flag-btn.urgent.active { background: var(--vx-danger); border-color: var(--vx-danger); color: #fff; }
+
+/* Nav buttons */
+.vx-nav-row { display: flex; gap: 12px; margin-top: 8px; }
+.vx-btn { flex: 1; padding: 17px; border-radius: 12px; border: none; font-size: 17px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.vx-btn.primary { background: var(--vx-teal); color: #fff; }
+.vx-btn.primary:hover { background: #0F6469; }
+.vx-btn.ghost { background: #fff; border: 2px solid var(--vx-border); color: var(--vx-text); }
+.vx-btn.ghost:hover { border-color: var(--vx-teal); color: var(--vx-teal); }
+.vx-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.vx-progress-count { text-align: center; font-size: 13px; color: var(--vx-muted); margin-top: -6px; margin-bottom: 18px; }
+
+/* ==================== TABS / SEMAKAN REKOD ==================== */
+.vx-tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+.vx-tab { flex: 1; padding: 15px 10px; border-radius: 12px; border: 2px solid var(--vx-border); background: #fff; font-size: 15px; font-weight: 700; color: var(--vx-muted); cursor: pointer; font-family: inherit; }
+.vx-tab.active { border-color: var(--vx-teal); background: var(--vx-teal-light); color: var(--vx-teal); }
+.fb { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.fb.ok     { background: var(--vx-success-light); color: #0F6E56; }
+.fb.warn   { background: var(--vx-warning-light); color: #854F0B; }
+.fb.danger { background: var(--vx-danger-light); color: #A32D2D; }
+.vx-rec-card { background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 16px 18px; margin-bottom: 14px; }
+.vx-rec-card-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.vx-rec-plate { font-size: 17px; font-weight: 800; color: var(--vx-text); }
+.vx-rec-meta { font-size: 13px; color: var(--vx-muted); margin-top: 2px; }
+.vx-rec-ringkasan { font-size: 14px; color: var(--vx-text); margin: 10px 0; line-height: 1.4; }
+.vx-rec-empty { text-align: center; color: var(--vx-muted); font-size: 15px; padding: 30px 10px; }
+
+@media (max-width: 480px) {
+  .vx-topbar-sub { display: none; }
+  .vx-item-btns { grid-template-columns: 1fr 1fr 1fr; }
+  .vx-item-btn { font-size: 12px; padding: 12px 4px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loginView">
+  <div class="auth-card">
+    <div class="auth-logo-row">
+      <div class="auth-logo-left"><img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara"></div>
+      <div class="auth-logo-center">
+        <div class="auth-org-line1">Hospital Pitas, Sabah</div>
+        <div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
+      </div>
+      <div class="auth-logo-right"><img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas"></div>
+    </div>
+    <div class="auth-brand">
+      <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+      <div class="auth-brand-line2">(VELOS)</div>
+    </div>
+    <p class="auth-portal-label">Portal Kenderaan — Pemandu</p>
+    <form id="loginForm" novalidate>
+      <input type="password" id="passwordInput" class="auth-password-input" placeholder="Kata Laluan" autocomplete="current-password" required>
+      <button type="submit" id="loginSubmitBtn" class="auth-submit-btn">Log Masuk</button>
+      <p id="loginError" class="auth-error"></p>
+    </form>
+    <a href="index.html" class="auth-back-link">← Kembali Ke Laman Utama</a>
+  </div>
+</div>
+
+<div id="appWrapper">
+<header class="vx-topbar">
+  <div class="vx-topbar-left">
+    <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
+    <div>
+      <div class="vx-topbar-title">VELOS — Kenderaan</div>
+      <div class="vx-topbar-sub">Senarai Semak Harian</div>
+    </div>
+  </div>
+  <button type="button" class="btn-logout-top" id="btnLogout">Log Keluar</button>
+</header>
+
+<div class="vx-main">
+
+  <div class="vx-tabs">
+    <button type="button" class="vx-tab active" id="tabFormBtn">Borang Baharu</button>
+    <button type="button" class="vx-tab" id="tabRecordsBtn">Semakan Rekod</button>
+  </div>
+
+  <div id="noVehicleState" class="vx-empty-state" style="display:none;">
+    <p>Tiada kenderaan berdaftar. Hubungi pentadbir sistem.</p>
+  </div>
+
+  <div id="recordsView" style="display:none;">
+    <div class="vx-card">
+      <h2 class="vx-card-title">Semakan Rekod</h2>
+
+      <div class="vx-field">
+        <label for="recFilterKenderaan">Pilih Kenderaan</label>
+        <select id="recFilterKenderaan"><option value="">Semua Kenderaan</option></select>
+      </div>
+
+      <div class="vx-field">
+        <label for="recFilterPemandu">Nama Pemandu (pilihan)</label>
+        <input type="text" id="recFilterPemandu" placeholder="Taip nama anda untuk tapis...">
+      </div>
+
+      <div class="vx-field">
+        <label for="recFilterBulan">Bulan</label>
+        <input type="month" id="recFilterBulan">
+      </div>
+
+      <button type="button" class="vx-btn primary" id="btnRecFilter" style="width:100%;">Tapis</button>
+    </div>
+
+    <div id="recResultsContainer"></div>
+  </div>
+
+  <div id="formFlow" style="display:none;">
+
+    <div class="vx-step-indicator" id="stepIndicator">Langkah 1 daripada 3</div>
+
+    <!-- STEP 1 -->
+    <div class="vx-card step-panel" id="step1">
+      <h2 class="vx-card-title">Pilih Kenderaan &amp; Pemandu</h2>
+
+      <div class="vx-field">
+        <label for="selKenderaan">Pilih Kenderaan</label>
+        <select id="selKenderaan"><option value="">Pilih Kenderaan...</option></select>
+      </div>
+
+      <div class="vx-field">
+        <label for="inpPemandu">Nama Pemandu</label>
+        <input type="text" id="inpPemandu" placeholder="Taip nama anda...">
+      </div>
+
+      <div class="vx-field">
+        <label for="inpTarikh">Tarikh</label>
+        <input type="date" id="inpTarikh">
+      </div>
+
+      <div class="vx-field">
+        <label for="inpMasa">Masa</label>
+        <input type="time" id="inpMasa">
+      </div>
+
+      <div class="vx-field">
+        <label for="inpOdometer">Odometer Semasa (km)</label>
+        <input type="number" id="inpOdometer" placeholder="Cth: 152300" inputmode="numeric" min="0">
+      </div>
+
+      <div class="vx-field">
+        <label>Status Kenderaan</label>
+        <button type="button" class="vx-choice-btn c-success" data-status="berfungsi">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg></span>
+          Berfungsi
+        </button>
+        <button type="button" class="vx-choice-btn c-danger" data-status="rosak">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></span>
+          Rosak
+        </button>
+        <button type="button" class="vx-choice-btn c-warning" data-status="dalam_pembaikan">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3z"/></svg></span>
+          Sedang Dalam Pembaikan
+        </button>
+        <button type="button" class="vx-choice-btn c-info" data-status="dalam_penggunaan">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span>
+          Sedang Digunakan
+        </button>
+        <button type="button" class="vx-choice-btn c-neutral" data-status="lain_lain">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r="0.5" fill="currentColor"/><circle cx="12" cy="12" r="0.5" fill="currentColor"/><circle cx="16" cy="12" r="0.5" fill="currentColor"/></svg></span>
+          Lain-lain
+        </button>
+        <div class="vx-inline-field" id="statusLainLainField">
+          <input type="text" id="inpStatusLainLain" placeholder="Nyatakan status kenderaan...">
+        </div>
+      </div>
+
+      <div class="vx-nav-row">
+        <button type="button" class="vx-btn primary" id="btnStep1Next">Seterusnya</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="vx-card step-panel" id="step2" style="display:none;">
+      <h2 class="vx-card-title">Senarai Semak Kenderaan</h2>
+      <div class="vx-progress-count" id="checklistProgress"></div>
+      <div id="checklistContainer"></div>
+      <div class="vx-nav-row">
+        <button type="button" class="vx-btn ghost" id="btnStep2Back">Kembali</button>
+        <button type="button" class="vx-btn primary" id="btnStep2Next">Seterusnya</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="vx-card step-panel" id="step3" style="display:none;">
+      <h2 class="vx-card-title">Ringkasan &amp; Pengesahan</h2>
+
+      <div class="vx-field">
+        <label for="inpRingkasan">Ringkasan Penemuan Kerosakan &amp; Tindakan</label>
+        <textarea id="inpRingkasan" placeholder="Nyatakan penemuan dan tindakan yang diambil..."></textarea>
+      </div>
+
+      <div class="vx-field">
+        <label>Adakah Kenderaan Boleh Digunakan?</label>
+        <button type="button" class="vx-choice-btn c-success" data-boleh="selamat">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg></span>
+          SELAMAT UNTUK DIGUNAKAN
+        </button>
+        <button type="button" class="vx-choice-btn c-warning" data-boleh="jarakDekat">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></span>
+          BOLEH DIGUNAKAN — JARAK DEKAT SAHAJA
+        </button>
+        <button type="button" class="vx-choice-btn c-danger" data-boleh="tidakSelamat">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></span>
+          TIDAK SELAMAT UNTUK DIGUNAKAN
+        </button>
+      </div>
+
+      <div class="vx-field">
+        <label for="inpPegawai">Nama Pegawai Mengesahkan</label>
+        <input type="text" id="inpPegawai" placeholder="Taip nama pegawai...">
+      </div>
+
+      <div class="vx-field">
+        <label for="inpNextServiceDate">Tarikh Servis Seterusnya</label>
+        <input type="date" id="inpNextServiceDate">
+      </div>
+
+      <div class="vx-field">
+        <label for="inpNextServiceOdo">Odometer Servis Seterusnya (km)</label>
+        <input type="number" id="inpNextServiceOdo" inputmode="numeric" min="0" placeholder="Cth: 155000">
+      </div>
+
+      <div class="vx-nav-row">
+        <button type="button" class="vx-btn ghost" id="btnStep3Back">Kembali</button>
+        <button type="button" class="vx-btn primary" id="btnSubmit">Hantar Rekod</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
+  setPersistence, browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB9cJlR7APmejMx8lQEHfoWk4vaWF7hZCY",
+  authDomain: "velos-pitas.firebaseapp.com",
+  projectId: "velos-pitas",
+  storageBucket: "velos-pitas.firebasestorage.app",
+  messagingSenderId: "714072882275",
+  appId: "1:714072882275:web:e45724c420899b92fe0c56"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const PORTAL_EMAIL = "kenderaan@pitas.velos";
+const MASTER_EMAIL = "master@pitas.velos";
+
+const esc = s => (s === undefined || s === null) ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const pad2 = n => String(n).padStart(2, '0');
+const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
+const nowHM = () => { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+
+const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>';
+const ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>';
+const ICON_MINUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>';
+const ICON_ALERT_TRIANGLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>';
+const ICON_ALERT_OCTAGON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/><path d="M12 8v5M12 16h.01"/></svg>';
+
+const STATUS_LABEL = { berfungsi: 'Berfungsi', rosak: 'Rosak', dalam_pembaikan: 'Sedang Dalam Pembaikan', dalam_penggunaan: 'Sedang Digunakan', lain_lain: 'Lain-lain' };
+const BOLEH_LABEL = { selamat: 'Selamat', jarakDekat: 'Jarak Dekat Sahaja', tidakSelamat: 'Tidak Selamat' };
+const statusLabelOf = sub => STATUS_LABEL[sub.statusKenderaan] ? (STATUS_LABEL[sub.statusKenderaan] + (sub.statusKenderaan === 'lain_lain' && sub.statusLainLain ? ' — ' + sub.statusLainLain : '')) : sub.statusKenderaan;
+
+/* ---------------------------------------------------------------------
+   AUTH GATE
+--------------------------------------------------------------------- */
+const loginView = document.getElementById('loginView');
+const appWrapper = document.getElementById('appWrapper');
+const loginForm = document.getElementById('loginForm');
+const passwordInput = document.getElementById('passwordInput');
+const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+const loginError = document.getElementById('loginError');
+
+onAuthStateChanged(auth, function (user) {
+  if (user) {
+    loginView.style.display = 'none';
+    appWrapper.style.display = 'block';
+    initApp();
+    initHistoryGuard();
+  } else {
+    loginView.style.display = 'flex';
+    appWrapper.style.display = 'none';
+    historyGuardActive = false;
+  }
+});
+
+loginForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  loginError.textContent = '';
+  loginSubmitBtn.disabled = true;
+  loginSubmitBtn.textContent = 'Mengesahkan...';
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    try {
+      await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+    } catch (err) {
+      await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+    }
+  } catch (err) {
+    loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
+    loginError.style.display = 'block';
+  } finally {
+    loginSubmitBtn.disabled = false;
+    loginSubmitBtn.textContent = 'Log Masuk';
+    passwordInput.value = '';
+  }
+});
+
+document.getElementById('btnLogout').addEventListener('click', function () { signOut(auth); });
+
+/* ---------------------------------------------------------------------
+   CHECKLIST DEFINITIONS
+--------------------------------------------------------------------- */
+const ALL_ITEMS = [
+  { id: 'kebersihan_luaran_dalaman', group: 'KEBERSIHAN', label: 'Kebersihan ambulans luaran dan dalaman', ambulansOnly: false },
+  { id: 'lampu_headlight', group: 'LAMPU', label: 'Lampu headlight', ambulansOnly: false },
+  { id: 'lampu_signal', group: 'LAMPU', label: 'Lampu signal', ambulansOnly: false },
+  { id: 'lampu_brek', group: 'LAMPU', label: 'Lampu brek', ambulansOnly: false },
+  { id: 'scene_beacon_light', group: 'LAMPU', label: 'Scene light dan beacon light', ambulansOnly: true },
+  { id: 'spotlight_search_light', group: 'LAMPU', label: 'Spotlight dan search light', ambulansOnly: true },
+  { id: 'wiper_air_wiper', group: 'WIPER & CERMIN', label: 'Wiper kanan & kiri serta air wiper', ambulansOnly: false },
+  { id: 'sistem_roda', group: 'TAYAR & RODA', label: 'Sistem roda (rim / bearing / getah)', ambulansOnly: false },
+  { id: 'sistem_suspension', group: 'SUSPENSION', label: 'Sistem suspension & absorber', ambulansOnly: false },
+  { id: 'sistem_enjin_minyak', group: 'ENJIN & MINYAK', label: 'Sistem enjin & minyak enjin', ambulansOnly: false },
+  { id: 'sistem_brek_minyak_brek', group: 'ENJIN & MINYAK', label: 'Sistem brek & minyak brek', ambulansOnly: false },
+  { id: 'sistem_gear', group: 'ENJIN & MINYAK', label: 'Sistem gear (gearbox / minyak gearbox)', ambulansOnly: false },
+  { id: 'sistem_belting', group: 'ENJIN & MINYAK', label: 'Sistem belting', ambulansOnly: false },
+  { id: 'minyak_power_steering', group: 'ENJIN & MINYAK', label: 'Minyak power steering', ambulansOnly: false },
+  { id: 'minyak_axle', group: 'ENJIN & MINYAK', label: 'Minyak axle', ambulansOnly: false },
+  { id: 'sistem_radiator', group: 'RADIATOR & BATERI', label: 'Sistem radiator', ambulansOnly: false },
+  { id: 'sistem_bateri', group: 'RADIATOR & BATERI', label: 'Sistem bateri', ambulansOnly: false },
+  { id: 'paras_minyak', group: 'BAHAN API', label: 'Paras minyak (petrol / diesel)', ambulansOnly: false },
+  { id: 'tool_kit', group: 'KELENGKAPAN KESELAMATAN', label: 'Tool kit (jack / pembuka tayar)', ambulansOnly: false },
+  { id: 'pemadam_api', group: 'KELENGKAPAN KESELAMATAN', label: 'Pemadam api', ambulansOnly: false },
+  { id: 'tali_pinggang_keledar', group: 'KELENGKAPAN KESELAMATAN', label: 'Tali pinggang keledar', ambulansOnly: false },
+  { id: 'penghawa_dingin', group: 'SISTEM KENDERAAN', label: 'Sistem penghawa dingin', ambulansOnly: false },
+  { id: 'stretcher', group: 'KELENGKAPAN AMBULANS', label: 'Stretcher', ambulansOnly: true },
+  { id: 'sistem_oksigen', group: 'KELENGKAPAN AMBULANS', label: 'Sistem oksigen (tong oksigen / regulator / oxygen wall)', ambulansOnly: true },
+  { id: 'sistem_siren', group: 'KELENGKAPAN AMBULANS', label: 'Sistem siren (lampu & bunyi)', ambulansOnly: true },
+  { id: 'sistem_pendawaian', group: 'PENDAWAIAN & ELEKTRIK', label: 'Sistem pendawaian', ambulansOnly: false },
+  { id: 'suis_soket', group: 'PENDAWAIAN & ELEKTRIK', label: 'Suis dan soket', ambulansOnly: false },
+  { id: 'lampu_cabin', group: 'PENDAWAIAN & ELEKTRIK', label: 'Lampu cabin', ambulansOnly: false },
+  { id: 'plat_nombor', group: 'DOKUMEN & PENGESAHAN', label: 'Plat nombor pendaftaran — bersih dan jelas', ambulansOnly: false },
+  { id: 'cukai_jalan', group: 'DOKUMEN & PENGESAHAN', label: 'Cukai jalan — masih sah', ambulansOnly: false }
+];
+
+function getItemsFor(jenis) {
+  const src = jenis === 'ambulans' ? ALL_ITEMS : ALL_ITEMS.filter(it => !it.ambulansOnly);
+  return src.map(it => ({ id: it.id, group: it.group, label: it.label, status: null, perihal: '', flag: null }));
+}
+
+/* ---------------------------------------------------------------------
+   STATE
+--------------------------------------------------------------------- */
+let vehicleProfiles = {};
+let selectedPlate = null;
+let selectedJenis = null;
+let currentItems = [];
+let currentItemsPlate = null;
+let statusKenderaan = null;
+let bolehDigunakan = null;
+let appInitialized = false;
+
+const selKenderaan = document.getElementById('selKenderaan');
+const noVehicleState = document.getElementById('noVehicleState');
+const formFlow = document.getElementById('formFlow');
+const stepIndicator = document.getElementById('stepIndicator');
+
+function initApp() {
+  if (appInitialized) return;
+  appInitialized = true;
+  loadVehicles();
+}
+
+async function loadVehicles() {
+  try {
+    const snap = await getDocs(collection(db, 'vehicleProfiles'));
+    vehicleProfiles = {};
+    snap.forEach(d => { vehicleProfiles[d.id] = d.data(); });
+    const plates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
+    if (plates.length === 0) {
+      noVehicleState.style.display = 'block';
+      formFlow.style.display = 'none';
+      return;
+    }
+    noVehicleState.style.display = 'none';
+    formFlow.style.display = 'block';
+    selKenderaan.innerHTML = '<option value="">Pilih Kenderaan...</option>' +
+      plates.map(p => `<option value="${p}">${p}</option>`).join('');
+    document.getElementById('recFilterKenderaan').innerHTML = '<option value="">Semua Kenderaan</option>' +
+      plates.map(p => `<option value="${p}">${p}</option>`).join('');
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal memuatkan senarai kenderaan: ' + (err.message || err), 'error');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   STEP 1
+--------------------------------------------------------------------- */
+document.getElementById('inpTarikh').value = todayISO();
+document.getElementById('inpMasa').value = nowHM();
+
+selKenderaan.addEventListener('change', function () {
+  selectedPlate = selKenderaan.value || null;
+  selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
+});
+
+const statusLainLainField = document.getElementById('statusLainLainField');
+const inpStatusLainLain = document.getElementById('inpStatusLainLain');
+
+document.querySelectorAll('[data-status]').forEach(btn => {
+  btn.addEventListener('click', function () {
+    statusKenderaan = btn.getAttribute('data-status');
+    document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (statusKenderaan === 'lain_lain') {
+      statusLainLainField.classList.add('open');
+    } else {
+      statusLainLainField.classList.remove('open');
+      inpStatusLainLain.value = '';
+    }
+  });
+});
+
+document.getElementById('btnStep1Next').addEventListener('click', function () {
+  const pemandu = document.getElementById('inpPemandu').value.trim();
+  const tarikh = document.getElementById('inpTarikh').value;
+  const masa = document.getElementById('inpMasa').value;
+  const odometer = document.getElementById('inpOdometer').value;
+
+  if (!selectedPlate) return Swal.fire('Perhatian', 'Sila pilih kenderaan.', 'warning');
+  if (!pemandu) return Swal.fire('Perhatian', 'Sila masukkan nama pemandu.', 'warning');
+  if (!tarikh) return Swal.fire('Perhatian', 'Sila masukkan tarikh.', 'warning');
+  if (!masa) return Swal.fire('Perhatian', 'Sila masukkan masa.', 'warning');
+  if (odometer === '' || Number(odometer) < 0) return Swal.fire('Perhatian', 'Sila masukkan bacaan odometer.', 'warning');
+  if (!statusKenderaan) return Swal.fire('Perhatian', 'Sila pilih status kenderaan.', 'warning');
+  if (statusKenderaan === 'lain_lain' && !inpStatusLainLain.value.trim()) return Swal.fire('Perhatian', 'Sila nyatakan status kenderaan.', 'warning');
+
+  if (statusKenderaan === 'berfungsi') {
+    if (currentItems.length === 0 || currentItemsPlate !== selectedPlate) {
+      currentItems = getItemsFor(selectedJenis);
+      currentItemsPlate = selectedPlate;
+    }
+    renderChecklist();
+    goToStep(2);
+  } else {
+    currentItems = [];
+    currentItemsPlate = null;
+    goToStep(3);
+  }
+});
+
+/* ---------------------------------------------------------------------
+   STEP 2 — CHECKLIST
+--------------------------------------------------------------------- */
+const checklistContainer = document.getElementById('checklistContainer');
+const checklistProgress = document.getElementById('checklistProgress');
+
+function renderChecklist() {
+  let html = '';
+  let lastGroup = null;
+  currentItems.forEach((item, idx) => {
+    if (item.group !== lastGroup) {
+      html += `<div class="vx-group-hd">${item.group}</div>`;
+      lastGroup = item.group;
+    }
+    const okActive = item.status === 'ok' ? ' active' : '';
+    const tidakOkActive = item.status === 'tidakOk' ? ' active' : '';
+    const naActive = item.status === 'na' ? ' active' : '';
+    const detailOpen = item.status === 'tidakOk' ? ' open' : '';
+    const minorActive = item.flag === 'minor' ? ' active' : '';
+    const urgentActive = item.flag === 'urgent' ? ' active' : '';
+    html += `
+      <div class="vx-item" data-idx="${idx}">
+        <div class="vx-item-label">${item.label}</div>
+        <div class="vx-item-btns">
+          <button type="button" class="vx-item-btn ok${okActive}" data-idx="${idx}" data-val="ok">${ICON_CHECK} OK</button>
+          <button type="button" class="vx-item-btn tidakOk${tidakOkActive}" data-idx="${idx}" data-val="tidakOk">${ICON_X} Tidak OK</button>
+          <button type="button" class="vx-item-btn na${naActive}" data-idx="${idx}" data-val="na">${ICON_MINUS} N/A</button>
+        </div>
+        <div class="vx-item-detail${detailOpen}" id="detail-${idx}">
+          <textarea id="perihal-${idx}" placeholder="Perihalkan masalah...">${esc(item.perihal || '')}</textarea>
+          <div class="vx-flag-btns">
+            <button type="button" class="vx-flag-btn minor${minorActive}" data-idx="${idx}" data-flag="minor">${ICON_ALERT_TRIANGLE} Minor</button>
+            <button type="button" class="vx-flag-btn urgent${urgentActive}" data-idx="${idx}" data-flag="urgent">${ICON_ALERT_OCTAGON} Urgent</button>
+          </div>
+        </div>
+      </div>`;
+  });
+  checklistContainer.innerHTML = html;
+  updateChecklistProgress();
+
+  checklistContainer.querySelectorAll('.vx-item-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const idx = Number(btn.getAttribute('data-idx'));
+      const val = btn.getAttribute('data-val');
+      currentItems[idx].status = val;
+      const itemEl = checklistContainer.querySelector(`.vx-item[data-idx="${idx}"]`);
+      itemEl.querySelectorAll('.vx-item-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const detail = document.getElementById('detail-' + idx);
+      if (val === 'tidakOk') {
+        detail.classList.add('open');
+      } else {
+        detail.classList.remove('open');
+        currentItems[idx].perihal = '';
+        currentItems[idx].flag = null;
+        document.getElementById('perihal-' + idx).value = '';
+        itemEl.querySelectorAll('.vx-flag-btn').forEach(b => b.classList.remove('active'));
+      }
+      updateChecklistProgress();
+    });
+  });
+
+  checklistContainer.querySelectorAll('.vx-flag-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const idx = Number(btn.getAttribute('data-idx'));
+      const flag = btn.getAttribute('data-flag');
+      currentItems[idx].flag = flag;
+      const itemEl = checklistContainer.querySelector(`.vx-item[data-idx="${idx}"]`);
+      itemEl.querySelectorAll('.vx-flag-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  checklistContainer.querySelectorAll('textarea[id^="perihal-"]').forEach(ta => {
+    ta.addEventListener('input', function () {
+      const idx = Number(ta.id.replace('perihal-', ''));
+      currentItems[idx].perihal = ta.value;
+    });
+  });
+}
+
+function updateChecklistProgress() {
+  const done = currentItems.filter(it => it.status !== null).length;
+  checklistProgress.textContent = `${done} / ${currentItems.length} item disemak`;
+}
+
+document.getElementById('btnStep2Back').addEventListener('click', function () { goToStep(1); });
+
+document.getElementById('btnStep2Next').addEventListener('click', function () {
+  const unchecked = currentItems.filter(it => it.status === null);
+  if (unchecked.length > 0) return Swal.fire('Perhatian', 'Sila lengkapkan semua item senarai semak.', 'warning');
+  const missingDetail = currentItems.filter(it => it.status === 'tidakOk' && (!it.perihal.trim() || !it.flag));
+  if (missingDetail.length > 0) return Swal.fire('Perhatian', 'Sila lengkapkan perihal masalah dan tanda keutamaan untuk item "Tidak OK".', 'warning');
+  goToStep(3);
+});
+
+/* ---------------------------------------------------------------------
+   STEP 3 — RINGKASAN
+--------------------------------------------------------------------- */
+document.querySelectorAll('[data-boleh]').forEach(btn => {
+  btn.addEventListener('click', function () {
+    bolehDigunakan = btn.getAttribute('data-boleh');
+    document.querySelectorAll('[data-boleh]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('btnStep3Back').addEventListener('click', function () {
+  if (statusKenderaan === 'berfungsi') goToStep(2); else goToStep(1);
+});
+
+document.getElementById('btnSubmit').addEventListener('click', async function () {
+  const ringkasan = document.getElementById('inpRingkasan').value.trim();
+  const pegawai = document.getElementById('inpPegawai').value.trim();
+  const nextServiceDate = document.getElementById('inpNextServiceDate').value;
+  const nextServiceOdo = document.getElementById('inpNextServiceOdo').value;
+
+  if (!ringkasan) return Swal.fire('Perhatian', 'Sila isikan ringkasan penemuan.', 'warning');
+  if (!bolehDigunakan) return Swal.fire('Perhatian', 'Sila pilih status kebolehgunaan kenderaan.', 'warning');
+  if (!pegawai) return Swal.fire('Perhatian', 'Sila masukkan nama pegawai mengesahkan.', 'warning');
+  if (!nextServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis seterusnya.', 'warning');
+  if (nextServiceOdo === '' || Number(nextServiceOdo) < 0) return Swal.fire('Perhatian', 'Sila masukkan odometer servis seterusnya.', 'warning');
+
+  const btn = this;
+  btn.disabled = true;
+  Swal.fire({ title: 'Menghantar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+  try {
+    const submission = {
+      kenderaan: selectedPlate,
+      jenisKenderaan: selectedJenis,
+      pemandu: document.getElementById('inpPemandu').value.trim(),
+      tarikh: document.getElementById('inpTarikh').value,
+      masa: document.getElementById('inpMasa').value,
+      odometer: Number(document.getElementById('inpOdometer').value),
+      statusKenderaan: statusKenderaan,
+      statusLainLain: statusKenderaan === 'lain_lain' ? inpStatusLainLain.value.trim() : '',
+      items: currentItems.map(it => ({ id: it.id, label: it.label, status: it.status, perihal: it.perihal || '', flag: it.flag || null })),
+      ringkasan: ringkasan,
+      bolehDigunakan: bolehDigunakan,
+      pegawaiMengesah: pegawai,
+      nextServiceDate: nextServiceDate,
+      nextServiceOdo: Number(nextServiceOdo),
+      timestamp: serverTimestamp()
+    };
+
+    await addDoc(collection(db, 'checklistSubmissions'), submission);
+
+    const profileUpdate = { nextServiceDate: nextServiceDate, nextServiceOdo: Number(nextServiceOdo) };
+    const brakeItem = currentItems.find(it => it.id === 'sistem_brek_minyak_brek');
+    if (brakeItem && brakeItem.status === 'ok') {
+      profileUpdate.lastBrakePadDate = todayISO();
+    }
+    await updateDoc(doc(db, 'vehicleProfiles', selectedPlate), profileUpdate);
+    Object.assign(vehicleProfiles[selectedPlate], profileUpdate);
+    allSubmissionsCache = null;
+
+    Swal.fire('Berjaya!', 'Rekod senarai semak telah dihantar.', 'success').then(resetForNewEntry);
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal menghantar rekod: ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function resetForNewEntry() {
+  const keepPlate = selKenderaan.value;
+  document.getElementById('inpPemandu').value = '';
+  document.getElementById('inpTarikh').value = todayISO();
+  document.getElementById('inpMasa').value = nowHM();
+  document.getElementById('inpOdometer').value = '';
+  document.getElementById('inpRingkasan').value = '';
+  document.getElementById('inpPegawai').value = '';
+  document.getElementById('inpNextServiceDate').value = '';
+  document.getElementById('inpNextServiceOdo').value = '';
+  statusKenderaan = null;
+  bolehDigunakan = null;
+  currentItems = [];
+  currentItemsPlate = null;
+  inpStatusLainLain.value = '';
+  statusLainLainField.classList.remove('open');
+  document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[data-boleh]').forEach(b => b.classList.remove('active'));
+  selKenderaan.value = keepPlate;
+  selectedPlate = keepPlate || null;
+  selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
+  goToStep(1);
+}
+
+/* ---------------------------------------------------------------------
+   TABS / SEMAKAN REKOD
+--------------------------------------------------------------------- */
+const tabFormBtn = document.getElementById('tabFormBtn');
+const tabRecordsBtn = document.getElementById('tabRecordsBtn');
+const recordsView = document.getElementById('recordsView');
+let allSubmissionsCache = null;
+
+function showFormTab() {
+  tabFormBtn.classList.add('active');
+  tabRecordsBtn.classList.remove('active');
+  recordsView.style.display = 'none';
+  const hasVehicles = Object.keys(vehicleProfiles).length > 0;
+  noVehicleState.style.display = hasVehicles ? 'none' : 'block';
+  formFlow.style.display = hasVehicles ? 'block' : 'none';
+}
+
+function showRecordsTab() {
+  tabFormBtn.classList.remove('active');
+  tabRecordsBtn.classList.add('active');
+  noVehicleState.style.display = 'none';
+  formFlow.style.display = 'none';
+  recordsView.style.display = 'block';
+}
+
+tabFormBtn.addEventListener('click', showFormTab);
+tabRecordsBtn.addEventListener('click', showRecordsTab);
+
+async function fetchAllSubmissions() {
+  if (allSubmissionsCache) return allSubmissionsCache;
+  const snap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc')));
+  allSubmissionsCache = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+  return allSubmissionsCache;
+}
+
+document.getElementById('btnRecFilter').addEventListener('click', async function () {
+  const btn = this;
+  btn.disabled = true;
+  btn.textContent = 'Memuatkan...';
+  const container = document.getElementById('recResultsContainer');
+  try {
+    const all = await fetchAllSubmissions();
+    const plate = document.getElementById('recFilterKenderaan').value;
+    const pemanduQuery = document.getElementById('recFilterPemandu').value.trim().toLowerCase();
+    const month = document.getElementById('recFilterBulan').value;
+
+    const filtered = all.filter(sub => {
+      if (plate && sub.kenderaan !== plate) return false;
+      if (pemanduQuery && !(sub.pemandu || '').toLowerCase().includes(pemanduQuery)) return false;
+      if (month && !(sub.tarikh || '').startsWith(month)) return false;
+      return true;
+    }).sort((a, b) => (a.tarikh + a.masa < b.tarikh + b.masa ? 1 : -1));
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="vx-rec-empty">Tiada rekod dijumpai.</div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(sub => {
+      const bolehClass = sub.bolehDigunakan === 'selamat' ? 'ok' : (sub.bolehDigunakan === 'jarakDekat' ? 'warn' : 'danger');
+      const ringkasanShort = (sub.ringkasan || '').length > 100 ? sub.ringkasan.slice(0, 100) + '…' : (sub.ringkasan || '—');
+      return `
+        <div class="vx-rec-card">
+          <div class="vx-rec-card-hd">
+            <div>
+              <div class="vx-rec-plate">${esc(sub.kenderaan)}</div>
+              <div class="vx-rec-meta">${esc(sub.tarikh)} ${esc(sub.masa)} — ${esc(sub.pemandu)}</div>
+            </div>
+            <span class="fb ${bolehClass}">${esc(BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan)}</span>
+          </div>
+          <div class="vx-rec-ringkasan">${esc(ringkasanShort)}</div>
+          <button type="button" class="vx-btn ghost" data-sub="${esc(sub._id)}" style="width:100%;">Lihat Butiran</button>
+        </div>`;
+    }).join('');
+
+    container.querySelectorAll('button[data-sub]').forEach(b => {
+      b.addEventListener('click', function () {
+        const sub = filtered.find(s => s._id === b.getAttribute('data-sub'));
+        showRecordDetail(sub);
+      });
+    });
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal memuatkan rekod: ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Tapis';
+  }
+});
+
+function showRecordDetail(sub) {
+  let itemsHtml = '<p style="color:var(--vx-muted);">Tiada item senarai semak (kenderaan tidak berfungsi).</p>';
+  if (Array.isArray(sub.items) && sub.items.length) {
+    itemsHtml = '<table style="width:100%; font-size:12px; border-collapse:collapse;"><thead><tr><th style="text-align:left;border-bottom:1px solid #ddd;">Item</th><th style="border-bottom:1px solid #ddd;">Status</th><th style="text-align:left;border-bottom:1px solid #ddd;">Catatan</th></tr></thead><tbody>' +
+      sub.items.map(it => {
+        const badge = it.status === 'ok' ? '<span class="fb ok">OK</span>' : it.status === 'tidakOk' ? `<span class="fb danger">Tidak OK${it.flag ? ' · ' + it.flag : ''}</span>` : '<span class="fb warn">N/A</span>';
+        return `<tr><td style="text-align:left;padding:4px 0;">${esc(it.label)}</td><td style="text-align:center;">${badge}</td><td style="text-align:left;">${esc(it.perihal || '—')}</td></tr>`;
+      }).join('') + '</tbody></table>';
+  }
+  Swal.fire({
+    title: `${sub.kenderaan} — ${sub.tarikh} ${sub.masa}`,
+    html: `
+      <div style="text-align:left; font-size:13px; margin-bottom:12px;">
+        <p><strong>Pemandu:</strong> ${esc(sub.pemandu)} &nbsp; <strong>Odometer:</strong> ${esc(sub.odometer)} km</p>
+        <p><strong>Status Kenderaan:</strong> ${esc(statusLabelOf(sub))}</p>
+        <p><strong>Ringkasan:</strong> ${esc(sub.ringkasan)}</p>
+        <p><strong>Boleh Digunakan:</strong> ${esc(BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan)}</p>
+        <p><strong>Pegawai Mengesahkan:</strong> ${esc(sub.pegawaiMengesah)}</p>
+      </div>
+      ${itemsHtml}
+    `,
+    width: 700,
+    confirmButtonText: 'Tutup'
+  });
+}
+
+/* ---------------------------------------------------------------------
+   STEP NAV
+--------------------------------------------------------------------- */
+let currentStep = 1;
+let historyGuardActive = false;
+
+function goToStep(n, pushHistory = true) {
+  currentStep = n;
+  document.getElementById('step1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('step2').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('step3').style.display = n === 3 ? 'block' : 'none';
+  stepIndicator.textContent = `Langkah ${n} daripada 3`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (pushHistory && historyGuardActive) {
+    history.pushState({ vxGuard: true }, '', location.href);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   BACK-BUTTON GUARD — the device/browser back button would otherwise
+   unload the page and wipe an in-progress checklist. We push a fake
+   history entry on every step change and re-trap on every popstate, so
+   "back" only ever steps the wizard backward, never leaves the page.
+   The only way out is Log Keluar or closing the tab (beforeunload warns).
+--------------------------------------------------------------------- */
+function initHistoryGuard() {
+  if (historyGuardActive) return;
+  historyGuardActive = true;
+  history.pushState({ vxGuard: true }, '', location.href);
+}
+
+window.addEventListener('popstate', function () {
+  if (!historyGuardActive) return;
+  if (currentStep > 1) {
+    goToStep(currentStep - 1, false);
+  }
+  history.pushState({ vxGuard: true }, '', location.href);
+});
+
+window.addEventListener('beforeunload', function (e) {
+  if (!historyGuardActive) return;
+  const pemanduEl = document.getElementById('inpPemandu');
+  const hasProgress = currentStep > 1 || (pemanduEl && pemanduEl.value.trim() !== '');
+  if (hasProgress) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+</script>
+</body>
+</html>

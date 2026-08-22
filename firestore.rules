@@ -22,7 +22,7 @@ service cloud.firestore {
     function uidUser()      { return '74UrpMh3v8X87x9qP1PP1pbV18c2'; }
     function uidVccC()      { return 'LZiT3i8OsMUy23vX5a1CAubpuDw2'; }
     function uidVccM()      { return 'y4WorrRkS2f0vWP9bOZCsXAwFF23'; }
-    function uidKenderaan() { return 'xUiId6yJRFMsEvZxVz8iLw8Znud2'; }
+    function uidKenderaan() { return 'OrpSCtNOF6X44YdTJi1xkxrtcy82'; }
     function uidMaster()    { return '0NnSA4HSbnaZejQAjQ1NOJ3Kt8d2'; }
 
     // ---- Role helpers ------------------------------------------------------
@@ -108,17 +108,26 @@ service cloud.firestore {
       allow write: if isAdmin() || isMaster();
     }
 
-    // ---- Portal Kenderaan --------------------------------------------------
-    // Placeholder. Portal Kenderaan is on hold until the VELOS revamp lands,
-    // so its collections do not exist yet. Add the match block here when the
-    // schema is decided -- kenderaan@pitas.velos already has its UID above.
-    //
-    // match /checklistKenderaan/{id} {
-    //   allow read:   if isKenderaan() || isAdmin();
-    //   allow create: if isKenderaan() || isAdmin();
-    //   allow update: if isAdmin();
-    //   allow delete: if isAdmin();
-    // }
+    // ---- vehicleProfiles -----------------------------------------------------
+    // Driver reads it (populate dropdown, get jenisKenderaan) and updates it
+    // after each submission (nextServiceDate/Odo, lastBrakePadDate). Only
+    // admin creates/deletes vehicles, via Module 1.
+    match /vehicleProfiles/{plate} {
+      allow read:   if isKenderaan() || isAdmin() || isMaster();
+      allow create: if isAdmin() || isMaster();
+      allow update: if isKenderaan() || isAdmin() || isMaster();
+      allow delete: if isAdmin() || isMaster();
+    }
+
+    // ---- checklistSubmissions -------------------------------------------------
+    // Driver creates one per checklist run. Only admin updates (resolving
+    // urgent flags) or deletes.
+    match /checklistSubmissions/{id} {
+      allow read:   if isKenderaan() || isAdmin() || isMaster();
+      allow create: if isKenderaan() || isAdmin() || isMaster();
+      allow update: if isAdmin() || isMaster();
+      allow delete: if isAdmin() || isMaster();
+    }
 
     // ---- konfigurasi -------------------------------------------------------
     // Hospital-specific lists: pemandu, pengiring, kenderaan, wad, destinasi.

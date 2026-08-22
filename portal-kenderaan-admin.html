@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<link rel="shortcut icon" href="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png">
+<title>VELOS — Portal Kenderaan (Admin)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
+<style>
+:root {
+  --vx-topbar:        #084E4E;
+  --vx-sidebar:       #0A5C5C;
+  --vx-gradient:      linear-gradient(135deg, #0F2A4A 0%, #0D4F54 50%, #147D82 100%);
+  --vx-sidebar-hover: rgba(255,255,255,0.08);
+  --vx-sidebar-active:rgba(255,255,255,0.18);
+  --vx-teal:          #147D82;
+  --vx-teal-light:    #E0F4F5;
+  --vx-teal-bright:   #7FDFDF;
+  --vx-bg:            #EEF8F8;
+  --vx-card:          #FFFFFF;
+  --vx-card-tint:     #F0FAFA;
+  --vx-border:        #DCE6ED;
+  --vx-text:          #0F2A4A;
+  --vx-muted:         #5B6774;
+  --vx-sb-text:       #A8D4D4;
+  --vx-sb-label:      #5FAAAA;
+  --vx-success:       #1E8E5A;
+  --vx-success-light: #E3F4EB;
+  --vx-danger:        #C62828;
+  --vx-danger-light:  #FDEAEA;
+  --vx-warning:       #C98A2E;
+  --vx-warning-light: #FDF3E0;
+  --vx-grey:          #9AA5AD;
+  --vx-grey-light:    #F0F2F4;
+  --vx-shadow:        0 1px 3px rgba(15,42,74,0.05), 0 4px 14px rgba(15,42,74,0.08);
+  --vx-radius:        16px;
+  --vx-radius-sm:     10px;
+  --navbar-header-h:  52px;
+  --sidebar-w-collapsed: 0px;
+  --sidebar-w-expanded:  240px;
+}
+* { box-sizing: border-box; }
+body { font-family: 'Public Sans', sans-serif; background: var(--vx-bg); color: var(--vx-text); margin: 0; min-height: 100vh; }
+
+/* ==================== AUTH GATE ==================== */
+#loginView { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+.auth-card { max-width: 420px; width: 100%; box-sizing: border-box; background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 30px; border-top: 4px solid var(--vx-text); }
+.auth-logo-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 15px; }
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--vx-text); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--vx-text); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: var(--vx-muted); text-align: center; margin-bottom: 20px; }
+.auth-password-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--vx-border); border-radius: 8px; font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px; }
+.auth-password-input:focus { outline: none; border-color: var(--vx-teal); }
+.auth-submit-btn { width: 100%; background: var(--vx-text); color: #fff; padding: 11px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.auth-submit-btn:hover:not(:disabled) { background: var(--vx-teal); }
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--vx-danger); font-size: 13px; text-align: center; margin-top: 8px; }
+.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: var(--vx-teal); text-decoration: none; font-weight: 600; }
+.auth-back-link:hover { text-decoration: underline; }
+
+/* ==================== TOPBAR / SIDEBAR ==================== */
+#appWrapper { display: none; }
+.vx-topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--navbar-header-h);
+  background: var(--vx-gradient); color: #fff; z-index: 1000;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 16px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.vx-topbar-left { display: flex; align-items: center; gap: 10px; }
+.vx-topbar-left img { height: 32px; width: auto; object-fit: contain; }
+.vx-topbar-title { font-weight: 700; font-size: 15px; letter-spacing: 1px; white-space: nowrap; text-align: center; }
+.vx-topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.vx-sidebar-toggle-floating { width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.12); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: 700; font-family: inherit; }
+.vx-sidebar-toggle-floating:hover { background: rgba(255,255,255,0.22); }
+.vx-topbar-refresh { background: rgba(255,255,255,0.12); color: #fff; border: none; border-radius: 20px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.vx-topbar-refresh:hover { background: rgba(255,255,255,0.22); }
+.btn-logout-top { background: var(--vx-danger); color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
+.btn-logout-top:hover { background: #A82121; }
+
+.vx-sidebar {
+  position: fixed; top: var(--navbar-header-h); left: 0; bottom: 0;
+  width: var(--sidebar-w-expanded); background: var(--vx-gradient);
+  z-index: 999; overflow-x: hidden; overflow-y: auto; transition: width 0.18s ease;
+  display: flex; flex-direction: column; padding-top: 10px;
+}
+.vx-sidebar.vx-collapsed { width: 0; }
+#vxBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 998; display: none; }
+.vx-sidebar-section-label { color: var(--vx-sb-label); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 14px 18px 8px; white-space: nowrap; }
+.vx-sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 8px 14px; }
+.vx-sidebar-link {
+  display: block; padding: 13px 18px; color: var(--vx-sb-text); text-decoration: none; font-size: 14px; font-weight: 600;
+  background: none; border: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.vx-sidebar-link:hover { background: var(--vx-sidebar-hover); color: #fff; }
+.vx-sidebar-link.vx-active { background: var(--vx-sidebar-active); color: var(--vx-teal-bright); border-left: 3px solid var(--vx-teal-bright); padding-left: 15px; }
+
+.vx-main-content { padding-top: calc(var(--navbar-header-h) + 20px); margin-left: var(--sidebar-w-expanded); transition: margin-left 0.18s ease; padding-left: 24px; padding-right: 24px; padding-bottom: 50px; }
+.vx-main-content.vx-sidebar-collapsed { margin-left: 0; }
+@media (max-width: 900px) {
+  .vx-main-content, .vx-main-content.vx-sidebar-collapsed { margin-left: 0 !important; }
+  .vx-sidebar:not(.vx-collapsed) { width: min(78vw, 280px); box-shadow: 6px 0 24px rgba(0,0,0,0.3); }
+  #vxBackdrop.vx-show { display: block; }
+}
+
+@media screen { .vx-page:not(.vx-page-active) { display: none !important; } }
+
+/* ==================== SHARED COMPONENTS ==================== */
+.vx-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--vx-teal); margin-bottom: 4px; }
+.vx-page-title { font-size: 24px; font-weight: 800; color: var(--vx-text); margin: 0 0 20px; }
+.vx-card { background: var(--vx-card); border-radius: var(--vx-radius); padding: 20px; box-shadow: var(--vx-shadow); margin-bottom: 20px; }
+.vx-card-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.vx-card-hd h2 { margin: 0; font-size: 16px; font-weight: 800; color: var(--vx-text); }
+.vx-btn { background: var(--vx-teal); color: #fff; border: none; border-radius: 8px; padding: 9px 16px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+.vx-btn:hover { background: #0F6469; }
+.vx-btn.ghost { background: #fff; border: 1.5px solid var(--vx-border); color: var(--vx-text); }
+.vx-btn.ghost:hover { border-color: var(--vx-teal); color: var(--vx-teal); }
+.vx-btn.danger { background: var(--vx-danger); }
+.vx-btn.danger:hover { background: #A82121; }
+.vx-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.vx-filter-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 18px; }
+.vx-filter-field { display: flex; flex-direction: column; gap: 6px; }
+.vx-filter-field label { font-size: 12px; font-weight: 700; color: var(--vx-muted); }
+.vx-filter-field select, .vx-filter-field input { padding: 9px 12px; border: 1.5px solid var(--vx-border); border-radius: 8px; font-family: inherit; font-size: 13px; background: #fff; color: var(--vx-text); }
+
+table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 13px; }
+th, td { padding: 9px 10px; border: 1px solid var(--vx-border); text-align: left; vertical-align: middle; }
+th { background-color: var(--vx-text); color: #fff; font-weight: 600; }
+tr:nth-child(even) { background-color: #F6FAFC; }
+tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
+.vx-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Vehicle status cards */
+.vx-veh-group-title { font-size: 13px; font-weight: 800; color: var(--vx-teal); text-transform: uppercase; letter-spacing: 1px; margin: 22px 0 12px; }
+.vx-veh-group-title:first-child { margin-top: 0; }
+.vx-veh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.vx-veh-card { background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 16px 18px; border-left: 5px solid var(--vx-border); }
+.vx-veh-card.st-red { border-left-color: var(--vx-danger); }
+.vx-veh-card.st-amber { border-left-color: var(--vx-warning); }
+.vx-veh-card.st-green { border-left-color: var(--vx-success); }
+.vx-veh-card.st-grey { border-left-color: var(--vx-grey); }
+.vx-veh-card-hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.vx-veh-plate { font-size: 17px; font-weight: 800; color: var(--vx-text); }
+.vx-veh-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: var(--vx-bg); color: var(--vx-muted); letter-spacing: 0.5px; margin-top: 4px; }
+.vx-veh-dot { font-size: 20px; line-height: 1; }
+.vx-veh-alerts { margin: 8px 0; }
+.vx-veh-alert-chip { display: inline-block; font-size: 10px; font-weight: 700; color: #7A4F0A; background: var(--vx-warning-light); padding: 3px 8px; border-radius: 20px; margin: 2px 4px 2px 0; }
+.vx-veh-latest { font-size: 12px; color: var(--vx-muted); margin-top: 8px; line-height: 1.5; border-top: 1px dashed var(--vx-border); padding-top: 8px; }
+.vx-veh-latest strong { color: var(--vx-text); }
+.vx-veh-empty { font-size: 13px; color: var(--vx-muted); }
+
+.fb { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.fb.ok     { background: var(--vx-success-light); color: #0F6E56; }
+.fb.warn   { background: var(--vx-warning-light); color: #854F0B; }
+.fb.danger { background: var(--vx-danger-light); color: #A32D2D; }
+
+.vx-empty-row { text-align: center; color: var(--vx-muted); padding: 24px; }
+
+/* Profile form */
+.vx-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.vx-field { margin-bottom: 4px; }
+.vx-field label { display: block; font-size: 13px; font-weight: 700; color: var(--vx-text); margin-bottom: 6px; }
+.vx-field input, .vx-field select, .vx-field textarea { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 8px; background: #fff; color: var(--vx-text); box-sizing: border-box; }
+.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus { outline: none; border-color: var(--vx-teal); }
+.vx-field input:disabled { background: var(--vx-grey-light); color: var(--vx-muted); }
+.vx-field textarea { min-height: 70px; resize: vertical; }
+@media (max-width: 700px) { .vx-form-grid { grid-template-columns: 1fr; } }
+
+.swal2-popup { border-radius: var(--vx-radius) !important; font-family: 'Public Sans', sans-serif !important; }
+.swal2-title { color: var(--vx-text) !important; font-weight: 700 !important; }
+.swal2-confirm { background-color: var(--vx-text) !important; border-radius: 8px !important; box-shadow: none !important; }
+.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+</style>
+</head>
+<body>
+
+<div id="loginView">
+  <div class="auth-card">
+    <div class="auth-logo-row">
+      <div class="auth-logo-left"><img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" height="40" alt="Jata Negara"></div>
+      <div class="auth-logo-center">
+        <div class="auth-org-line1">Hospital Pitas, Sabah</div>
+        <div class="auth-org-line2">Kementerian Kesihatan Malaysia</div>
+      </div>
+      <div class="auth-logo-right"><img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" height="40" alt="Logo Hospital Pitas"></div>
+    </div>
+    <div class="auth-brand">
+      <div class="auth-brand-line1">Vehicle Logistics and Operations System</div>
+      <div class="auth-brand-line2">(VELOS)</div>
+    </div>
+    <p class="auth-portal-label">Portal Kenderaan — Penyelia</p>
+    <form id="loginForm" novalidate>
+      <input type="password" id="passwordInput" class="auth-password-input" placeholder="Kata Laluan" autocomplete="current-password" required>
+      <button type="submit" id="loginSubmitBtn" class="auth-submit-btn">Log Masuk</button>
+      <p id="loginError" class="auth-error"></p>
+    </form>
+    <a href="index.html" class="auth-back-link">← Kembali Ke Laman Utama</a>
+  </div>
+</div>
+
+<div id="appWrapper">
+<header class="vx-topbar">
+  <div class="vx-topbar-left">
+    <button class="vx-sidebar-toggle-floating" id="vxSidebarToggle" title="Buka/Tutup menu" aria-label="Buka/Tutup menu">☰</button>
+    <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
+    <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Hospital Pitas">
+  </div>
+  <div class="vx-topbar-title">VELOS — Kenderaan (Admin)</div>
+  <div class="vx-topbar-right">
+    <button class="vx-topbar-refresh" id="btnRefresh">Muat Semula</button>
+    <button class="btn-logout-top" id="btnLogout">Log Keluar</button>
+  </div>
+</header>
+
+<nav class="vx-sidebar" id="vxSidebar">
+  <div class="vx-sidebar-section-label">Portal Kenderaan</div>
+  <button class="vx-sidebar-link vx-active" data-section="sec-status">Status Kenderaan</button>
+  <button class="vx-sidebar-link" data-section="sec-rekod">Semakan Rekod</button>
+  <button class="vx-sidebar-link" data-section="sec-laporan">Laporan Bulanan</button>
+  <button class="vx-sidebar-link" data-section="sec-profil">Profil Kenderaan</button>
+  <hr class="vx-sidebar-divider">
+  <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">← Kembali ke Admin</button>
+</nav>
+<div id="vxBackdrop"></div>
+
+<div class="vx-main-content" id="vxMainContent">
+
+<!-- ==================== SECTION 1: STATUS KENDERAAN ==================== -->
+<section id="sec-status" class="vx-page vx-page-active">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Status Kenderaan</div>
+
+  <div id="statusLoading" class="vx-card"><p class="vx-empty-row">Memuatkan status kenderaan...</p></div>
+  <div id="statusContent" style="display:none;">
+    <div class="vx-veh-group-title">Ambulans</div>
+    <div class="vx-veh-grid" id="gridAmbulans"></div>
+
+    <div class="vx-veh-group-title">Kenderaan Jabatan</div>
+    <div class="vx-veh-grid" id="gridJabatan"></div>
+  </div>
+
+  <div class="vx-card" style="margin-top:24px;">
+    <div class="vx-card-hd"><h2>Tindakan Segera (30 Hari Terkini)</h2></div>
+    <div class="vx-table-scroll">
+      <table>
+        <thead><tr><th>Tarikh</th><th>Kenderaan</th><th>Pemandu</th><th>Item</th><th>Catatan</th><th>Tindakan</th></tr></thead>
+        <tbody id="urgentFlagsBody"><tr><td colspan="6" class="vx-empty-row">Memuatkan...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 2: SEMAKAN REKOD ==================== -->
+<section id="sec-rekod" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Semakan Rekod</div>
+
+  <div class="vx-card">
+    <div class="vx-filter-row">
+      <div class="vx-filter-field">
+        <label>Pilih Kenderaan</label>
+        <select id="rekodFilterKenderaan"><option value="">Semua Kenderaan</option></select>
+      </div>
+      <div class="vx-filter-field">
+        <label>Bulan</label>
+        <input type="month" id="rekodFilterBulan">
+      </div>
+      <div class="vx-filter-field">
+        <button class="vx-btn" id="btnRekodFilter">Tapis</button>
+      </div>
+      <div class="vx-filter-field">
+        <button class="vx-btn ghost" id="btnRekodExport">Eksport CSV</button>
+      </div>
+    </div>
+    <div class="vx-table-scroll">
+      <table>
+        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Pemandu</th><th>Odometer</th><th>Status Kenderaan</th><th>Boleh Digunakan</th><th>Ringkasan</th><th>Butiran</th></tr></thead>
+        <tbody id="rekodBody"><tr><td colspan="9" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan rekod.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 3: LAPORAN BULANAN ==================== -->
+<section id="sec-laporan" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Laporan Bulanan</div>
+
+  <div class="vx-card">
+    <div class="vx-filter-row">
+      <div class="vx-filter-field">
+        <label>Bulan</label>
+        <input type="month" id="laporanFilterBulan">
+      </div>
+      <div class="vx-filter-field">
+        <button class="vx-btn" id="btnLaporanFilter">Tapis</button>
+      </div>
+      <div class="vx-filter-field">
+        <button class="vx-btn ghost" id="btnLaporanExport">Eksport CSV</button>
+      </div>
+    </div>
+    <div class="vx-table-scroll">
+      <table>
+        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Ringkasan Penemuan Kerosakan &amp; Tindakan</th><th>Adakah Kenderaan Boleh Digunakan?</th></tr></thead>
+        <tbody id="laporanBody"><tr><td colspan="5" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan laporan.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 4: PROFIL KENDERAAN ==================== -->
+<section id="sec-profil" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Profil Kenderaan</div>
+
+  <div class="vx-card">
+    <div class="vx-filter-row">
+      <div class="vx-filter-field" style="min-width:260px;">
+        <label>Pilih Kenderaan</label>
+        <select id="profilSelectKenderaan">
+          <option value="__new__">+ Tambah Kenderaan Baru</option>
+        </select>
+      </div>
+    </div>
+
+    <form id="profilForm" novalidate>
+      <div class="vx-form-grid">
+        <div class="vx-field">
+          <label for="pfPlate">No. Pendaftaran</label>
+          <input type="text" id="pfPlate" placeholder="Cth: BNU9974">
+        </div>
+        <div class="vx-field">
+          <label for="pfJenis">Jenis Kenderaan</label>
+          <select id="pfJenis">
+            <option value="">Pilih Jenis...</option>
+            <option value="ambulans">Ambulans</option>
+            <option value="jabatan">Kenderaan Jabatan</option>
+          </select>
+        </div>
+        <div class="vx-field">
+          <label for="pfChasis">No. Chasis</label>
+          <input type="text" id="pfChasis">
+        </div>
+        <div class="vx-field">
+          <label for="pfEnjin">No. Enjin</label>
+          <input type="text" id="pfEnjin">
+        </div>
+        <div class="vx-field">
+          <label for="pfBahanApi">Jenis Bahan Api</label>
+          <select id="pfBahanApi">
+            <option value="">Pilih Jenis...</option>
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Gas">Gas</option>
+            <option value="Elektrik">Elektrik</option>
+            <option value="Hybrid">Hybrid</option>
+          </select>
+        </div>
+        <div class="vx-field">
+          <label for="pfKapasiti">Kapasiti Tangki (L)</label>
+          <input type="number" id="pfKapasiti" min="0">
+        </div>
+        <div class="vx-field" style="grid-column: 1 / -1;">
+          <label for="pfKelengkapan">Kelengkapan Tambahan</label>
+          <textarea id="pfKelengkapan"></textarea>
+        </div>
+        <div class="vx-field">
+          <label for="pfNextServiceDate">Tarikh Servis Seterusnya</label>
+          <input type="date" id="pfNextServiceDate">
+        </div>
+        <div class="vx-field">
+          <label for="pfNextServiceOdo">Odometer Servis Seterusnya (km)</label>
+          <input type="number" id="pfNextServiceOdo" min="0">
+        </div>
+        <div class="vx-field">
+          <label for="pfLastBrakeDate">Tarikh Servis Brek Terakhir</label>
+          <input type="date" id="pfLastBrakeDate">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button type="submit" class="vx-btn" id="btnProfilSave">Simpan</button>
+        <button type="button" class="vx-btn danger" id="btnProfilDelete" style="display:none;">Padam Kenderaan</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
+  setPersistence, browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc,
+  query, orderBy, arrayUnion
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB9cJlR7APmejMx8lQEHfoWk4vaWF7hZCY",
+  authDomain: "velos-pitas.firebaseapp.com",
+  projectId: "velos-pitas",
+  storageBucket: "velos-pitas.firebasestorage.app",
+  messagingSenderId: "714072882275",
+  appId: "1:714072882275:web:e45724c420899b92fe0c56"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const PORTAL_EMAIL = "admin@pitas.velos";
+const MASTER_EMAIL = "master@pitas.velos";
+
+const pad2 = n => String(n).padStart(2, '0');
+const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
+const daysSince = (dateStr) => {
+  if (!dateStr) return -Infinity;
+  const then = new Date(dateStr + 'T00:00:00');
+  const now = new Date(todayISO() + 'T00:00:00');
+  return Math.floor((now - then) / 86400000);
+};
+const esc = s => (s === undefined || s === null) ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const BOLEH_LABEL = { selamat: 'Selamat', jarakDekat: 'Jarak Dekat Sahaja', tidakSelamat: 'Tidak Selamat' };
+const STATUS_LABEL = { berfungsi: 'Berfungsi', rosak: 'Rosak', dalam_pembaikan: 'Sedang Dalam Pembaikan', dalam_penggunaan: 'Sedang Digunakan', lain_lain: 'Lain-lain' };
+const statusLabelOf = sub => STATUS_LABEL[sub.statusKenderaan] ? (STATUS_LABEL[sub.statusKenderaan] + (sub.statusKenderaan === 'lain_lain' && sub.statusLainLain ? ' — ' + sub.statusLainLain : '')) : sub.statusKenderaan;
+
+/* ---------------------------------------------------------------------
+   AUTH GATE
+--------------------------------------------------------------------- */
+const loginView = document.getElementById('loginView');
+const appWrapper = document.getElementById('appWrapper');
+const loginForm = document.getElementById('loginForm');
+const passwordInput = document.getElementById('passwordInput');
+const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+const loginError = document.getElementById('loginError');
+let adminInitialized = false;
+
+onAuthStateChanged(auth, function (user) {
+  if (user) {
+    loginView.style.display = 'none';
+    appWrapper.style.display = 'block';
+    initAdmin();
+  } else {
+    loginView.style.display = 'flex';
+    appWrapper.style.display = 'none';
+  }
+});
+
+loginForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  loginError.textContent = '';
+  loginSubmitBtn.disabled = true;
+  loginSubmitBtn.textContent = 'Mengesahkan...';
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    try {
+      await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
+    } catch (err) {
+      await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+    }
+  } catch (err) {
+    loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
+    loginError.style.display = 'block';
+  } finally {
+    loginSubmitBtn.disabled = false;
+    loginSubmitBtn.textContent = 'Log Masuk';
+    passwordInput.value = '';
+  }
+});
+
+document.getElementById('btnLogout').addEventListener('click', function () { signOut(auth); });
+
+/* ---------------------------------------------------------------------
+   SIDEBAR NAV
+--------------------------------------------------------------------- */
+const vxSidebar = document.getElementById('vxSidebar');
+const vxMainContent = document.getElementById('vxMainContent');
+const vxBackdrop = document.getElementById('vxBackdrop');
+let sidebarCollapsed = window.innerWidth <= 900;
+function applySidebarState() {
+  vxSidebar.classList.toggle('vx-collapsed', sidebarCollapsed);
+  vxMainContent.classList.toggle('vx-sidebar-collapsed', sidebarCollapsed || window.innerWidth <= 900);
+  vxBackdrop.classList.toggle('vx-show', !sidebarCollapsed && window.innerWidth <= 900);
+}
+applySidebarState();
+document.getElementById('vxSidebarToggle').addEventListener('click', function () {
+  sidebarCollapsed = !sidebarCollapsed;
+  applySidebarState();
+});
+vxBackdrop.addEventListener('click', function () { sidebarCollapsed = true; applySidebarState(); });
+
+document.querySelectorAll('.vx-sidebar-link[data-section]').forEach(link => {
+  link.addEventListener('click', function () {
+    const target = link.getAttribute('data-section');
+    document.querySelectorAll('.vx-page').forEach(p => p.classList.toggle('vx-page-active', p.id === target));
+    document.querySelectorAll('.vx-sidebar-link[data-section]').forEach(l => l.classList.toggle('vx-active', l === link));
+    if (window.innerWidth <= 900) { sidebarCollapsed = true; applySidebarState(); }
+  });
+});
+
+/* ---------------------------------------------------------------------
+   DATA STATE
+--------------------------------------------------------------------- */
+let vehicleProfiles = {};      // plate -> profile data
+let allSubmissions = [];       // sorted desc by timestamp, each carries _id, _date (JS Date)
+let latestByPlate = {};        // plate -> submission
+
+async function initAdmin() {
+  if (adminInitialized) return;
+  adminInitialized = true;
+  document.getElementById('laporanFilterBulan').value = todayISO().slice(0, 7);
+  document.getElementById('rekodFilterBulan').value = todayISO().slice(0, 7);
+  await loadAllData();
+}
+
+document.getElementById('btnRefresh').addEventListener('click', loadAllData);
+
+async function loadAllData() {
+  document.getElementById('statusLoading').style.display = 'block';
+  document.getElementById('statusContent').style.display = 'none';
+  try {
+    const vpSnap = await getDocs(collection(db, 'vehicleProfiles'));
+    vehicleProfiles = {};
+    vpSnap.forEach(d => { vehicleProfiles[d.id] = d.data(); });
+
+    const subSnap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc')));
+    allSubmissions = subSnap.docs.map(d => {
+      const data = d.data();
+      return Object.assign({}, data, {
+        _id: d.id,
+        _date: data.timestamp && data.timestamp.toDate ? data.timestamp.toDate() : null
+      });
+    });
+
+    latestByPlate = {};
+    allSubmissions.forEach(sub => {
+      if (!latestByPlate[sub.kenderaan]) latestByPlate[sub.kenderaan] = sub;
+    });
+
+    renderStatusSection();
+    renderUrgentFlagsPanel();
+    renderProfilDropdown();
+    renderRekodKenderaanFilter();
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal memuatkan data: ' + (err.message || err), 'error');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SECTION 1: STATUS KENDERAAN
+--------------------------------------------------------------------- */
+function computeVehicleStatus(plate, profile) {
+  const latest = latestByPlate[plate];
+  const alerts = [];
+
+  if (profile.lastBrakePadDate && daysSince(profile.lastBrakePadDate) >= 13) alerts.push('⚠ Servis Brek Akan Tiba');
+  if (typeof profile.nextServiceOdo === 'number' && latest && typeof latest.odometer === 'number' && latest.odometer >= profile.nextServiceOdo - 500) alerts.push('⚠ Servis Hampir Tiba');
+  if (profile.nextServiceDate && todayISO() >= profile.nextServiceDate) alerts.push('⚠ Tarikh Servis Tiba');
+
+  const noRecentSubmission = !latest || !latest._date || daysSince(latest.tarikh) > 7;
+
+  let hasUrgent = false, hasMinor = false;
+  if (latest && Array.isArray(latest.items)) {
+    hasUrgent = latest.items.some(it => it.flag === 'urgent');
+    hasMinor = latest.items.some(it => it.flag === 'minor');
+  }
+
+  let color = 'grey';
+  if (noRecentSubmission) {
+    color = 'grey';
+  } else if (hasUrgent || latest.bolehDigunakan === 'tidakSelamat') {
+    color = 'red';
+  } else if (hasMinor || latest.bolehDigunakan === 'jarakDekat' || alerts.length > 0) {
+    color = 'amber';
+  } else {
+    color = 'green';
+  }
+
+  return { color, alerts, latest, noRecentSubmission };
+}
+
+const DOT = { red: '🔴', amber: '🟡', green: '🟢', grey: '⚫' };
+
+function renderVehicleCard(plate, profile) {
+  const st = computeVehicleStatus(plate, profile);
+  const latest = st.latest;
+  let latestHtml = '<div class="vx-veh-empty">Tiada rekod senarai semak.</div>';
+  if (latest) {
+    const ringkasanShort = (latest.ringkasan || '').length > 80 ? latest.ringkasan.slice(0, 80) + '…' : (latest.ringkasan || '—');
+    const bolehClass = latest.bolehDigunakan === 'selamat' ? 'ok' : (latest.bolehDigunakan === 'jarakDekat' ? 'warn' : 'danger');
+    latestHtml = `
+      <div class="vx-veh-latest">
+        <div><strong>${esc(latest.tarikh)}</strong> ${esc(latest.masa)} — ${esc(latest.pemandu)}</div>
+        <div style="margin:4px 0;">${esc(ringkasanShort)}</div>
+        <span class="fb ${bolehClass}">${BOLEH_LABEL[latest.bolehDigunakan] || latest.bolehDigunakan}</span>
+      </div>`;
+  }
+  const alertsHtml = st.alerts.length ? `<div class="vx-veh-alerts">${st.alerts.map(a => `<span class="vx-veh-alert-chip">${esc(a)}</span>`).join('')}</div>` : '';
+  return `
+    <div class="vx-veh-card st-${st.color}">
+      <div class="vx-veh-card-hd">
+        <div>
+          <div class="vx-veh-plate">${esc(plate)}</div>
+          <span class="vx-veh-tag">${profile.jenisKenderaan === 'ambulans' ? 'AMBULANS' : 'JABATAN'}</span>
+        </div>
+        <div class="vx-veh-dot" title="${st.color}">${DOT[st.color]}</div>
+      </div>
+      ${alertsHtml}
+      ${latestHtml}
+    </div>`;
+}
+
+function renderStatusSection() {
+  const ambulansPlates = [], jabatanPlates = [];
+  Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b)).forEach(plate => {
+    const p = vehicleProfiles[plate];
+    (p.jenisKenderaan === 'ambulans' ? ambulansPlates : jabatanPlates).push(plate);
+  });
+
+  document.getElementById('gridAmbulans').innerHTML = ambulansPlates.length
+    ? ambulansPlates.map(p => renderVehicleCard(p, vehicleProfiles[p])).join('')
+    : '<div class="vx-veh-empty">Tiada kenderaan ambulans berdaftar.</div>';
+
+  document.getElementById('gridJabatan').innerHTML = jabatanPlates.length
+    ? jabatanPlates.map(p => renderVehicleCard(p, vehicleProfiles[p])).join('')
+    : '<div class="vx-veh-empty">Tiada kenderaan jabatan berdaftar.</div>';
+
+  document.getElementById('statusLoading').style.display = 'none';
+  document.getElementById('statusContent').style.display = 'block';
+}
+
+function renderUrgentFlagsPanel() {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const rows = [];
+  allSubmissions.forEach(sub => {
+    if (!sub._date || sub._date < cutoff) return;
+    if (!Array.isArray(sub.items)) return;
+    const resolved = sub.resolvedFlags || [];
+    sub.items.forEach(item => {
+      if (item.flag === 'urgent' && resolved.indexOf(item.id) === -1) {
+        rows.push({ subId: sub._id, tarikh: sub.tarikh, kenderaan: sub.kenderaan, pemandu: sub.pemandu, itemId: item.id, itemLabel: item.label, perihal: item.perihal });
+      }
+    });
+  });
+
+  const tbody = document.getElementById('urgentFlagsBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="vx-empty-row">Tiada bendera urgent aktif.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.tarikh)}</td>
+      <td>${esc(r.kenderaan)}</td>
+      <td>${esc(r.pemandu)}</td>
+      <td>${esc(r.itemLabel)}</td>
+      <td>${esc(r.perihal)}</td>
+      <td><button class="vx-btn ghost" data-sub="${esc(r.subId)}" data-item="${esc(r.itemId)}">Tandakan Selesai</button></td>
+    </tr>`).join('');
+
+  tbody.querySelectorAll('button[data-sub]').forEach(btn => {
+    btn.addEventListener('click', async function () {
+      const subId = btn.getAttribute('data-sub');
+      const itemId = btn.getAttribute('data-item');
+      btn.disabled = true;
+      try {
+        await updateDoc(doc(db, 'checklistSubmissions', subId), { resolvedFlags: arrayUnion(itemId) });
+        const sub = allSubmissions.find(s => s._id === subId);
+        if (sub) sub.resolvedFlags = (sub.resolvedFlags || []).concat(itemId);
+        renderUrgentFlagsPanel();
+        renderStatusSection();
+      } catch (err) {
+        Swal.fire('Ralat', 'Gagal mengemaskini: ' + (err.message || err), 'error');
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   SECTION 2: SEMAKAN REKOD
+--------------------------------------------------------------------- */
+function renderRekodKenderaanFilter() {
+  const sel = document.getElementById('rekodFilterKenderaan');
+  const plates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="">Semua Kenderaan</option>' + plates.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+}
+
+function filterSubmissions(plate, monthStr) {
+  return allSubmissions.filter(sub => {
+    if (plate && sub.kenderaan !== plate) return false;
+    if (monthStr && !(sub.tarikh || '').startsWith(monthStr)) return false;
+    return true;
+  }).sort((a, b) => (a.tarikh + a.masa < b.tarikh + b.masa ? 1 : -1));
+}
+
+let currentRekodFiltered = [];
+
+document.getElementById('btnRekodFilter').addEventListener('click', function () {
+  const plate = document.getElementById('rekodFilterKenderaan').value;
+  const month = document.getElementById('rekodFilterBulan').value;
+  currentRekodFiltered = filterSubmissions(plate, month);
+  const tbody = document.getElementById('rekodBody');
+  if (!currentRekodFiltered.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="vx-empty-row">Tiada rekod dijumpai.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = currentRekodFiltered.map(sub => {
+    const bolehClass = sub.bolehDigunakan === 'selamat' ? 'ok' : (sub.bolehDigunakan === 'jarakDekat' ? 'warn' : 'danger');
+    const ringkasanShort = (sub.ringkasan || '').length > 80 ? sub.ringkasan.slice(0, 80) + '…' : (sub.ringkasan || '—');
+    return `
+      <tr>
+        <td>${esc(sub.tarikh)}</td>
+        <td>${esc(sub.masa)}</td>
+        <td>${esc(sub.kenderaan)}</td>
+        <td>${esc(sub.pemandu)}</td>
+        <td>${esc(sub.odometer)}</td>
+        <td>${esc(statusLabelOf(sub))}</td>
+        <td><span class="fb ${bolehClass}">${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}</span></td>
+        <td>${esc(ringkasanShort)}</td>
+        <td><button class="vx-btn ghost" data-sub="${esc(sub._id)}">Butiran</button></td>
+      </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('button[data-sub]').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const sub = currentRekodFiltered.find(s => s._id === btn.getAttribute('data-sub'));
+      showButiranModal(sub);
+    });
+  });
+});
+
+function showButiranModal(sub) {
+  let itemsHtml = '<p style="color:#5B6774;">Tiada item senarai semak (kenderaan tidak standby).</p>';
+  if (Array.isArray(sub.items) && sub.items.length) {
+    itemsHtml = '<table style="width:100%; font-size:12px;"><thead><tr><th>Item</th><th>Status</th><th>Catatan</th></tr></thead><tbody>' +
+      sub.items.map(it => {
+        const badge = it.status === 'ok' ? '<span class="fb ok">OK</span>' : it.status === 'tidakOk' ? `<span class="fb danger">Tidak OK${it.flag ? ' · ' + it.flag : ''}</span>` : '<span class="fb warn">N/A</span>';
+        return `<tr><td style="text-align:left;">${esc(it.label)}</td><td>${badge}</td><td style="text-align:left;">${esc(it.perihal || '—')}</td></tr>`;
+      }).join('') + '</tbody></table>';
+  }
+  Swal.fire({
+    title: `${sub.kenderaan} — ${sub.tarikh} ${sub.masa}`,
+    html: `
+      <div style="text-align:left; font-size:13px; margin-bottom:12px;">
+        <p><strong>Pemandu:</strong> ${esc(sub.pemandu)} &nbsp; <strong>Odometer:</strong> ${esc(sub.odometer)} km</p>
+        <p><strong>Status Kenderaan:</strong> ${esc(statusLabelOf(sub))}</p>
+        <p><strong>Ringkasan:</strong> ${esc(sub.ringkasan)}</p>
+        <p><strong>Boleh Digunakan:</strong> ${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}</p>
+        <p><strong>Pegawai Mengesahkan:</strong> ${esc(sub.pegawaiMengesah)}</p>
+      </div>
+      ${itemsHtml}
+    `,
+    width: 700,
+    confirmButtonText: 'Tutup'
+  });
+}
+
+function csvEscape(v) {
+  const s = (v === undefined || v === null) ? '' : String(v);
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+function downloadCsv(filename, rows) {
+  const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('btnRekodExport').addEventListener('click', function () {
+  if (!currentRekodFiltered.length) return Swal.fire('Perhatian', 'Tiada rekod untuk dieksport. Sila tapis dahulu.', 'warning');
+  const rows = [['Tarikh', 'Masa', 'Kenderaan', 'Pemandu', 'Odometer', 'Status Kenderaan', 'Boleh Digunakan', 'Ringkasan Penemuan']];
+  currentRekodFiltered.forEach(sub => rows.push([
+    sub.tarikh, sub.masa, sub.kenderaan, sub.pemandu, sub.odometer,
+    statusLabelOf(sub),
+    BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan,
+    sub.ringkasan
+  ]));
+  downloadCsv('semakan-rekod-kenderaan.csv', rows);
+});
+
+/* ---------------------------------------------------------------------
+   SECTION 3: LAPORAN BULANAN
+--------------------------------------------------------------------- */
+let currentLaporanFiltered = [];
+
+document.getElementById('btnLaporanFilter').addEventListener('click', function () {
+  const month = document.getElementById('laporanFilterBulan').value;
+  currentLaporanFiltered = filterSubmissions('', month);
+  const tbody = document.getElementById('laporanBody');
+  if (!currentLaporanFiltered.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="vx-empty-row">Tiada rekod untuk bulan ini.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = currentLaporanFiltered.map(sub => `
+    <tr>
+      <td>${esc(sub.tarikh)}</td>
+      <td>${esc(sub.masa)}</td>
+      <td>${esc(sub.kenderaan)}</td>
+      <td>${esc(sub.ringkasan)}</td>
+      <td>${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}</td>
+    </tr>`).join('');
+});
+
+document.getElementById('btnLaporanExport').addEventListener('click', function () {
+  if (!currentLaporanFiltered.length) return Swal.fire('Perhatian', 'Tiada rekod untuk dieksport. Sila tapis dahulu.', 'warning');
+  const rows = [['Tarikh', 'Masa', 'Kenderaan', 'Ringkasan Penemuan Kerosakan & Tindakan', 'Adakah Kenderaan Boleh Digunakan?']];
+  currentLaporanFiltered.forEach(sub => rows.push([sub.tarikh, sub.masa, sub.kenderaan, sub.ringkasan, BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan]));
+  downloadCsv('laporan-bulanan-kenderaan.csv', rows);
+});
+
+/* ---------------------------------------------------------------------
+   SECTION 4: PROFIL KENDERAAN
+--------------------------------------------------------------------- */
+const profilSelect = document.getElementById('profilSelectKenderaan');
+const pfPlate = document.getElementById('pfPlate');
+const btnProfilDelete = document.getElementById('btnProfilDelete');
+
+function renderProfilDropdown() {
+  const plates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
+  profilSelect.innerHTML = '<option value="__new__">+ Tambah Kenderaan Baru</option>' +
+    plates.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  loadProfilForm('__new__');
+}
+
+function loadProfilForm(plate) {
+  if (plate === '__new__') {
+    pfPlate.value = '';
+    pfPlate.disabled = false;
+    document.getElementById('pfJenis').value = '';
+    document.getElementById('pfChasis').value = '';
+    document.getElementById('pfEnjin').value = '';
+    document.getElementById('pfBahanApi').value = '';
+    document.getElementById('pfKapasiti').value = '';
+    document.getElementById('pfKelengkapan').value = '';
+    document.getElementById('pfNextServiceDate').value = '';
+    document.getElementById('pfNextServiceOdo').value = '';
+    document.getElementById('pfLastBrakeDate').value = '';
+    btnProfilDelete.style.display = 'none';
+  } else {
+    const p = vehicleProfiles[plate] || {};
+    pfPlate.value = plate;
+    pfPlate.disabled = true;
+    document.getElementById('pfJenis').value = p.jenisKenderaan || '';
+    document.getElementById('pfChasis').value = p.noChasis || '';
+    document.getElementById('pfEnjin').value = p.noEnjin || '';
+    document.getElementById('pfBahanApi').value = p.jenisBashanApi || '';
+    document.getElementById('pfKapasiti').value = (p.kapasiti !== undefined && p.kapasiti !== null) ? p.kapasiti : '';
+    document.getElementById('pfKelengkapan').value = p.kelengkapanTambahan || '';
+    document.getElementById('pfNextServiceDate').value = p.nextServiceDate || '';
+    document.getElementById('pfNextServiceOdo').value = (p.nextServiceOdo !== undefined && p.nextServiceOdo !== null) ? p.nextServiceOdo : '';
+    document.getElementById('pfLastBrakeDate').value = p.lastBrakePadDate || '';
+    btnProfilDelete.style.display = 'inline-block';
+  }
+}
+
+profilSelect.addEventListener('change', function () { loadProfilForm(profilSelect.value); });
+
+document.getElementById('profilForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const isNew = profilSelect.value === '__new__';
+  const plate = (isNew ? pfPlate.value : profilSelect.value).replace(/\s+/g, '');
+  const jenis = document.getElementById('pfJenis').value;
+
+  if (!plate) return Swal.fire('Perhatian', 'Sila masukkan no. pendaftaran.', 'warning');
+  if (!jenis) return Swal.fire('Perhatian', 'Sila pilih jenis kenderaan.', 'warning');
+  if (isNew && vehicleProfiles[plate]) return Swal.fire('Perhatian', 'Kenderaan dengan no. pendaftaran ini sudah wujud.', 'warning');
+
+  const data = {
+    jenisKenderaan: jenis,
+    noChasis: document.getElementById('pfChasis').value.trim(),
+    noEnjin: document.getElementById('pfEnjin').value.trim(),
+    jenisBashanApi: document.getElementById('pfBahanApi').value,
+    kapasiti: document.getElementById('pfKapasiti').value === '' ? null : Number(document.getElementById('pfKapasiti').value),
+    kelengkapanTambahan: document.getElementById('pfKelengkapan').value.trim(),
+    nextServiceDate: document.getElementById('pfNextServiceDate').value || null,
+    nextServiceOdo: document.getElementById('pfNextServiceOdo').value === '' ? null : Number(document.getElementById('pfNextServiceOdo').value),
+    lastBrakePadDate: document.getElementById('pfLastBrakeDate').value || null
+  };
+
+  const btn = document.getElementById('btnProfilSave');
+  btn.disabled = true;
+  try {
+    await setDoc(doc(db, 'vehicleProfiles', plate), data);
+    vehicleProfiles[plate] = data;
+    await loadAllData();
+    profilSelect.value = plate;
+    loadProfilForm(plate);
+    Swal.fire('Disimpan!', `Profil kenderaan ${plate} telah dikemaskini.`, 'success');
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+btnProfilDelete.addEventListener('click', function () {
+  const plate = profilSelect.value;
+  if (plate === '__new__') return;
+  Swal.fire({
+    title: 'Padam Kenderaan?',
+    text: `Rekod profil kenderaan ${plate} akan dipadam secara kekal. Rekod senarai semak sedia ada tidak akan dipadam.`,
+    icon: 'warning', showCancelButton: true, confirmButtonText: 'Padam', cancelButtonText: 'Batal', confirmButtonColor: '#C62828'
+  }).then(async result => {
+    if (!result.isConfirmed) return;
+    try {
+      await deleteDoc(doc(db, 'vehicleProfiles', plate));
+      delete vehicleProfiles[plate];
+      await loadAllData();
+      Swal.fire('Dipadam', `Profil kenderaan ${plate} telah dipadam.`, 'success');
+    } catch (err) {
+      Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
+    }
+  });
+});
+</script>
+</body>
+</html>
