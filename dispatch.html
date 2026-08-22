@@ -443,7 +443,7 @@ import {
   onAuthStateChanged,
   signOut,
   setPersistence,
-  browserLocalPersistence
+  browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
   getFirestore,
@@ -488,7 +488,7 @@ loginForm.addEventListener('submit', async function (e) {
   btnLogin.disabled = true;
   btnLogin.innerText = 'Mengesahkan...';
   try {
-    await setPersistence(auth, browserLocalPersistence);
+    await setPersistence(auth, browserSessionPersistence);
     try {
       await signInWithEmailAndPassword(auth, 'vccc@pitas.velos', loginPassword.value);
     } catch (errVccc) {
@@ -536,6 +536,23 @@ let currentVccType = '';
 let allPermohonanRaw = [];
 let unsubscribePermohonan = null;
 let portalInitialized = false;
+
+// AUTO-LOGOUT — 30 minutes of inactivity signs the user out.
+const INACTIVITY_MS = 30 * 60 * 1000;
+let inactivityTimer = null;
+const INACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keypress', 'touchstart', 'click', 'scroll'];
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(function () { signOut(auth); }, INACTIVITY_MS);
+}
+function startInactivityWatch() {
+  INACTIVITY_EVENTS.forEach(function (evt) { document.addEventListener(evt, resetInactivityTimer, true); });
+  resetInactivityTimer();
+}
+function stopInactivityWatch() {
+  clearTimeout(inactivityTimer);
+  INACTIVITY_EVENTS.forEach(function (evt) { document.removeEventListener(evt, resetInactivityTimer, true); });
+}
 // True while a master@pitas.velos login is waiting on the role-picker
 // SweetAlert2 prompt -- onAuthStateChanged must not render the dashboard
 // on its own during this window; the submit handler renders it explicitly
@@ -558,6 +575,7 @@ function renderAuthenticatedDashboard(vccType) {
   renderFasaHelperTexts();
   window.goTo('menu');
   initPortal();
+  startInactivityWatch();
 }
 
 onAuthStateChanged(auth, function (user) {
@@ -582,11 +600,16 @@ onAuthStateChanged(auth, function (user) {
     loginView.style.display = 'flex';
     portalInitialized = false;
     currentVccType = '';
+    stopInactivityWatch();
     if (unsubscribePermohonan) {
       unsubscribePermohonan();
       unsubscribePermohonan = null;
     }
   }
+});
+
+window.addEventListener('beforeunload', function () {
+  if (unsubscribePermohonan) unsubscribePermohonan();
 });
 
 function initPortal() {
