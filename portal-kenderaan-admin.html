@@ -164,6 +164,11 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
 .fb.danger { background: var(--vx-danger-light); color: #A32D2D; }
 
 .vx-empty-row { text-align: center; color: var(--vx-muted); padding: 24px; }
+.vx-remark-cell { display: flex; gap: 6px; align-items: center; min-width: 200px; }
+.vx-remark-cell input { flex: 1; padding: 6px 9px; border: 1.5px solid var(--vx-border); border-radius: 6px; font-family: inherit; font-size: 12px; color: var(--vx-text); }
+.vx-remark-cell input:focus { outline: none; border-color: var(--vx-teal); }
+.vx-remark-cell .vx-btn { padding: 6px 10px; font-size: 11px; white-space: nowrap; }
+.vx-remark-saved { font-size: 10px; color: var(--vx-success); font-weight: 700; margin-left: 4px; }
 
 /* Profile form */
 .vx-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -252,8 +257,8 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
     <div class="vx-card-hd"><h2>Tindakan Segera (30 Hari Terkini)</h2></div>
     <div class="vx-table-scroll">
       <table>
-        <thead><tr><th>Tarikh</th><th>Kenderaan</th><th>Pemandu</th><th>Item</th><th>Catatan</th><th>Tindakan</th></tr></thead>
-        <tbody id="urgentFlagsBody"><tr><td colspan="6" class="vx-empty-row">Memuatkan...</td></tr></tbody>
+        <thead><tr><th>Tarikh</th><th>Kenderaan</th><th>Pemandu</th><th>Item</th><th>Catatan</th><th>Catatan Admin</th><th>Tindakan</th></tr></thead>
+        <tbody id="urgentFlagsBody"><tr><td colspan="7" class="vx-empty-row">Memuatkan...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -653,27 +658,60 @@ function renderUrgentFlagsPanel() {
     const resolved = sub.resolvedFlags || [];
     sub.items.forEach(item => {
       if (item.flag === 'urgent' && resolved.indexOf(item.id) === -1) {
-        rows.push({ subId: sub._id, tarikh: sub.tarikh, kenderaan: sub.kenderaan, pemandu: sub.pemandu, itemId: item.id, itemLabel: item.label, perihal: item.perihal });
+        rows.push({ subId: sub._id, tarikh: sub.tarikh, kenderaan: sub.kenderaan, pemandu: sub.pemandu, itemId: item.id, itemLabel: item.label, perihal: item.perihal, adminRemark: (sub.adminRemarks && sub.adminRemarks[item.id]) || '' });
       }
     });
   });
 
   const tbody = document.getElementById('urgentFlagsBody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="vx-empty-row">Tiada bendera urgent aktif.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="vx-empty-row">Tiada bendera urgent aktif.</td></tr>';
     return;
   }
-  tbody.innerHTML = rows.map(r => `
+  tbody.innerHTML = rows.map((r, idx) => `
     <tr>
       <td>${esc(r.tarikh)}</td>
       <td>${esc(r.kenderaan)}</td>
       <td>${esc(r.pemandu)}</td>
       <td>${esc(r.itemLabel)}</td>
       <td>${esc(r.perihal)}</td>
-      <td><button class="vx-btn ghost" data-sub="${esc(r.subId)}" data-item="${esc(r.itemId)}">Tandakan Selesai</button></td>
+      <td>
+        <div class="vx-remark-cell">
+          <input type="text" id="remarkInput-${idx}" value="${esc(r.adminRemark)}" placeholder="Catatan admin...">
+          <button class="vx-btn ghost" data-action="save-remark" data-idx="${idx}" data-sub="${esc(r.subId)}" data-item="${esc(r.itemId)}">Simpan</button>
+        </div>
+      </td>
+      <td><button class="vx-btn ghost" data-action="resolve" data-sub="${esc(r.subId)}" data-item="${esc(r.itemId)}">Tandakan Selesai</button></td>
     </tr>`).join('');
 
-  tbody.querySelectorAll('button[data-sub]').forEach(btn => {
+  tbody.querySelectorAll('button[data-action="save-remark"]').forEach(btn => {
+    btn.addEventListener('click', async function () {
+      const subId = btn.getAttribute('data-sub');
+      const itemId = btn.getAttribute('data-item');
+      const idx = btn.getAttribute('data-idx');
+      const input = document.getElementById('remarkInput-' + idx);
+      const remarkText = input.value.trim();
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'Menyimpan...';
+      try {
+        await updateDoc(doc(db, 'checklistSubmissions', subId), { ['adminRemarks.' + itemId]: remarkText });
+        const sub = allSubmissions.find(s => s._id === subId);
+        if (sub) {
+          if (!sub.adminRemarks) sub.adminRemarks = {};
+          sub.adminRemarks[itemId] = remarkText;
+        }
+        btn.textContent = 'Disimpan ✓';
+        setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 1500);
+      } catch (err) {
+        Swal.fire('Ralat', 'Gagal menyimpan catatan: ' + (err.message || err), 'error');
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+  });
+
+  tbody.querySelectorAll('button[data-action="resolve"]').forEach(btn => {
     btn.addEventListener('click', async function () {
       const subId = btn.getAttribute('data-sub');
       const itemId = btn.getAttribute('data-item');
