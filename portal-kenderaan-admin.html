@@ -727,7 +727,7 @@ function computeTindakanRows() {
     const flagged = Array.isArray(sub.items) ? sub.items.filter(it => it.status === 'tidakOk') : [];
     if (['rosak', 'dalam_pembaikan', 'lain_lain'].indexOf(sub.statusKenderaan) !== -1) {
       flagged.push({
-        id: '__statusKenderaan__',
+        id: 'statusKenderaan',
         label: 'Status Kenderaan Keseluruhan',
         perihal: sub.ringkasan || '',
         flag: null,
