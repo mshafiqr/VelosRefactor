@@ -290,7 +290,7 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
     </div>
     <div class="vx-table-scroll">
       <table>
-        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Pemandu</th><th>Odometer</th><th>Status Kenderaan</th><th>Boleh Digunakan</th><th>Ringkasan</th><th>Butiran</th></tr></thead>
+        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Pemandu</th><th>Odometer</th><th>Status Kenderaan</th><th>Boleh Digunakan</th><th>Ringkasan</th><th>Tindakan</th></tr></thead>
         <tbody id="rekodBody"><tr><td colspan="9" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan rekod.</td></tr></tbody>
       </table>
     </div>
@@ -770,10 +770,7 @@ function filterSubmissions(plate, monthStr) {
 
 let currentRekodFiltered = [];
 
-document.getElementById('btnRekodFilter').addEventListener('click', function () {
-  const plate = document.getElementById('rekodFilterKenderaan').value;
-  const month = document.getElementById('rekodFilterBulan').value;
-  currentRekodFiltered = filterSubmissions(plate, month);
+function renderRekodTable() {
   const tbody = document.getElementById('rekodBody');
   if (!currentRekodFiltered.length) {
     tbody.innerHTML = '<tr><td colspan="9" class="vx-empty-row">Tiada rekod dijumpai.</td></tr>';
@@ -783,7 +780,7 @@ document.getElementById('btnRekodFilter').addEventListener('click', function () 
     const bolehClass = sub.bolehDigunakan === 'selamat' ? 'ok' : (sub.bolehDigunakan === 'jarakDekat' ? 'warn' : 'danger');
     const ringkasanShort = (sub.ringkasan || '').length > 80 ? sub.ringkasan.slice(0, 80) + '…' : (sub.ringkasan || '—');
     return `
-      <tr>
+      <tr data-row="${esc(sub._id)}">
         <td>${esc(sub.tarikh)}</td>
         <td>${esc(sub.masa)}</td>
         <td>${esc(sub.kenderaan)}</td>
@@ -792,7 +789,10 @@ document.getElementById('btnRekodFilter').addEventListener('click', function () 
         <td>${esc(statusLabelOf(sub))}</td>
         <td><span class="fb ${bolehClass}">${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}</span></td>
         <td>${esc(ringkasanShort)}</td>
-        <td><button class="vx-btn ghost" data-sub="${esc(sub._id)}">Butiran</button></td>
+        <td>
+          <button class="vx-btn ghost" data-sub="${esc(sub._id)}">Butiran</button>
+          <button class="vx-btn danger" data-del="${esc(sub._id)}">Padam</button>
+        </td>
       </tr>`;
   }).join('');
 
@@ -802,6 +802,47 @@ document.getElementById('btnRekodFilter').addEventListener('click', function () 
       showButiranModal(sub);
     });
   });
+
+  tbody.querySelectorAll('button[data-del]').forEach(btn => {
+    btn.addEventListener('click', function () {
+      deleteSubmission(btn.getAttribute('data-del'));
+    });
+  });
+}
+
+function deleteSubmission(subId) {
+  Swal.fire({
+    title: 'Padam rekod ini?',
+    text: 'Tindakan ini tidak boleh dibatalkan.',
+    icon: 'warning', showCancelButton: true,
+    confirmButtonText: 'Padam', cancelButtonText: 'Batal', confirmButtonColor: '#C62828'
+  }).then(async result => {
+    if (!result.isConfirmed) return;
+    try {
+      await deleteDoc(doc(db, 'checklistSubmissions', subId));
+
+      allSubmissions = allSubmissions.filter(s => s._id !== subId);
+      currentRekodFiltered = currentRekodFiltered.filter(s => s._id !== subId);
+      currentLaporanFiltered = currentLaporanFiltered.filter(s => s._id !== subId);
+      latestByPlate = {};
+      allSubmissions.forEach(sub => { if (!latestByPlate[sub.kenderaan]) latestByPlate[sub.kenderaan] = sub; });
+
+      renderRekodTable();
+      renderStatusSection();
+      renderUrgentFlagsPanel();
+
+      Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Rekod dipadam', showConfirmButton: false, timer: 1800 });
+    } catch (err) {
+      Swal.fire('Ralat', 'Gagal memadam rekod: ' + (err.message || err), 'error');
+    }
+  });
+}
+
+document.getElementById('btnRekodFilter').addEventListener('click', function () {
+  const plate = document.getElementById('rekodFilterKenderaan').value;
+  const month = document.getElementById('rekodFilterBulan').value;
+  currentRekodFiltered = filterSubmissions(plate, month);
+  renderRekodTable();
 });
 
 function showButiranModal(sub) {
