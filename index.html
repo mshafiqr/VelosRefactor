@@ -42,7 +42,7 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
 .vx-sidebar-link:hover{background:var(--vx-sidebar-hover);color:#CBD5E0}
 .vx-sidebar-link.vx-active{background:var(--vx-sidebar-active);color:var(--vx-teal-bright)}
 .vx-sidebar-link.vx-soon{opacity:0.45;cursor:default;pointer-events:none}
-.vx-sidebar-icon{flex:0 0 20px;display:inline-flex;align-items:center;justify-content:center}
+.vx-sidebar-icon{flex:0 0 20px;display:inline-flex;align-items:center;justify-content:center;position:relative}
 .vx-sidebar-icon svg{width:17px;height:17px;display:block}
 .vx-sidebar-text{flex:1 1 auto}
 .vx-portal-tag{font-size:9px;font-weight:700;color:var(--vx-sb-label);margin-left:auto}
@@ -94,8 +94,8 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
 .pc-soon{opacity:0.55;filter:grayscale(18%);cursor:default}
 .pc-soon:hover{transform:none;box-shadow:0 2px 4px rgba(15,42,74,0.07),0 8px 20px rgba(15,42,74,0.09)}
 .soon-tag{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.28);color:rgba(255,255,255,0.9);font-size:9.5px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:0.09em;text-transform:uppercase;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-/* NOTIFICATION BADGE — red dot, top-right of a card, hidden until a live count says otherwise */
-.pc-badge-dot{display:none;position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;background:#E53E3E;box-shadow:0 0 0 2px rgba(255,255,255,0.5)}
+/* NOTIFICATION BADGE — red dot on a sidebar icon, hidden until a live count says otherwise */
+.vx-sidebar-badge-dot{display:none;position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#E53E3E;border:1.5px solid #0D4F54}
 /* ABOUT CARD */
 .about-card{background:white;border-radius:14px;border:1px solid #E3E8EE;padding:22px;box-shadow:0 1px 2px rgba(15,42,74,0.05),0 3px 8px rgba(15,42,74,0.06);display:flex;align-items:flex-start;gap:16px;margin-bottom:4px}
 .about-card .ac-title{font-size:14px;font-weight:700;color:#0F2A4A;margin-bottom:5px}
@@ -133,10 +133,10 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></span><span class="vx-sidebar-text">Log Pemandu</span><span class="vx-portal-tag">01</span>
   </button>
   <button class="vx-sidebar-link" onclick="window.open('borang-permohonan.html','_self')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v5h5"/><path d="M8 13h8M8 17h8M8 9h3"/></svg></span><span class="vx-sidebar-text">Permohonan</span><span class="vx-portal-tag">02</span>
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v5h5"/><path d="M8 13h8M8 17h8M8 9h3"/></svg><span class="vx-sidebar-badge-dot" id="badgeDotPermohonan" aria-label="Permohonan menunggu"></span></span><span class="vx-sidebar-text">Permohonan</span><span class="vx-portal-tag">02</span>
   </button>
   <button class="vx-sidebar-link" onclick="window.open('dispatch.html','_self')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg></span><span class="vx-sidebar-text">VCC</span><span class="vx-portal-tag">03</span>
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg><span class="vx-sidebar-badge-dot" id="badgeDotVcc" aria-label="Permohonan VCC belum selesai"></span></span><span class="vx-sidebar-text">VCC</span><span class="vx-portal-tag">03</span>
   </button>
   <button class="vx-sidebar-link" onclick="window.open('portal-kenderaan.html','_self')">
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span><span class="vx-sidebar-text">Kenderaan</span><span class="vx-portal-tag">04</span>
@@ -195,7 +195,6 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     <!-- Portal 02 -->
     <a class="pcard pc2" href="#" onclick="window.open('borang-permohonan.html','_self');return false;">
       <div class="pcard-top">
-        <span class="pc-badge-dot" id="badgeDotPermohonan" aria-label="Permohonan menunggu"></span>
         <div class="pc-role">Portal 02</div>
         <div class="pc-name">Portal Permohonan</div>
         <div class="pc-desc">Permohonan Kenderaan Klinikal atau Kenderaan Jabatan, Semak Status Permohonan dan Cetak Tiket VCC. Setiap permohonan akan melalui 3 fasa utama bermula daripada penerimaan sehingga keputusan permohonan.</div>
@@ -205,7 +204,6 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     <!-- Portal 03 -->
     <a class="pcard pc3" href="#" onclick="window.open('dispatch.html','_self');return false;">
       <div class="pcard-top">
-        <span class="pc-badge-dot" id="badgeDotVcc" aria-label="Permohonan VCC belum selesai"></span>
         <div class="pc-role">Portal 03</div>
         <div class="pc-name">Portal VCC</div>
         <div class="pc-desc">Pusat koordinasi khusus untuk penyelaras VCC Klinikal dan Pengurusan untuk memproses permohonan kenderaan melalui 3 fasa utama iaitu penerimaan sehingga penyelarasan pergerakan kenderaan.</div>
