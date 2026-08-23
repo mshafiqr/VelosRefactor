@@ -257,8 +257,11 @@ body {
       </div>
 
       <div class="vx-field">
-        <label for="inpPemandu">Nama Pemandu</label>
-        <input type="text" id="inpPemandu" placeholder="Taip nama anda...">
+        <label for="selPemandu">Nama Pemandu</label>
+        <select id="selPemandu"><option value="">Pilih Nama Pemandu...</option></select>
+        <div class="vx-inline-field" id="pemanduLainLainField">
+          <input type="text" id="inpPemanduLainLain" placeholder="Nama pemandu...">
+        </div>
       </div>
 
       <div class="vx-field">
@@ -404,6 +407,8 @@ const ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 const ICON_MINUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>';
 const ICON_ALERT_TRIANGLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>';
 const ICON_ALERT_OCTAGON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/><path d="M12 8v5M12 16h.01"/></svg>';
+
+const PEMANDU_LIST = ['Ahmad Agar', 'Masnin', 'Rafaie', 'Jilie', 'Mazni', 'Nurikram', 'Rosley', 'Affendy', 'SN Reno', 'PPK Franli', 'PKA Fikri', 'PPK Shan', 'PPK Armay', 'PPK James', 'CC Dell', 'PPP Shafiq'];
 
 const STATUS_LABEL = { berfungsi: 'Berfungsi', rosak: 'Rosak', dalam_pembaikan: 'Sedang Dalam Pembaikan', dalam_penggunaan: 'Sedang Digunakan', lain_lain: 'Lain-lain' };
 const BOLEH_LABEL = { selamat: 'Selamat', jarakDekat: 'Jarak Dekat Sahaja', tidakSelamat: 'Tidak Selamat' };
@@ -568,6 +573,26 @@ async function loadVehicles() {
 document.getElementById('inpTarikh').value = todayISO();
 document.getElementById('inpMasa').value = nowHM();
 
+const selPemandu = document.getElementById('selPemandu');
+const pemanduLainLainField = document.getElementById('pemanduLainLainField');
+const inpPemanduLainLain = document.getElementById('inpPemanduLainLain');
+selPemandu.innerHTML = '<option value="">Pilih Nama Pemandu...</option>' +
+  PEMANDU_LIST.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
+  '<option value="Lain-lain">Lain-lain</option>';
+
+selPemandu.addEventListener('change', function () {
+  if (selPemandu.value === 'Lain-lain') {
+    pemanduLainLainField.classList.add('open');
+  } else {
+    pemanduLainLainField.classList.remove('open');
+    inpPemanduLainLain.value = '';
+  }
+});
+
+function getPemanduValue() {
+  return selPemandu.value === 'Lain-lain' ? inpPemanduLainLain.value.trim() : selPemandu.value;
+}
+
 selKenderaan.addEventListener('change', function () {
   selectedPlate = selKenderaan.value || null;
   selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
@@ -591,13 +616,14 @@ document.querySelectorAll('[data-status]').forEach(btn => {
 });
 
 document.getElementById('btnStep1Next').addEventListener('click', function () {
-  const pemandu = document.getElementById('inpPemandu').value.trim();
+  const pemandu = getPemanduValue();
   const tarikh = document.getElementById('inpTarikh').value;
   const masa = document.getElementById('inpMasa').value;
   const odometer = document.getElementById('inpOdometer').value;
 
   if (!selectedPlate) return Swal.fire('Perhatian', 'Sila pilih kenderaan.', 'warning');
-  if (!pemandu) return Swal.fire('Perhatian', 'Sila masukkan nama pemandu.', 'warning');
+  if (!selPemandu.value) return Swal.fire('Perhatian', 'Sila pilih nama pemandu.', 'warning');
+  if (!pemandu) return Swal.fire('Perhatian', 'Sila nyatakan nama pemandu.', 'warning');
   if (!tarikh) return Swal.fire('Perhatian', 'Sila masukkan tarikh.', 'warning');
   if (!masa) return Swal.fire('Perhatian', 'Sila masukkan masa.', 'warning');
   if (odometer === '' || Number(odometer) < 0) return Swal.fire('Perhatian', 'Sila masukkan bacaan odometer.', 'warning');
@@ -749,7 +775,7 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
     const submission = {
       kenderaan: selectedPlate,
       jenisKenderaan: selectedJenis,
-      pemandu: document.getElementById('inpPemandu').value.trim(),
+      pemandu: getPemanduValue(),
       tarikh: document.getElementById('inpTarikh').value,
       masa: document.getElementById('inpMasa').value,
       odometer: Number(document.getElementById('inpOdometer').value),
@@ -785,7 +811,9 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
 
 function resetForNewEntry() {
   const keepPlate = selKenderaan.value;
-  document.getElementById('inpPemandu').value = '';
+  selPemandu.value = '';
+  inpPemanduLainLain.value = '';
+  pemanduLainLainField.classList.remove('open');
   document.getElementById('inpTarikh').value = todayISO();
   document.getElementById('inpMasa').value = nowHM();
   document.getElementById('inpOdometer').value = '';
@@ -963,8 +991,7 @@ window.addEventListener('popstate', function () {
 
 window.addEventListener('beforeunload', function (e) {
   if (!historyGuardActive) return;
-  const pemanduEl = document.getElementById('inpPemandu');
-  const hasProgress = currentStep > 1 || (pemanduEl && pemanduEl.value.trim() !== '');
+  const hasProgress = currentStep > 1 || getPemanduValue() !== '';
   if (hasProgress) {
     e.preventDefault();
     e.returnValue = '';
