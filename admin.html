@@ -1170,6 +1170,7 @@ window.doLogout = function () { signOut(auth); };
 let ambulanceData = [], fuelDataLog = [], permohonanData = [], cloudTangkiCap = {};
 let dashboardInitialized = false;
 let unsubLog = null, unsubFuel = null, unsubMohon = null;
+let loadedYear = new Date().getFullYear();
 
 // AUTO-LOGOUT — 30 minutes of inactivity signs the user out.
 const INACTIVITY_MS = 30 * 60 * 1000;
@@ -1244,7 +1245,17 @@ function initDashboard() {
 
   const now = new Date();
   document.getElementById('pilihanBulan').value = now.getFullYear() + '-' + pad2(now.getMonth() + 1);
-  document.getElementById('pilihanBulan').addEventListener('change', window.updateUI);
+  document.getElementById('pilihanBulan').addEventListener('change', function () {
+    const val = this.value;
+    if (val) {
+      const pickedYear = parseInt(val.split('-')[0], 10);
+      if (pickedYear !== loadedYear) {
+        window.subscribeToYear(pickedYear);
+        return;
+      }
+    }
+    window.updateUI();
+  });
 
   Swal.fire({ title: 'Syncing...', text: 'Sila tunggu, sistem sedang memuatkan data terkini.', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
 
@@ -1319,7 +1330,61 @@ function teardownDashboard() {
   if (unsubFuel) { unsubFuel(); unsubFuel = null; }
   if (unsubMohon) { unsubMohon(); unsubMohon = null; }
   ambulanceData = []; fuelDataLog = []; permohonanData = []; cloudTangkiCap = {};
+  loadedYear = new Date().getFullYear();
 }
+
+/* ---------------------------------------------------------------------
+   YEAR SELECTOR — tears down and re-subscribes the 3 year-scoped
+   listeners above for a different year, on demand. Same query shape as
+   initDashboard's startup block, only the year value changes.
+--------------------------------------------------------------------- */
+window.subscribeToYear = function (year) {
+  if (unsubLog) { unsubLog(); unsubLog = null; }
+  if (unsubFuel) { unsubFuel(); unsubFuel = null; }
+  if (unsubMohon) { unsubMohon(); unsubMohon = null; }
+  ambulanceData = []; fuelDataLog = []; permohonanData = [];
+  loadedYear = year;
+
+  Swal.fire({ title: 'Memuatkan Tahun ' + year + '...', text: 'Sila tunggu, sistem sedang memuatkan data.', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+  let logReady = false, fuelReady = false, mohonReady = false, yearSyncDone = false;
+  function maybeFinishYearSync() {
+    if (yearSyncDone || !(logReady && fuelReady && mohonReady)) return;
+    yearSyncDone = true;
+    window.updateUI();
+    Swal.close();
+  }
+
+  const _yrStart = String(year) + '-01-01';
+  const _yrEnd = String(year + 1) + '-01-01';
+  const _yyNow = String(year).slice(2);
+  const _yyNext = String(year + 1).slice(2);
+
+  unsubLog = onSnapshot(query(collection(db, 'logPergerakan'), where('tarikh', '>=', _yrStart), where('tarikh', '<', _yrEnd)), function (snap) {
+    ambulanceData = snap.docs.map(function (d) { return d.data(); });
+    logReady = true;
+    if (yearSyncDone) window.updateUI();
+    maybeFinishYearSync();
+  }, function (err) { console.error('Ralat langganan logPergerakan:', err); logReady = true; maybeFinishYearSync(); });
+
+  unsubFuel = onSnapshot(query(collection(db, 'logBahanApi'), where('tarikh', '>=', _yrStart), where('tarikh', '<', _yrEnd)), function (snap) {
+    fuelDataLog = snap.docs.map(function (d) {
+      const entry = d.data();
+      entry._docId = d.id;
+      return entry;
+    });
+    fuelReady = true;
+    if (yearSyncDone) window.updateUI();
+    maybeFinishYearSync();
+  }, function (err) { console.error('Ralat langganan logBahanApi:', err); fuelReady = true; maybeFinishYearSync(); });
+
+  unsubMohon = onSnapshot(query(collection(db, 'permohonanVCC'), where(documentId(), '>=', 'VCC-' + _yyNow + '0101'), where(documentId(), '<', 'VCC-' + _yyNext + '0101')), function (snap) {
+    permohonanData = snap.docs.map(function (d) { return d.data(); });
+    mohonReady = true;
+    if (yearSyncDone) window.updateUI();
+    maybeFinishYearSync();
+  }, function (err) { console.error('Ralat langganan permohonanVCC:', err); mohonReady = true; maybeFinishYearSync(); });
+};
 
 window.addEventListener('beforeunload', function () {
   if (unsubLog) unsubLog();
