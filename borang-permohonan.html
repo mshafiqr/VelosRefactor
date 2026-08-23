@@ -688,9 +688,20 @@ function initPortal() {
     globalPermohonanList = snapshot.docs.map(function (d) { return toViewModel(d.data()); });
     semakKemaskiniStatusSaya(globalPermohonanList);
     renderPermohonanGlobal();
+    updateBadgeCounts(globalPermohonanList);
   }, function (err) {
     console.error('Ralat langganan permohonanVCC:', err);
   });
+}
+
+// Public landing-page badge counter (sistemMeta/badgeCounts) -- two numbers
+// only, no patient data. Recomputed from the full snapshot each time so a
+// stale write from either portal is harmless (see firestore.rules).
+function updateBadgeCounts(list) {
+  const menunggu = list.filter(function (i) { return i.status === 'Menunggu'; }).length;
+  const diproses = list.filter(function (i) { return i.status === 'Diproses'; }).length;
+  setDoc(doc(db, 'sistemMeta', 'badgeCounts'), { menungguCount: menunggu, diprosesCount: diproses }, { merge: true })
+    .catch(function (err) { console.error('Ralat kemaskini badgeCounts:', err); });
 }
 
 // Datalist option text: "MW — Wad Lelaki" for entries with a trailing

@@ -94,6 +94,8 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
 .pc-soon{opacity:0.55;filter:grayscale(18%);cursor:default}
 .pc-soon:hover{transform:none;box-shadow:0 2px 4px rgba(15,42,74,0.07),0 8px 20px rgba(15,42,74,0.09)}
 .soon-tag{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.28);color:rgba(255,255,255,0.9);font-size:9.5px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:0.09em;text-transform:uppercase;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+/* NOTIFICATION BADGE — red dot, top-right of a card, hidden until a live count says otherwise */
+.pc-badge-dot{display:none;position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;background:#E53E3E;box-shadow:0 0 0 2px rgba(255,255,255,0.5)}
 /* ABOUT CARD */
 .about-card{background:white;border-radius:14px;border:1px solid #E3E8EE;padding:22px;box-shadow:0 1px 2px rgba(15,42,74,0.05),0 3px 8px rgba(15,42,74,0.06);display:flex;align-items:flex-start;gap:16px;margin-bottom:4px}
 .about-card .ac-title{font-size:14px;font-weight:700;color:#0F2A4A;margin-bottom:5px}
@@ -193,6 +195,7 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     <!-- Portal 02 -->
     <a class="pcard pc2" href="#" onclick="window.open('borang-permohonan.html','_self');return false;">
       <div class="pcard-top">
+        <span class="pc-badge-dot" id="badgeDotPermohonan" aria-label="Permohonan menunggu"></span>
         <div class="pc-role">Portal 02</div>
         <div class="pc-name">Portal Permohonan</div>
         <div class="pc-desc">Permohonan Kenderaan Klinikal atau Kenderaan Jabatan, Semak Status Permohonan dan Cetak Tiket VCC. Setiap permohonan akan melalui 3 fasa utama bermula daripada penerimaan sehingga keputusan permohonan.</div>
@@ -202,6 +205,7 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     <!-- Portal 03 -->
     <a class="pcard pc3" href="#" onclick="window.open('dispatch.html','_self');return false;">
       <div class="pcard-top">
+        <span class="pc-badge-dot" id="badgeDotVcc" aria-label="Permohonan VCC belum selesai"></span>
         <div class="pc-role">Portal 03</div>
         <div class="pc-name">Portal VCC</div>
         <div class="pc-desc">Pusat koordinasi khusus untuk penyelaras VCC Klinikal dan Pengurusan untuk memproses permohonan kenderaan melalui 3 fasa utama iaitu penerimaan sehingga penyelarasan pergerakan kenderaan.</div>
@@ -258,6 +262,35 @@ body{font-family:'Public Sans',sans-serif;background:#F7F9FB;color:#1C2530;-webk
     mainContent.classList.add('vx-sidebar-collapsed');
   }
 })();
+</script>
+<script type="module">
+// Landing page has no auth (CLAUDE.md: no global gate, no login here).
+// This listener reads only sistemMeta/badgeCounts -- two numbers, no
+// patient data -- which is the sole publicly-readable doc derived from
+// permohonanVCC. See firestore.rules for why the rest of that collection
+// stays auth-gated.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const dotPermohonan = document.getElementById('badgeDotPermohonan');
+const dotVcc = document.getElementById('badgeDotVcc');
+
+const unsubscribeBadgeCounts = onSnapshot(doc(db, 'sistemMeta', 'badgeCounts'), function (snap) {
+  const data = snap.exists() ? snap.data() : {};
+  const menunggu = data.menungguCount || 0;
+  const diproses = data.diprosesCount || 0;
+  if (dotPermohonan) dotPermohonan.style.display = menunggu > 0 ? 'block' : 'none';
+  if (dotVcc) dotVcc.style.display = (menunggu + diproses) > 0 ? 'block' : 'none';
+}, function (err) {
+  console.error('Ralat langganan badgeCounts:', err);
+});
+
+window.addEventListener('beforeunload', function () {
+  if (unsubscribeBadgeCounts) unsubscribeBadgeCounts();
+});
 </script>
 </body>
 </html>

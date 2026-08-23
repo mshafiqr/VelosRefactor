@@ -450,6 +450,7 @@ import {
   collection,
   doc,
   getDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   onSnapshot,
@@ -635,9 +636,20 @@ function initPortal() {
   unsubscribePermohonan = onSnapshot(collection(db, 'permohonanVCC'), function (snapshot) {
     allPermohonanRaw = snapshot.docs.map(function (d) { return d.data(); });
     refreshAllViews();
+    updateBadgeCounts(allPermohonanRaw);
   }, function (err) {
     console.error('Ralat langganan permohonanVCC:', err);
   });
+}
+
+// Public landing-page badge counter (sistemMeta/badgeCounts) -- two numbers
+// only, no patient data. Recomputed from the full snapshot each time so a
+// stale write from either portal is harmless (see firestore.rules).
+function updateBadgeCounts(list) {
+  const menunggu = list.filter(function (i) { return i.status === 'Menunggu'; }).length;
+  const diproses = list.filter(function (i) { return i.status === 'Diproses'; }).length;
+  setDoc(doc(db, 'sistemMeta', 'badgeCounts'), { menungguCount: menunggu, diprosesCount: diproses }, { merge: true })
+    .catch(function (err) { console.error('Ralat kemaskini badgeCounts:', err); });
 }
 
 /* ---------------------------------------------------------------------

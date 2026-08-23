@@ -103,6 +103,17 @@ service cloud.firestore {
     }
 
     // ---- sistemMeta --------------------------------------------------------
+    // badgeCounts holds only two numbers (menungguCount/diprosesCount) for the
+    // unauthenticated landing page's notification dots. It is intentionally
+    // public -- unlike every other permohonanVCC-derived read, it carries no
+    // patient data. Kept in sync client-side by borang-permohonan.html and
+    // dispatch.html, both of which already hold an unscoped permohonanVCC
+    // listener. Do not add any other field to this doc without re-checking
+    // for PHI exposure.
+    match /sistemMeta/badgeCounts {
+      allow read:  if true;
+      allow write: if isUser() || isVcc() || isAdmin() || isMaster();
+    }
     match /sistemMeta/{docId} {
       allow read:  if isAdmin() || isMaster() || isViewer();
       allow write: if isAdmin() || isMaster();
