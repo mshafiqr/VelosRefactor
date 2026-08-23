@@ -155,6 +155,16 @@ tbody tr:hover {
 }
 .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center; }
 
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+.stat-box { background: #e9ecef; padding: 15px; border-radius: 6px; text-align: center; border-left: 5px solid var(--primary); }
+.stat-box h3 { margin: 0; font-size: 24px; color: var(--primary); }
+.stat-box p { margin: 5px 0 0; font-size: 13px; font-weight: bold; }
+
+.leaders-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+.leader-alert-box { padding: 14px 18px; border-radius: 10px; font-weight: 700; text-align: center; font-size: 14px; display: none; line-height: 1.5; }
+.alert-driver { background-color: #E0F4F5; color: #0F2A4A; border: 1px solid #147D82; }
+.alert-driver span { color: #147D82; }
+
 .hide-print { display: table-cell; }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
@@ -183,6 +193,7 @@ min-height: 40px;
   body { padding: 10px; }
   #secureDashboardWrapper { padding: 0; }
   .vx-topbar-title { display: none; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ==================== NAVBAR ==================== */
@@ -447,6 +458,21 @@ min-height: 40px;
 <div class="vx-year-nav hide-print">
 <input type="number" id="yearPicker" min="2026" step="1">
 <button type="button" class="vx-btn" id="btnMuatData">Muat Data</button>
+</div>
+</div>
+
+<div class="card section-stats">
+<h2>
+<span>Laporan Statistik Tahunan <span id="yStatYearLabel" style="color: var(--danger);"></span></span>
+</h2>
+<div class="stats-grid">
+<div class="stat-box"><h3 id="yStatTotalTrips">0</h3><p>Jumlah Pergerakan</p></div>
+<div class="stat-box"><h3 id="yStatTotalPatients">0</h3><p>Jumlah Pesakit Dihantar</p></div>
+<div class="stat-box" style="border-left: 5px solid var(--primary);"><h3 id="yStatTotalStepdown">0</h3><p>Jumlah Pesakit Diambil</p></div>
+<div class="stat-box"><h3 id="yStatNoPatientTrips">0</h3><p>Pergerakan Tanpa Pesakit</p></div>
+</div>
+<div class="leaders-container">
+<div id="yTopDriverAlert" class="leader-alert-box alert-driver"></div>
 </div>
 </div>
 
@@ -778,6 +804,54 @@ async function loadCurrentYearIFT() {
 }
 
 /* ---------------------------------------------------------------------
+   YEARLY SUMMARY — same 4 KPI stat-boxes + top-driver alert as
+   admin.html's monthly "Laporan Statistik Bulanan", scoped to the whole
+   year instead of one month. Top driver score is trips + patients, same
+   tiebreak rule as admin.html's driverStats loop.
+--------------------------------------------------------------------- */
+function computeYearlySummary(trips) {
+  let totalPatients = 0, totalStepdown = 0, emptyTrips = 0;
+  let driverStats = {};
+  trips.forEach(item => {
+    const cPax = item.pesakitList ? item.pesakitList.length : 0;
+    const cStep = item.stepdownList ? item.stepdownList.length : 0;
+    totalPatients += cPax; totalStepdown += cStep;
+    if (cPax === 0 && cStep === 0) emptyTrips++;
+    [item.pemandu, item.pemandu2].filter(Boolean).forEach(nama => {
+      if (!driverStats[nama]) driverStats[nama] = { trips: 0, patients: 0 };
+      driverStats[nama].trips++;
+      driverStats[nama].patients += (cPax + cStep);
+    });
+  });
+  let topDriver = null, maxScore = -1, maxTrips = 0, maxPatients = 0;
+  for (const [d, s] of Object.entries(driverStats)) {
+    const score = s.trips + s.patients;
+    if (score > maxScore) { maxScore = score; topDriver = d; maxTrips = s.trips; maxPatients = s.patients; }
+  }
+  return { totalTrips: trips.length, totalPatients, totalStepdown, emptyTrips, topDriver, maxTrips, maxPatients };
+}
+
+function renderYearSummary(trips, year) {
+  const s = computeYearlySummary(trips);
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('yStatTotalTrips', s.totalTrips);
+  set('yStatTotalPatients', s.totalPatients);
+  set('yStatTotalStepdown', s.totalStepdown);
+  set('yStatNoPatientTrips', s.emptyTrips);
+  const yearLabel = document.getElementById('yStatYearLabel');
+  if (yearLabel) yearLabel.textContent = '(' + year + ')';
+  const topDriverAlert = document.getElementById('yTopDriverAlert');
+  if (topDriverAlert) {
+    if (s.topDriver && s.totalTrips > 0) {
+      topDriverAlert.style.display = 'block';
+      topDriverAlert.innerHTML = ' 🏆  Pemandu Terbaik Tahun Ini:<br><span>' + s.topDriver + '</span> (' + s.maxTrips + ' Pergerakan | ' + s.maxPatients + ' Pesakit)';
+    } else {
+      topDriverAlert.style.display = 'none';
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------
    DATA 1 — Pesakit Ke Fasiliti Luar (yearly aggregate of admin.html's
    computeMonthStats paxStats breakdown: kenderaan-type x syif x jenisKes).
 --------------------------------------------------------------------- */
@@ -987,6 +1061,7 @@ async function muatDataTahunan() {
       fetchYearLogBahanApi(year),
       fetchYearPermohonanVCC(year)
     ]);
+    renderYearSummary(trips, year);
     renderData1(trips);
     renderData5(trips);
     renderData6(trips, fuel);
