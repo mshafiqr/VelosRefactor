@@ -353,8 +353,13 @@ body {
       </div>
 
       <div class="vx-field">
-        <label for="inpNextServiceDate">Tarikh Servis Seterusnya</label>
+        <label for="inpNextServiceDate">Tarikh Servis Enjin Seterusnya</label>
         <input type="date" id="inpNextServiceDate">
+      </div>
+
+      <div class="vx-field">
+        <label for="inpNextBrakeServiceDate">Tarikh Servis Brek Seterusnya</label>
+        <input type="date" id="inpNextBrakeServiceDate">
       </div>
 
       <div class="vx-field">
@@ -759,12 +764,14 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
   const ringkasan = document.getElementById('inpRingkasan').value.trim();
   const pegawai = document.getElementById('inpPegawai').value.trim();
   const nextServiceDate = document.getElementById('inpNextServiceDate').value;
+  const nextBrakeServiceDate = document.getElementById('inpNextBrakeServiceDate').value;
   const nextServiceOdo = document.getElementById('inpNextServiceOdo').value;
 
   if (!ringkasan) return Swal.fire('Perhatian', 'Sila isikan ringkasan penemuan.', 'warning');
   if (!bolehDigunakan) return Swal.fire('Perhatian', 'Sila pilih status kebolehgunaan kenderaan.', 'warning');
   if (!pegawai) return Swal.fire('Perhatian', 'Sila masukkan nama pegawai mengesahkan.', 'warning');
-  if (!nextServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis seterusnya.', 'warning');
+  if (!nextServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis enjin seterusnya.', 'warning');
+  if (!nextBrakeServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis brek seterusnya.', 'warning');
   if (nextServiceOdo === '' || Number(nextServiceOdo) < 0) return Swal.fire('Perhatian', 'Sila masukkan odometer servis seterusnya.', 'warning');
 
   const btn = this;
@@ -786,13 +793,14 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
       bolehDigunakan: bolehDigunakan,
       pegawaiMengesah: pegawai,
       nextServiceDate: nextServiceDate,
+      nextBrakeServiceDate: nextBrakeServiceDate,
       nextServiceOdo: Number(nextServiceOdo),
       timestamp: serverTimestamp()
     };
 
     await addDoc(collection(db, 'checklistSubmissions'), submission);
 
-    const profileUpdate = { nextServiceDate: nextServiceDate, nextServiceOdo: Number(nextServiceOdo) };
+    const profileUpdate = { nextServiceDate: nextServiceDate, nextBrakeServiceDate: nextBrakeServiceDate, nextServiceOdo: Number(nextServiceOdo) };
     const brakeItem = currentItems.find(it => it.id === 'sistem_brek_minyak_brek');
     if (brakeItem && brakeItem.status === 'ok') {
       profileUpdate.lastBrakePadDate = todayISO();
@@ -820,6 +828,7 @@ function resetForNewEntry() {
   document.getElementById('inpRingkasan').value = '';
   document.getElementById('inpPegawai').value = '';
   document.getElementById('inpNextServiceDate').value = '';
+  document.getElementById('inpNextBrakeServiceDate').value = '';
   document.getElementById('inpNextServiceOdo').value = '';
   statusKenderaan = null;
   bolehDigunakan = null;
