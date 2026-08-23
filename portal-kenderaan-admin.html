@@ -724,8 +724,17 @@ function computeTindakanRows() {
   const active = [], done = [];
   tindakanSubmissions.forEach(sub => {
     if (!sub._date || sub._date < cutoff) return;
-    if (!Array.isArray(sub.items)) return;
-    const flagged = sub.items.filter(it => it.status === 'tidakOk');
+    const flagged = Array.isArray(sub.items) ? sub.items.filter(it => it.status === 'tidakOk') : [];
+    if (['rosak', 'dalam_pembaikan', 'lain_lain'].indexOf(sub.statusKenderaan) !== -1) {
+      flagged.push({
+        id: '__statusKenderaan__',
+        label: 'Status Kenderaan Keseluruhan',
+        perihal: sub.ringkasan || '',
+        flag: null,
+        _statusPseudo: true,
+        _statusText: statusLabelOf(sub)
+      });
+    }
     if (!flagged.length) return;
     const ts = sub.tindakanSegera || {};
     const allDone = flagged.every(it => ts[it.id] && ts[it.id].selesai);
@@ -750,7 +759,9 @@ function renderTindakanGroup(tbodyId, rows) {
     const itemsHtml = flagged.map(it => {
       const state = ts[it.id] || {};
       const isDone = !!state.selesai;
-      const flagBadge = it.flag === 'urgent' ? '<span class="fb danger">Urgent</span>' : '<span class="fb warn">Minor</span>';
+      const flagBadge = it._statusPseudo
+        ? `<span class="fb danger">${esc(it._statusText)}</span>`
+        : (it.flag === 'urgent' ? '<span class="fb danger">Urgent</span>' : '<span class="fb warn">Minor</span>');
       return `
         <tr class="${isDone ? 'tsg-item-done' : ''}">
           <td>${esc(it.label)}</td>
