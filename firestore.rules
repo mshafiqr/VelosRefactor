@@ -156,6 +156,26 @@ service cloud.firestore {
       allow write: if isAdmin() || isMaster();
     }
 
+    // ---- vehicleIncidents ---------------------------------------------------
+    // Admin's Kronologi Penyelia (Laporan Insiden Kenderaan). Pemandu never
+    // reads or writes this collection -- see insidenPenyata below.
+    match /vehicleIncidents/{id} {
+      allow read, write: if isAdmin() || isMaster();
+      match /kronologiPenyelia/{entryId} {
+        allow read, write: if isAdmin() || isMaster();
+      }
+    }
+
+    // ---- insidenPenyata -----------------------------------------------------
+    // Pemandu's self-submitted individual incident statements. Pemandu creates
+    // and reads (own Laporan Insiden list); admin reads read-only (Penyata
+    // Kakitangan tab). Neither role updates or deletes an existing statement.
+    match /insidenPenyata/{id} {
+      allow read:   if isKenderaan() || isAdmin() || isMaster();
+      allow create: if isKenderaan() || isAdmin() || isMaster();
+      allow update, delete: if isAdmin() || isMaster();
+    }
+
     // ---- Default deny ------------------------------------------------------
     // Anything not matched above is closed. Do not remove this block.
     match /{document=**} {

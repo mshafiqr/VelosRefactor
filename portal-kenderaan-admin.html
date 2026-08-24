@@ -190,6 +190,52 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
 .swal2-title { color: var(--vx-text) !important; font-weight: 700 !important; }
 .swal2-confirm { background-color: var(--vx-text) !important; border-radius: 8px !important; box-shadow: none !important; }
 .swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+
+/* Status Kenderaan — summary tiles / table */
+.vx-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 4px; }
+.vx-summary-tile { background: var(--vx-card); border-radius: var(--vx-radius-sm); padding: 14px 16px; text-align: center; box-shadow: var(--vx-shadow); }
+.vx-summary-tile .tile-val { font-size: 26px; font-weight: 800; color: var(--vx-text); }
+.vx-summary-tile .tile-label { font-size: 11px; color: var(--vx-muted); margin-top: 4px; }
+.vx-summary-tile.t-success { border-top: 3px solid var(--vx-success); }
+.vx-summary-tile.t-danger  { border-top: 3px solid var(--vx-danger);  }
+.vx-summary-tile.t-warning { border-top: 3px solid var(--vx-warning); }
+@media (max-width: 600px) { .vx-summary-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.sc-berfungsi { background: var(--vx-success-light); }
+.sc-tidak      { background: var(--vx-danger-light);  }
+.sc-digunakan  { background: var(--vx-teal-light);    }
+.sc-dipinjam   { background: var(--vx-warning-light); }
+.servis-ok     { background: var(--vx-success-light); }
+.servis-hampir { background: var(--vx-warning-light); }
+.servis-lampau { background: var(--vx-danger-light);  }
+
+.vx-expand-row { display: none; }
+.vx-expand-row.open { display: table-row; }
+.vx-expand-row td { font-size: 12px; color: var(--vx-muted); background: var(--vx-card-tint); border-top: 1px dashed var(--vx-border); padding: 8px 12px; }
+
+.tsg-keutamaan-sel { font-size: 11px; font-weight: 700; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-family: inherit; }
+.tsg-keutamaan-sel.k-kritikal  { background: var(--vx-danger-light);  color: var(--vx-danger);  }
+.tsg-keutamaan-sel.k-sederhana { background: var(--vx-warning-light); color: var(--vx-warning); }
+.tsg-keutamaan-sel.k-rendah    { background: var(--vx-grey-light);    color: var(--vx-muted);   }
+
+.print-only { display: none; }
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .vx-topbar, .vx-sidebar, #vxBackdrop { display: none !important; }
+  .vx-main-content { margin-left: 0 !important; padding-top: 10px !important; }
+}
+
+/* Laporan Insiden Kenderaan — tabs */
+.insiden-tab-btn {
+  padding: 10px 16px; background: none; border: none; border-bottom: 3px solid transparent;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--vx-muted);
+  cursor: pointer; white-space: nowrap;
+}
+.insiden-tab-btn:hover { color: var(--vx-text); }
+.insiden-tab-btn.vx-active-tab { border-bottom-color: var(--vx-teal); color: var(--vx-teal); }
+.insiden-tab-panel { display: none; }
+.insiden-tab-panel.active { display: block; }
 </style>
 </head>
 <body>
@@ -237,6 +283,7 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   <button class="vx-sidebar-link vx-active" data-section="sec-status">Status Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-rekod">Semakan Rekod</button>
   <button class="vx-sidebar-link" data-section="sec-laporan">Laporan Bulanan</button>
+  <button class="vx-sidebar-link" data-section="sec-insiden">Laporan Insiden Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-profil">Profil Kenderaan</button>
   <hr class="vx-sidebar-divider">
   <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">← Kembali ke Admin</button>
@@ -250,37 +297,72 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   <div class="vx-eyebrow">Portal Kenderaan</div>
   <div class="vx-page-title">Status Kenderaan</div>
 
-  <div id="statusLoading" class="vx-card"><p class="vx-empty-row">Memuatkan status kenderaan...</p></div>
-  <div id="statusContent" style="display:none;">
-    <div class="vx-veh-group-title">Ambulans</div>
-    <div class="vx-veh-grid" id="gridAmbulans"></div>
+  <!-- Summary Tiles -->
+  <div class="vx-summary-grid" id="statusSummaryGrid"></div>
 
-    <div class="vx-veh-group-title">Kenderaan Jabatan</div>
-    <div class="vx-veh-grid" id="gridJabatan"></div>
-  </div>
-
-  <div class="vx-card" style="margin-top:24px;">
-    <div class="vx-card-hd"><h2>Tindakan Segera (30 Hari Terkini)</h2></div>
-    <div class="vx-table-scroll">
-      <table>
-        <thead><tr><th>Tarikh &amp; Masa</th><th>Kenderaan</th><th>Pemandu</th><th>Status</th><th>Butiran</th></tr></thead>
-        <tbody id="urgentFlagsBody"><tr><td colspan="5" class="vx-empty-row">Memuatkan...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
+  <!-- Status Table -->
   <div class="vx-card" style="margin-top:16px;">
     <div class="vx-card-hd">
-      <h2>Rekod Selesai (<span id="tsgDoneCount">0</span>)</h2>
-      <button type="button" class="vx-btn ghost" id="btnToggleTsgDone">Papar</button>
+      <h2>Status Kenderaan</h2>
+      <select id="statusJenisFilter" style="padding:7px 10px;border:1.5px solid var(--vx-border);border-radius:8px;font-family:inherit;font-size:13px;">
+        <option value="semua">Semua Jenis</option>
+        <option value="ambulans">Ambulans</option>
+        <option value="jabatan">Kenderaan Jabatan</option>
+      </select>
     </div>
-    <div class="vx-table-scroll" id="tsgDoneWrap" style="display:none;">
+    <div class="vx-table-scroll">
       <table>
-        <thead><tr><th>Tarikh &amp; Masa</th><th>Kenderaan</th><th>Pemandu</th><th>Status</th><th>Butiran</th></tr></thead>
-        <tbody id="tsgDoneBody"><tr><td colspan="5" class="vx-empty-row">Tiada rekod selesai.</td></tr></tbody>
+        <thead>
+          <tr>
+            <th>Kenderaan</th>
+            <th>Status</th>
+            <th>Boleh Guna</th>
+            <th>Servis Enjin</th>
+            <th>Servis Brek</th>
+            <th>Pemeriksaan Terakhir</th>
+          </tr>
+        </thead>
+        <tbody id="statusTableBody"></tbody>
       </table>
     </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+      <button class="vx-btn ghost" id="btnJanaLaporanStatus">📋 Jana Laporan PDF</button>
+    </div>
   </div>
+
+  <!-- Tindakan Segera (flat table) -->
+  <div class="vx-card" style="margin-top:16px;">
+    <div class="vx-card-hd">
+      <div>
+        <h2>Tindakan Segera</h2>
+        <div id="tsgCount" style="font-size:12px;color:var(--vx-muted);margin-top:2px;"></div>
+      </div>
+    </div>
+    <div class="vx-table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Kenderaan</th>
+            <th>Item</th>
+            <th>Keutamaan</th>
+            <th>Catatan Pemandu</th>
+            <th>Catatan Admin</th>
+            <th>Tindakan</th>
+          </tr>
+        </thead>
+        <tbody id="tsgActiveBody"></tbody>
+      </table>
+    </div>
+    <div id="tsgSelesaiSection" style="display:none;border-top:1px solid var(--vx-border);padding:12px 16px 4px;">
+      <div style="font-size:11px;font-weight:700;color:var(--vx-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+        Selesai (<span id="tsgSelesaiCount">0</span>)
+      </div>
+      <div id="tsgSelesaiList"></div>
+    </div>
+  </div>
+
+  <!-- Print-only: Jana Laporan PDF content -->
+  <div class="print-only" id="laporanStatusPrint" style="display:none;"></div>
 </section>
 
 <!-- ==================== SECTION 2: SEMAKAN REKOD ==================== -->
@@ -319,26 +401,22 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   <div class="vx-eyebrow">Portal Kenderaan</div>
   <div class="vx-page-title">Laporan Bulanan</div>
 
-  <div class="vx-card">
+  <div class="vx-card no-print">
     <div class="vx-filter-row">
       <div class="vx-filter-field">
         <label>Bulan</label>
         <input type="month" id="laporanFilterBulan">
       </div>
       <div class="vx-filter-field">
-        <button class="vx-btn" id="btnLaporanFilter">Tapis</button>
+        <button class="vx-btn" id="btnLaporanFilter">Jana Laporan</button>
       </div>
       <div class="vx-filter-field">
-        <button class="vx-btn ghost" id="btnLaporanExport">Eksport CSV</button>
+        <button class="vx-btn ghost" id="btnLaporanCetak" style="display:none;">📄 Cetak / Jana PDF</button>
       </div>
     </div>
-    <div class="vx-table-scroll">
-      <table>
-        <thead><tr><th>Tarikh</th><th>Masa</th><th>Kenderaan</th><th>Ringkasan Penemuan Kerosakan &amp; Tindakan</th><th>Adakah Kenderaan Boleh Digunakan?</th><th>Tindakan Admin</th></tr></thead>
-        <tbody id="laporanBody"><tr><td colspan="6" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan laporan.</td></tr></tbody>
-      </table>
-    </div>
   </div>
+
+  <div id="laporanContent" style="display:none;"></div>
 </section>
 
 <!-- ==================== SECTION 4: PROFIL KENDERAAN ==================== -->
@@ -361,6 +439,14 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
         <div class="vx-field">
           <label for="pfPlate">No. Pendaftaran</label>
           <input type="text" id="pfPlate" placeholder="Cth: BNU9974">
+        </div>
+        <div class="vx-field">
+          <label for="pfNoAset">No. Aset</label>
+          <input type="text" id="pfNoAset" placeholder="Cth: 917001004">
+        </div>
+        <div class="vx-field">
+          <label for="pfNamaKenderaan">Nama / Model Kenderaan</label>
+          <input type="text" id="pfNamaKenderaan" placeholder="Cth: Ambulans 1, Foton, Ninja">
         </div>
         <div class="vx-field">
           <label for="pfJenis">Jenis Kenderaan</label>
@@ -423,6 +509,132 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   </div>
 </section>
 
+<!-- ==================== SECTION 5: LAPORAN INSIDEN KENDERAAN ==================== -->
+<section id="sec-insiden" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Laporan Insiden Kenderaan</div>
+
+  <!-- Two top-level tabs -->
+  <div style="display:flex;border-bottom:2px solid var(--vx-border);margin-bottom:20px;overflow-x:auto;">
+    <button class="insiden-tab-btn vx-active-tab" data-itab="itab-kronologi-penyelia">Kronologi Penyelia</button>
+    <button class="insiden-tab-btn" data-itab="itab-penyata-kkt">Penyata Kakitangan</button>
+  </div>
+
+  <!-- ═══ TAB A: KRONOLOGI PENYELIA ═══ -->
+  <div id="itab-kronologi-penyelia" class="insiden-tab-panel">
+
+    <!-- List view -->
+    <div id="kpListView">
+      <div class="vx-card-hd" style="margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--vx-muted);" id="kpListCount"></div>
+        <button class="vx-btn" id="btnKpBaharu">+ Laporan Baharu</button>
+      </div>
+      <div id="kpListContainer"></div>
+    </div>
+
+    <!-- Create form -->
+    <div id="kpCreateView" style="display:none;">
+      <button type="button" class="vx-btn ghost" id="btnKpCreateBack" style="margin-bottom:16px;">← Kembali</button>
+      <div class="vx-card">
+        <h2 style="font-size:16px;font-weight:800;margin:0 0 16px;">Laporan Kronologi Baharu</h2>
+        <div class="vx-form-grid">
+          <div class="vx-field">
+            <label for="kpJenis">Jenis Insiden</label>
+            <select id="kpJenis">
+              <option value="">Pilih jenis...</option>
+              <option value="kemalangan">Kemalangan Jalan Raya</option>
+              <option value="kerosakan">Kerosakan Kenderaan</option>
+              <option value="lainalain">Lain-lain</option>
+            </select>
+          </div>
+          <div class="vx-field">
+            <label for="kpKenderaan">Kenderaan</label>
+            <select id="kpKenderaan"><option value="">Pilih kenderaan...</option></select>
+          </div>
+          <div class="vx-field">
+            <label for="kpTarikh">Tarikh Kejadian</label>
+            <input type="date" id="kpTarikh">
+          </div>
+          <div class="vx-field">
+            <label for="kpMasa">Masa Kejadian</label>
+            <input type="time" id="kpMasa">
+          </div>
+          <div class="vx-field" style="grid-column:1/-1;">
+            <label for="kpLokasi">Lokasi Kejadian</label>
+            <input type="text" id="kpLokasi" placeholder="Cth: KM 25, Jalan Berungis-Tenghilan">
+          </div>
+          <div class="vx-field" style="grid-column:1/-1;">
+            <label for="kpButiran">Butiran Ringkas</label>
+            <textarea id="kpButiran" placeholder="Perihalkan kejadian secara ringkas..."></textarea>
+          </div>
+        </div>
+        <button class="vx-btn" id="btnKpCipta">Cipta Laporan</button>
+      </div>
+    </div>
+
+    <!-- Detail view -->
+    <div id="kpDetailView" style="display:none;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <button type="button" class="vx-btn ghost" id="btnKpDetailBack">← Senarai</button>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-weight:800;font-size:15px;" id="kpDetailVirId"></span>
+            <span class="fb" id="kpDetailJenisBadge"></span>
+            <span class="fb" id="kpDetailStatusBadge"></span>
+          </div>
+          <div style="font-size:12px;color:var(--vx-muted);margin-top:2px;" id="kpDetailSubHeader"></div>
+        </div>
+      </div>
+
+      <!-- Butiran card -->
+      <div class="vx-card" id="kpButiranPanel" style="margin-bottom:14px;"></div>
+
+      <!-- Kronologi table builder -->
+      <div class="vx-card" style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="font-size:14px;font-weight:800;margin:0;">Entri Kronologi</h3>
+          <button class="vx-btn ghost" id="btnPrintKronologi">📄 Print Laporan Kronologi</button>
+        </div>
+        <div id="kpKronologiList"></div>
+        <button class="vx-btn ghost" id="btnTambahKronologi"
+          style="width:100%;margin-top:12px;border-style:dashed;">
+          + Tambah Entri
+        </button>
+      </div>
+
+      <button class="vx-btn ghost" id="btnKpSelesai">Tandakan Selesai</button>
+    </div>
+  </div>
+
+  <!-- ═══ TAB B: PENYATA KAKITANGAN (Read-only from insidenPenyata) ═══ -->
+  <div id="itab-penyata-kkt" class="insiden-tab-panel" style="display:none;">
+    <div class="vx-card" style="margin-bottom:16px;">
+      <div class="vx-filter-row">
+        <div class="vx-filter-field">
+          <label>Tarikh</label>
+          <input type="date" id="pktFilterTarikh">
+        </div>
+        <div class="vx-filter-field">
+          <label>Kenderaan</label>
+          <input type="text" id="pktFilterKenderaan" placeholder="Cth: BNU 9974">
+        </div>
+        <div class="vx-filter-field">
+          <button class="vx-btn" id="btnPktFilter">Tapis</button>
+          <button class="vx-btn ghost" id="btnPktReset" style="margin-left:8px;">Reset</button>
+        </div>
+      </div>
+    </div>
+    <div id="pktListCount" style="font-size:13px;color:var(--vx-muted);margin-bottom:12px;"></div>
+    <div id="pktListContainer"></div>
+
+    <!-- Print-only: individual statement -->
+    <div class="print-only" id="pktPrintDoc" style="display:none;"></div>
+  </div>
+
+  <!-- Print-only: Laporan Kronologi -->
+  <div class="print-only" id="kpPrintKronologiDoc" style="display:none;"></div>
+</section>
+
 </div>
 </div>
 
@@ -433,8 +645,8 @@ import {
   setPersistence, browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
-  getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc,
-  query, orderBy, limit, onSnapshot, serverTimestamp
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, updateDoc,
+  query, where, orderBy, limit, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -462,7 +674,18 @@ const daysSince = (dateStr) => {
 };
 const esc = s => (s === undefined || s === null) ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const BOLEH_LABEL = { selamat: 'Selamat', jarakDekat: 'Jarak Dekat Sahaja', tidakSelamat: 'Tidak Selamat' };
-const STATUS_LABEL = { berfungsi: 'Berfungsi', rosak: 'Rosak', dalam_pembaikan: 'Sedang Dalam Pembaikan', dalam_penggunaan: 'Sedang Digunakan', lain_lain: 'Lain-lain' };
+const STATUS_LABEL = {
+  berfungsi:        'Berfungsi (Di Hospital)',
+  tidak_berfungsi:  'Tidak Berfungsi (Di Hospital)',
+  di_bengkel:       'Tidak Berfungsi (Di Bengkel)',
+  sedang_digunakan: 'Sedang Digunakan',
+  dipinjam:         'Dipinjam (Di Fasiliti Lain)',
+  // backward compat with pre-revamp status values:
+  rosak:            'Rosak',
+  dalam_pembaikan:  'Sedang Dalam Pembaikan',
+  dalam_penggunaan: 'Sedang Digunakan',
+  lain_lain:        'Lain-lain',
+};
 const statusLabelOf = sub => STATUS_LABEL[sub.statusKenderaan] ? (STATUS_LABEL[sub.statusKenderaan] + (sub.statusKenderaan === 'lain_lain' && sub.statusLainLain ? ' — ' + sub.statusLainLain : '')) : sub.statusKenderaan;
 
 /* ---------------------------------------------------------------------
@@ -503,7 +726,6 @@ onAuthStateChanged(auth, function (user) {
     loginView.style.display = 'flex';
     appWrapper.style.display = 'none';
     stopInactivityWatch();
-    if (unsubTindakanSegera) { unsubTindakanSegera(); unsubTindakanSegera = null; }
   }
 });
 
@@ -572,15 +794,12 @@ async function initAdmin() {
   adminInitialized = true;
   document.getElementById('laporanFilterBulan').value = todayISO().slice(0, 7);
   document.getElementById('rekodFilterBulan').value = todayISO().slice(0, 7);
-  startTindakanSegeraListener();
   await loadAllData();
 }
 
 document.getElementById('btnRefresh').addEventListener('click', loadAllData);
 
 async function loadAllData() {
-  document.getElementById('statusLoading').style.display = 'block';
-  document.getElementById('statusContent').style.display = 'none';
   try {
     const vpSnap = await getDocs(collection(db, 'vehicleProfiles'));
     vehicleProfiles = {};
@@ -611,219 +830,313 @@ async function loadAllData() {
 /* ---------------------------------------------------------------------
    SECTION 1: STATUS KENDERAAN
 --------------------------------------------------------------------- */
-function computeVehicleStatus(plate, profile) {
-  const latest = latestByPlate[plate];
-  const alerts = [];
-
-  if (profile.lastBrakePadDate && daysSince(profile.lastBrakePadDate) >= 13) alerts.push('⚠ Servis Brek Akan Tiba');
-  if (typeof profile.nextServiceOdo === 'number' && latest && typeof latest.odometer === 'number' && latest.odometer >= profile.nextServiceOdo - 500) alerts.push('⚠ Servis Hampir Tiba');
-  if (profile.nextServiceDate && todayISO() >= profile.nextServiceDate) alerts.push('⚠ Tarikh Servis Tiba');
-
-  const noRecentSubmission = !latest || !latest._date || daysSince(latest.tarikh) > 7;
-
-  let hasUrgent = false, hasMinor = false;
-  if (latest && Array.isArray(latest.items)) {
-    hasUrgent = latest.items.some(it => it.flag === 'urgent');
-    hasMinor = latest.items.some(it => it.flag === 'minor');
-  }
-
-  let color = 'grey';
-  if (noRecentSubmission) {
-    color = 'grey';
-  } else if (hasUrgent || latest.bolehDigunakan === 'tidakSelamat') {
-    color = 'red';
-  } else if (hasMinor || latest.bolehDigunakan === 'jarakDekat' || alerts.length > 0) {
-    color = 'amber';
-  } else {
-    color = 'green';
-  }
-
-  return { color, alerts, latest, noRecentSubmission };
+function servisCell(dateStr) {
+  if (!dateStr) return { cls: '', label: '—', date: '—' };
+  const days = daysSince(dateStr);
+  if (days >= 0)   return { cls: 'servis-lampau', label: 'Telah Berlalu', date: dateStr };
+  if (days >= -14) return { cls: 'servis-hampir', label: 'Hampir Tiba',   date: dateStr };
+  return { cls: 'servis-ok', label: 'OK', date: dateStr };
 }
 
-const DOT = { red: '🔴', amber: '🟡', green: '🟢', grey: '⚫' };
-
-function renderVehicleCard(plate, profile) {
-  const st = computeVehicleStatus(plate, profile);
-  const latest = st.latest;
-  let latestHtml = '<div class="vx-veh-empty">Tiada rekod senarai semak.</div>';
-  if (latest) {
-    const ringkasanShort = (latest.ringkasan || '').length > 80 ? latest.ringkasan.slice(0, 80) + '…' : (latest.ringkasan || '—');
-    const bolehClass = latest.bolehDigunakan === 'selamat' ? 'ok' : (latest.bolehDigunakan === 'jarakDekat' ? 'warn' : 'danger');
-    latestHtml = `
-      <div class="vx-veh-latest">
-        <div><strong>${esc(latest.tarikh)}</strong> ${esc(latest.masa)} — ${esc(latest.pemandu)}</div>
-        <div style="margin:4px 0;">${esc(ringkasanShort)}</div>
-        <span class="fb ${bolehClass}">${BOLEH_LABEL[latest.bolehDigunakan] || latest.bolehDigunakan}</span>
-      </div>`;
-  }
-  const alertsHtml = st.alerts.length ? `<div class="vx-veh-alerts">${st.alerts.map(a => `<span class="vx-veh-alert-chip">${esc(a)}</span>`).join('')}</div>` : '';
-  return `
-    <div class="vx-veh-card st-${st.color}">
-      <div class="vx-veh-card-hd">
-        <div>
-          <div class="vx-veh-plate">${esc(plate)}</div>
-          <span class="vx-veh-tag">${profile.jenisKenderaan === 'ambulans' ? 'AMBULANS' : 'JABATAN'}</span>
-        </div>
-        <div class="vx-veh-dot" title="${st.color}">${DOT[st.color]}</div>
-      </div>
-      ${alertsHtml}
-      ${latestHtml}
-    </div>`;
+function statusCellClass(s) {
+  if (!s) return '';
+  if (s === 'berfungsi') return 'sc-berfungsi';
+  if (['tidak_berfungsi', 'di_bengkel', 'rosak', 'dalam_pembaikan'].includes(s)) return 'sc-tidak';
+  if (['sedang_digunakan', 'dalam_penggunaan'].includes(s)) return 'sc-digunakan';
+  if (s === 'dipinjam') return 'sc-dipinjam';
+  return '';
 }
 
 function renderStatusSection() {
-  const ambulansPlates = [], jabatanPlates = [];
-  Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b)).forEach(plate => {
-    const p = vehicleProfiles[plate];
-    (p.jenisKenderaan === 'ambulans' ? ambulansPlates : jabatanPlates).push(plate);
-  });
+  const allPlates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
+  const ambulansPlates = allPlates.filter(p => vehicleProfiles[p].jenisKenderaan === 'ambulans');
 
-  document.getElementById('gridAmbulans').innerHTML = ambulansPlates.length
-    ? ambulansPlates.map(p => renderVehicleCard(p, vehicleProfiles[p])).join('')
-    : '<div class="vx-veh-empty">Tiada kenderaan ambulans berdaftar.</div>';
+  const countStatus = (plates, fn) => plates.filter(p => {
+    const s = latestByPlate[p] ? latestByPlate[p].statusKenderaan : null;
+    return fn(s);
+  }).length;
 
-  document.getElementById('gridJabatan').innerHTML = jabatanPlates.length
-    ? jabatanPlates.map(p => renderVehicleCard(p, vehicleProfiles[p])).join('')
-    : '<div class="vx-veh-empty">Tiada kenderaan jabatan berdaftar.</div>';
+  const summary = {
+    total:          ambulansPlates.length,
+    berfungsi:      countStatus(ambulansPlates, s => s === 'berfungsi'),
+    tidakBerfungsi: countStatus(ambulansPlates, s => ['tidak_berfungsi','di_bengkel','rosak','dalam_pembaikan'].includes(s)),
+    dipinjam:       countStatus(ambulansPlates, s => s === 'dipinjam'),
+  };
 
-  document.getElementById('statusLoading').style.display = 'none';
-  document.getElementById('statusContent').style.display = 'block';
+  document.getElementById('statusSummaryGrid').innerHTML = [
+    { label: 'Jumlah Ambulans',   val: summary.total,          cls: ''          },
+    { label: 'Berfungsi',         val: summary.berfungsi,      cls: 't-success'  },
+    { label: 'Tidak Berfungsi',   val: summary.tidakBerfungsi, cls: 't-danger'   },
+    { label: 'Dipinjam',          val: summary.dipinjam,       cls: 't-warning'  },
+  ].map(t => `<div class="vx-summary-tile ${t.cls}">
+    <div class="tile-val">${t.val}</div>
+    <div class="tile-label">${esc(t.label)}</div>
+  </div>`).join('');
+
+  renderStatusTable();
+  renderTindakanSegera();
 }
 
-/* ---------------------------------------------------------------------
-   TINDAKAN SEGERA — real-time, keyed off checklist item status
-   'tidakOk'. Items always carry a flag ('minor'/'urgent') by the
-   pemandu-side validation. State lives on the submission doc itself:
-   tindakanSegera: { "<itemId>": { catatanAdmin, selesai, selesaiTimestamp } }
---------------------------------------------------------------------- */
-let tindakanSubmissions = [];
-let unsubTindakanSegera = null;
-let tsgExpanded = {}; // subId -> bool, expand state survives re-renders
+function renderStatusTable() {
+  const filter = document.getElementById('statusJenisFilter').value;
+  const plates = Object.keys(vehicleProfiles)
+    .filter(p => filter === 'semua' || vehicleProfiles[p].jenisKenderaan === filter)
+    .sort((a, b) => a.localeCompare(b));
 
-function startTindakanSegeraListener() {
-  if (unsubTindakanSegera) return;
-  const q = query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc'), limit(200));
-  unsubTindakanSegera = onSnapshot(q, function (snap) {
-    tindakanSubmissions = snap.docs.map(d => {
-      const data = d.data();
-      return Object.assign({}, data, {
-        _id: d.id,
-        _date: data.timestamp && data.timestamp.toDate ? data.timestamp.toDate() : null
-      });
-    });
-    renderTindakanSegera();
-  }, function (err) {
-    Swal.fire('Ralat', 'Gagal memuat Tindakan Segera: ' + (err.message || err), 'error');
-  });
-}
-
-function computeTindakanRows() {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 30);
-  const active = [], done = [];
-  tindakanSubmissions.forEach(sub => {
-    if (!sub._date || sub._date < cutoff) return;
-    const flagged = Array.isArray(sub.items) ? sub.items.filter(it => it.status === 'tidakOk') : [];
-    if (['rosak', 'dalam_pembaikan', 'lain_lain'].indexOf(sub.statusKenderaan) !== -1) {
-      flagged.push({
-        id: 'statusKenderaan',
-        label: 'Status Kenderaan Keseluruhan',
-        perihal: sub.ringkasan || '',
-        flag: null,
-        _statusPseudo: true,
-        _statusText: statusLabelOf(sub)
-      });
-    }
-    if (!flagged.length) return;
-    const ts = sub.tindakanSegera || {};
-    const allDone = flagged.every(it => ts[it.id] && ts[it.id].selesai);
-    (allDone ? done : active).push({ sub, flagged, ts });
-  });
-  return { active, done };
-}
-
-function renderTindakanGroup(tbodyId, rows) {
-  const tbody = document.getElementById(tbodyId);
-  if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="vx-empty-row">Tiada rekod.</td></tr>';
+  const tbody = document.getElementById('statusTableBody');
+  if (!plates.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="vx-empty-row">Tiada kenderaan berdaftar.</td></tr>';
     return;
   }
-  tbody.innerHTML = rows.map(({ sub, flagged, ts }) => {
-    const doneCount = flagged.filter(it => ts[it.id] && ts[it.id].selesai).length;
-    const statusBadge = doneCount === flagged.length
-      ? '<span class="fb ok">Selesai</span>'
-      : `<span class="fb danger">${flagged.length - doneCount} Isu Belum Selesai</span>`;
-    const expanded = !!tsgExpanded[sub._id];
 
-    const itemsHtml = flagged.map(it => {
-      const state = ts[it.id] || {};
-      const isDone = !!state.selesai;
-      const flagBadge = it._statusPseudo
-        ? `<span class="fb danger">${esc(it._statusText)}</span>`
-        : (it.flag === 'urgent' ? '<span class="fb danger">Urgent</span>' : '<span class="fb warn">Minor</span>');
-      return `
-        <tr class="${isDone ? 'tsg-item-done' : ''}">
-          <td>${esc(it.label)}</td>
-          <td>${flagBadge}</td>
-          <td>${esc(it.perihal || '—')}</td>
-          <td>
-            <div class="vx-remark-cell">
-              <input type="text" data-tsg-catatan data-sub="${esc(sub._id)}" data-item="${esc(it.id)}" value="${esc(state.catatanAdmin || '')}" placeholder="Catatan admin..." ${isDone ? 'disabled' : ''}>
-            </div>
-          </td>
-          <td><button class="vx-btn ghost" data-tsg-selesai data-sub="${esc(sub._id)}" data-item="${esc(it.id)}" ${isDone ? 'disabled' : ''}>${isDone ? 'Selesai ✓' : 'Tandakan Selesai'}</button></td>
-        </tr>`;
-    }).join('');
+  tbody.innerHTML = plates.map(plate => {
+    const profile = vehicleProfiles[plate];
+    const sub     = latestByPlate[plate];
+    const enjin   = servisCell(profile.nextServiceDate);
+    const brek    = servisCell(profile.nextBrakeServiceDate);
+    const sc      = statusCellClass(sub ? sub.statusKenderaan : null);
+    const sLabel  = sub ? (STATUS_LABEL[sub.statusKenderaan] || sub.statusKenderaan) : 'Tiada rekod';
+    const sDetail = sub && sub.statusKenderaan === 'di_bengkel'   ? (sub.namaBengkel  || '') :
+                    sub && sub.statusKenderaan === 'dipinjam'     ? (sub.namaFasiliti || '') : '';
+    const bolehCls = sub && sub.bolehDigunakan === 'selamat'      ? 'ok'     :
+                     sub && sub.bolehDigunakan === 'jarakDekat'   ? 'warn'   :
+                     sub && sub.bolehDigunakan === 'tidakSelamat' ? 'danger' : '';
+    const bolehLbl = sub ? (BOLEH_LABEL[sub.bolehDigunakan] || '—') : '—';
 
     return `
-      <tr class="tsg-row">
-        <td>${esc(sub.tarikh)} ${esc(sub.masa)}</td>
-        <td>${esc(sub.kenderaan)}</td>
-        <td>${esc(sub.pemandu)}</td>
-        <td>${statusBadge}</td>
-        <td><button class="vx-btn ghost" data-tsg-toggle data-sub="${esc(sub._id)}">${expanded ? 'Tutup' : 'Lihat'} (${flagged.length})</button></td>
-      </tr>
-      <tr class="tsg-detail" style="${expanded ? '' : 'display:none;'}">
-        <td colspan="5" style="padding:0;">
-          <table>
-            <thead><tr><th>Nama Item</th><th>Keutamaan</th><th>Catatan Pemandu</th><th>Catatan Admin</th><th>Tindakan</th></tr></thead>
-            <tbody>${itemsHtml}</tbody>
-          </table>
+      <tr class="vx-status-row" data-plate="${esc(plate)}" style="cursor:pointer;">
+        <td>
+          <div style="font-weight:800;font-size:14px;">${esc(plate)}</div>
+          <div style="font-size:11px;color:var(--vx-muted);">${esc(profile.noAset || '')}${profile.noAset && profile.namaKenderaan ? ' · ' : ''}${esc(profile.namaKenderaan || '')}</div>
         </td>
+        <td class="${sc}" style="vertical-align:middle;">
+          <div style="font-weight:700;font-size:12px;">${esc(sLabel)}</div>
+          ${sDetail ? `<div style="font-size:11px;opacity:.8;">${esc(sDetail)}</div>` : ''}
+        </td>
+        <td>${bolehCls ? `<span class="fb ${bolehCls}">${esc(bolehLbl)}</span>` : `<span style="color:var(--vx-grey)">—</span>`}</td>
+        <td class="${enjin.cls}" style="vertical-align:middle;">
+          <div style="font-size:12px;font-weight:700;">${esc(enjin.label)}</div>
+          <div style="font-size:11px;">${esc(enjin.date)}</div>
+        </td>
+        <td class="${brek.cls}" style="vertical-align:middle;">
+          <div style="font-size:12px;font-weight:700;">${esc(brek.label)}</div>
+          <div style="font-size:11px;">${esc(brek.date)}</div>
+        </td>
+        <td>
+          <div style="font-size:12px;font-weight:600;">${sub ? esc(sub.pemandu) : '—'}</div>
+          <div style="font-size:11px;color:var(--vx-muted);">${sub ? esc(sub.tarikh) + ' · ' + esc(sub.masa) : ''}</div>
+        </td>
+      </tr>
+      <tr class="vx-expand-row" id="expand-${esc(plate)}">
+        <td colspan="6"><strong>Ringkasan:</strong> ${sub ? esc(sub.ringkasan || '—') : '—'}</td>
       </tr>`;
   }).join('');
 
-  tbody.querySelectorAll('button[data-tsg-toggle]').forEach(btn => {
-    btn.addEventListener('click', function () {
-      tsgExpanded[btn.getAttribute('data-sub')] = !tsgExpanded[btn.getAttribute('data-sub')];
-      renderTindakanSegera();
+  tbody.querySelectorAll('.vx-status-row').forEach(row => {
+    row.addEventListener('click', function () {
+      const plate = row.getAttribute('data-plate');
+      document.getElementById('expand-' + plate).classList.toggle('open');
     });
   });
+}
 
-  tbody.querySelectorAll('input[data-tsg-catatan]').forEach(inp => {
-    const save = () => saveTindakanCatatan(inp.getAttribute('data-sub'), inp.getAttribute('data-item'), inp.value.trim());
-    inp.addEventListener('blur', save);
-    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') inp.blur(); });
+document.getElementById('statusJenisFilter').addEventListener('change', renderStatusTable);
+
+document.getElementById('btnJanaLaporanStatus').addEventListener('click', function () {
+  const today = new Date();
+  const tarikhJana = today.toLocaleDateString('ms-MY', { day:'2-digit', month:'long', year:'numeric' })
+    + ', ' + pad2(today.getHours()) + ':' + pad2(today.getMinutes());
+
+  const ambulansPlates = Object.keys(vehicleProfiles)
+    .filter(p => vehicleProfiles[p].jenisKenderaan === 'ambulans')
+    .sort((a, b) => a.localeCompare(b));
+
+  let html = `
+    <div style="font-family:'Public Sans',sans-serif;max-width:700px;margin:0 auto;padding:20px;">
+      <div style="text-align:center;margin-bottom:20px;border-bottom:2px solid #0F2A4A;padding-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#5B6774;">Status Kenderaan</div>
+        <div style="font-size:20px;font-weight:800;color:#0F2A4A;margin-top:4px;">Hospital Pitas</div>
+        <div style="font-size:13px;color:#147D82;font-weight:600;margin-top:2px;">Dijana: ${esc(tarikhJana)}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;">
+        <thead>
+          <tr style="background:#0F2A4A;color:#fff;">
+            <th style="padding:8px;text-align:left;">Kenderaan</th>
+            <th style="padding:8px;text-align:left;">No. Aset</th>
+            <th style="padding:8px;text-align:left;">Status</th>
+            <th style="padding:8px;text-align:left;">Boleh Guna</th>
+            <th style="padding:8px;text-align:left;">Ringkasan</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+  ambulansPlates.forEach((plate, i) => {
+    const profile = vehicleProfiles[plate];
+    const sub = latestByPlate[plate];
+    const bg = i % 2 === 0 ? '#fff' : '#F6FAFC';
+    html += `
+      <tr style="background:${bg};">
+        <td style="padding:8px;font-weight:700;">${esc(plate)}</td>
+        <td style="padding:8px;">${esc(profile.noAset || '—')}</td>
+        <td style="padding:8px;">${sub ? esc(STATUS_LABEL[sub.statusKenderaan] || sub.statusKenderaan) : 'Tiada rekod'}</td>
+        <td style="padding:8px;">${sub ? esc(BOLEH_LABEL[sub.bolehDigunakan] || '—') : '—'}</td>
+        <td style="padding:8px;">${sub ? esc((sub.ringkasan || '').slice(0, 80)) : '—'}</td>
+      </tr>`;
   });
 
-  tbody.querySelectorAll('button[data-tsg-selesai]').forEach(btn => {
-    btn.addEventListener('click', function () {
-      markTindakanSelesai(btn.getAttribute('data-sub'), btn.getAttribute('data-item'));
-    });
+  html += `</tbody></table>
+      <div style="margin-top:24px;font-size:10px;color:#9AA5AD;text-align:center;border-top:1px solid #DCE6ED;padding-top:12px;">
+        Dijana oleh Sistem VELOS · Hospital Pitas · ${esc(tarikhJana)}
+      </div>
+    </div>`;
+
+  document.getElementById('laporanStatusPrint').innerHTML = html;
+  window.print();
+});
+
+/* ---------------------------------------------------------------------
+   TINDAKAN SEGERA — passive, keyed off checklist item status 'tidakOk'.
+   Items always carry a flag ('minor'/'urgent') by the pemandu-side
+   validation. State lives on the submission doc itself:
+   tindakanSegera: { "<itemId>": { catatanAdmin, keutamaan, selesai, selesaiTimestamp } }
+--------------------------------------------------------------------- */
+const K_ORDER = { kritikal: 0, sederhana: 1, rendah: 2 };
+const TINDAKAN_TRIGGER = ['tidak_berfungsi','di_bengkel','sedang_digunakan','dipinjam','rosak','dalam_pembaikan','lain_lain'];
+
+function computeTindakanRows() {
+  const active = [], done = [];
+  const source = allSubmissions;
+
+  source.forEach(sub => {
+    const ts = sub.tindakanSegera || {};
+
+    if (TINDAKAN_TRIGGER.includes(sub.statusKenderaan)) {
+      const state = ts['statusKenderaan'] || {};
+      const row = {
+        subId: sub._id, itemId: 'statusKenderaan',
+        kenderaan: sub.kenderaan, pemandu: sub.pemandu, tarikh: sub.tarikh, masa: sub.masa,
+        item: 'Status Kenderaan Keseluruhan',
+        keutamaan: state.keutamaan || 'kritikal',
+        catatanPemandu: statusLabelOf(sub) + (sub.ringkasan ? ' — ' + sub.ringkasan.slice(0, 80) : ''),
+        catatanAdmin: state.catatanAdmin || '',
+        selesai: !!state.selesai,
+      };
+      (row.selesai ? done : active).push(row);
+    }
+
+    if (Array.isArray(sub.items)) {
+      sub.items.filter(it => it.status === 'tidakOk').forEach(it => {
+        const state = ts[it.id] || {};
+        const row = {
+          subId: sub._id, itemId: it.id,
+          kenderaan: sub.kenderaan, pemandu: sub.pemandu, tarikh: sub.tarikh, masa: sub.masa,
+          item: it.label,
+          keutamaan: state.keutamaan || (it.flag === 'urgent' ? 'kritikal' : 'sederhana'),
+          catatanPemandu: it.perihal || '—',
+          catatanAdmin: state.catatanAdmin || '',
+          selesai: !!state.selesai,
+        };
+        (row.selesai ? done : active).push(row);
+      });
+    }
   });
+
+  active.sort((a, b) => (K_ORDER[a.keutamaan] ?? 9) - (K_ORDER[b.keutamaan] ?? 9));
+  return { active, done };
 }
 
 function renderTindakanSegera() {
   const { active, done } = computeTindakanRows();
-  renderTindakanGroup('urgentFlagsBody', active);
-  renderTindakanGroup('tsgDoneBody', done);
-  document.getElementById('tsgDoneCount').textContent = done.length;
+  document.getElementById('tsgCount').textContent =
+    `${active.length} isu belum selesai · disusun mengikut keutamaan`;
+
+  const tbody = document.getElementById('tsgActiveBody');
+  if (!active.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="vx-empty-row">Tiada isu belum selesai.</td></tr>';
+  } else {
+    tbody.innerHTML = active.map(row => {
+      const kCls = row.keutamaan === 'kritikal' ? 'k-kritikal' : row.keutamaan === 'sederhana' ? 'k-sederhana' : 'k-rendah';
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:700;">${esc(row.kenderaan)}</div>
+            <div style="font-size:11px;color:var(--vx-muted);">${esc(row.pemandu)}<br>${esc(row.tarikh)} · ${esc(row.masa)}</div>
+          </td>
+          <td style="font-size:12px;max-width:160px;">${esc(row.item)}</td>
+          <td>
+            <select class="tsg-keutamaan-sel ${kCls}"
+              data-sub="${esc(row.subId)}" data-item="${esc(row.itemId)}">
+              <option value="kritikal"  ${row.keutamaan === 'kritikal'  ? 'selected' : ''}>Kritikal</option>
+              <option value="sederhana" ${row.keutamaan === 'sederhana' ? 'selected' : ''}>Sederhana</option>
+              <option value="rendah"    ${row.keutamaan === 'rendah'    ? 'selected' : ''}>Rendah</option>
+            </select>
+          </td>
+          <td style="font-size:12px;max-width:180px;">${esc(row.catatanPemandu)}</td>
+          <td>
+            <div class="vx-remark-cell">
+              <input type="text" class="tsg-catatan-inp"
+                data-sub="${esc(row.subId)}" data-item="${esc(row.itemId)}"
+                value="${esc(row.catatanAdmin)}" placeholder="Catatan admin...">
+            </div>
+          </td>
+          <td>
+            <button class="vx-btn ghost tsg-selesai-btn"
+              data-sub="${esc(row.subId)}" data-item="${esc(row.itemId)}">
+              Tandakan Selesai
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('.tsg-keutamaan-sel').forEach(sel => {
+      sel.addEventListener('change', async function () {
+        const cls = sel.value === 'kritikal' ? 'k-kritikal' : sel.value === 'sederhana' ? 'k-sederhana' : 'k-rendah';
+        sel.className = `tsg-keutamaan-sel ${cls}`;
+        try {
+          await updateDoc(doc(db, 'checklistSubmissions', sel.dataset.sub), {
+            [`tindakanSegera.${sel.dataset.item}.keutamaan`]: sel.value
+          });
+          const sub = allSubmissions.find(s => s._id === sel.dataset.sub);
+          if (sub) {
+            if (!sub.tindakanSegera) sub.tindakanSegera = {};
+            if (!sub.tindakanSegera[sel.dataset.item]) sub.tindakanSegera[sel.dataset.item] = {};
+            sub.tindakanSegera[sel.dataset.item].keutamaan = sel.value;
+          }
+        } catch (err) { Swal.fire('Ralat', err.message, 'error'); }
+      });
+    });
+    tbody.querySelectorAll('.tsg-catatan-inp').forEach(inp => {
+      const save = () => saveTindakanCatatan(inp.dataset.sub, inp.dataset.item, inp.value.trim());
+      inp.addEventListener('blur', save);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+    });
+    tbody.querySelectorAll('.tsg-selesai-btn').forEach(btn => {
+      btn.addEventListener('click', () => markTindakanSelesai(btn.dataset.sub, btn.dataset.item));
+    });
+  }
+
+  const selesaiSection = document.getElementById('tsgSelesaiSection');
+  document.getElementById('tsgSelesaiCount').textContent = done.length;
+  if (done.length) {
+    selesaiSection.style.display = 'block';
+    document.getElementById('tsgSelesaiList').innerHTML = done.map(row =>
+      `<div style="font-size:12px;color:var(--vx-muted);text-decoration:line-through;margin-bottom:4px;">
+        ${esc(row.kenderaan)} — ${esc(row.item)}
+      </div>`).join('');
+  } else {
+    selesaiSection.style.display = 'none';
+  }
 }
 
 async function saveTindakanCatatan(subId, itemId, text) {
   try {
     await updateDoc(doc(db, 'checklistSubmissions', subId), { ['tindakanSegera.' + itemId + '.catatanAdmin']: text });
+    const sub = allSubmissions.find(s => s._id === subId);
+    if (sub) {
+      if (!sub.tindakanSegera) sub.tindakanSegera = {};
+      if (!sub.tindakanSegera[itemId]) sub.tindakanSegera[itemId] = {};
+      sub.tindakanSegera[itemId].catatanAdmin = text;
+    }
   } catch (err) {
     Swal.fire('Ralat', 'Gagal menyimpan catatan admin: ' + (err.message || err), 'error');
   }
@@ -835,17 +1148,17 @@ async function markTindakanSelesai(subId, itemId) {
       ['tindakanSegera.' + itemId + '.selesai']: true,
       ['tindakanSegera.' + itemId + '.selesaiTimestamp']: serverTimestamp()
     });
+    const sub = allSubmissions.find(s => s._id === subId);
+    if (sub) {
+      if (!sub.tindakanSegera) sub.tindakanSegera = {};
+      if (!sub.tindakanSegera[itemId]) sub.tindakanSegera[itemId] = {};
+      sub.tindakanSegera[itemId].selesai = true;
+    }
+    renderTindakanSegera();
   } catch (err) {
     Swal.fire('Ralat', 'Gagal mengemaskini: ' + (err.message || err), 'error');
   }
 }
-
-document.getElementById('btnToggleTsgDone').addEventListener('click', function () {
-  const wrap = document.getElementById('tsgDoneWrap');
-  const nowHidden = wrap.style.display !== 'none';
-  wrap.style.display = nowHidden ? 'none' : 'block';
-  this.textContent = nowHidden ? 'Papar' : 'Sembunyi';
-});
 
 /* ---------------------------------------------------------------------
    SECTION 2: SEMAKAN REKOD
@@ -1012,14 +1325,6 @@ function downloadButiranPDF(sub) {
   doc.save(`kenderaan-${sub.kenderaan}-${sub.tarikh}.pdf`);
 }
 
-function adminRemarksSummary(sub) {
-  if (!sub.adminRemarks || !Array.isArray(sub.items)) return '';
-  return sub.items
-    .filter(it => sub.adminRemarks[it.id] && sub.adminRemarks[it.id].trim())
-    .map(it => `${it.label}: ${sub.adminRemarks[it.id]}`)
-    .join('; ');
-}
-
 function csvEscape(v) {
   const s = (v === undefined || v === null) ? '' : String(v);
   return '"' + s.replace(/"/g, '""') + '"';
@@ -1052,29 +1357,207 @@ document.getElementById('btnRekodExport').addEventListener('click', function () 
 let currentLaporanFiltered = [];
 
 document.getElementById('btnLaporanFilter').addEventListener('click', function () {
-  const month = document.getElementById('laporanFilterBulan').value;
-  currentLaporanFiltered = filterSubmissions('', month);
-  const tbody = document.getElementById('laporanBody');
-  if (!currentLaporanFiltered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="vx-empty-row">Tiada rekod untuk bulan ini.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = currentLaporanFiltered.map(sub => `
-    <tr>
-      <td>${esc(sub.tarikh)}</td>
-      <td>${esc(sub.masa)}</td>
-      <td>${esc(sub.kenderaan)}</td>
-      <td>${esc(sub.ringkasan)}</td>
-      <td>${BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan}</td>
-      <td>${esc(adminRemarksSummary(sub) || '—')}</td>
-    </tr>`).join('');
+  const monthStr = document.getElementById('laporanFilterBulan').value;
+  if (!monthStr) return Swal.fire('Perhatian', 'Sila pilih bulan.', 'warning');
+
+  const monthSubs = allSubmissions.filter(sub => (sub.tarikh || '').startsWith(monthStr));
+  const ambulansPlates = Object.keys(vehicleProfiles)
+    .filter(p => vehicleProfiles[p].jenisKenderaan === 'ambulans')
+    .sort((a, b) => a.localeCompare(b));
+
+  const [yr, mo] = monthStr.split('-');
+  const bulanLabel = new Date(Number(yr), Number(mo) - 1, 1)
+    .toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
+  const tarikhJana = new Date().toLocaleDateString('ms-MY', { day:'2-digit', month:'long', year:'numeric' })
+    + ', ' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
+
+  let totalIsuDilaporkan = 0, totalIsuSelesai = 0, totalDowntime = 0;
+
+  const vehicleSections = ambulansPlates.map(plate => {
+    const profile = vehicleProfiles[plate];
+    const plateSubs = monthSubs.filter(s => s.kenderaan === plate);
+
+    const dayCounts = { berfungsi: 0, tidak_berfungsi: 0, di_bengkel: 0, dipinjam: 0, sedang_digunakan: 0 };
+    plateSubs.forEach(s => {
+      const k = s.statusKenderaan;
+      if (k === 'berfungsi')                 dayCounts.berfungsi++;
+      else if (k === 'tidak_berfungsi' || k === 'rosak' || k === 'dalam_pembaikan') dayCounts.tidak_berfungsi++;
+      else if (k === 'di_bengkel')           dayCounts.di_bengkel++;
+      else if (k === 'dipinjam')             dayCounts.dipinjam++;
+      else if (k === 'sedang_digunakan' || k === 'dalam_penggunaan') dayCounts.sedang_digunakan++;
+    });
+    const downtime = dayCounts.tidak_berfungsi + dayCounts.di_bengkel;
+    totalDowntime += downtime;
+
+    const isuList = [];
+    plateSubs.forEach(sub => {
+      const ts = sub.tindakanSegera || {};
+      if (['tidak_berfungsi','di_bengkel','rosak','dalam_pembaikan','lain_lain'].includes(sub.statusKenderaan)) {
+        const state = ts['statusKenderaan'] || {};
+        isuList.push({
+          item: 'Status Kenderaan Keseluruhan',
+          tarikh: sub.tarikh,
+          catatanPemandu: statusLabelOf(sub) + (sub.ringkasan ? ' — ' + sub.ringkasan : ''),
+          tindakanPenyelia: state.catatanAdmin || '',
+          selesai: !!state.selesai,
+        });
+      }
+      if (Array.isArray(sub.items)) {
+        sub.items.filter(it => it.status === 'tidakOk').forEach(it => {
+          const state = ts[it.id] || {};
+          isuList.push({
+            item: it.label, tarikh: sub.tarikh,
+            catatanPemandu: it.perihal || '—',
+            tindakanPenyelia: state.catatanAdmin || '',
+            selesai: !!state.selesai,
+          });
+        });
+      }
+    });
+
+    totalIsuDilaporkan += isuList.length;
+    totalIsuSelesai    += isuList.filter(i => i.selesai).length;
+
+    const enjin = servisCell(profile.nextServiceDate);
+    const brek  = servisCell(profile.nextBrakeServiceDate);
+
+    const isuRows = isuList.length ? isuList.map(isu =>
+      `<tr>
+        <td style="padding:6px 8px;font-weight:600;">${esc(isu.item)}</td>
+        <td style="padding:6px 8px;">${esc(isu.tarikh)}</td>
+        <td style="padding:6px 8px;">${esc(isu.catatanPemandu)}</td>
+        <td style="padding:6px 8px;">${esc(isu.tindakanPenyelia) || '<span style="color:#9AA5AD;font-style:italic;">Tiada tindakan dicatat</span>'}</td>
+        <td style="padding:6px 8px;">
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+            background:${isu.selesai ? '#E3F4EB' : '#FDEAEA'};color:${isu.selesai ? '#1E8E5A' : '#C62828'};">
+            ${isu.selesai ? 'Selesai' : 'Belum Selesai'}
+          </span>
+        </td>
+      </tr>`).join('')
+    : `<tr><td colspan="5" style="padding:8px;color:#9AA5AD;font-style:italic;text-align:center;">Tiada isu dilaporkan bulan ini.</td></tr>`;
+
+    return `
+      <div style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(15,42,74,.05),0 4px 14px rgba(15,42,74,.08);padding:20px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:20px;font-weight:800;color:#0F2A4A;">${esc(plate)}</span>
+              <span style="font-size:11px;font-weight:700;background:#E0F4F5;color:#147D82;padding:3px 8px;border-radius:4px;">AMBULANS</span>
+            </div>
+            <div style="font-size:12px;color:#5B6774;margin-top:2px;">${esc(profile.namaKenderaan || '')} · No. Aset: ${esc(profile.noAset || '—')}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+            ${downtime > 0
+              ? `<div style="font-size:11px;color:#5B6774;">Jumlah Downtime</div>
+                 <div style="font-size:28px;font-weight:800;color:#C62828;line-height:1.1;">${downtime}</div>
+                 <div style="font-size:11px;font-weight:600;color:#C62828;">hari</div>`
+              : `<div style="font-size:11px;font-weight:700;color:#1E8E5A;background:#E3F4EB;padding:4px 10px;border-radius:6px;">Tiada Downtime</div>`}
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div style="background:#EEF8F8;border-radius:8px;padding:12px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:8px;">Status Bulan Ini</div>
+            ${[
+              ['Berfungsi',                dayCounts.berfungsi,       '#1E8E5A'],
+              ['Tidak Berfungsi (Di Hospital)', dayCounts.tidak_berfungsi,'#C62828'],
+              ['Di Bengkel',               dayCounts.di_bengkel,      '#A82121'],
+              ['Dipinjam',                 dayCounts.dipinjam,        '#C98A2E'],
+              ['Sedang Digunakan',         dayCounts.sedang_digunakan,'#147D82'],
+            ].map(([label, val, color]) => `
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+                <span style="color:#5B6774;">${label}</span>
+                <span style="font-weight:700;color:${color};">${val} hari</span>
+              </div>`).join('')}
+          </div>
+          <div style="background:#EEF8F8;border-radius:8px;padding:12px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:8px;">Status Servis</div>
+            ${[
+              ['Servis Enjin', enjin],
+              ['Servis Brek',  brek],
+            ].map(([label, s]) => `
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+                <span style="font-size:12px;color:#5B6774;">${label}</span>
+                <div style="text-align:right;">
+                  <div style="font-size:12px;font-weight:700;color:${s.cls==='servis-lampau'?'#C62828':s.cls==='servis-hampir'?'#C98A2E':'#1E8E5A'};">${s.label}</div>
+                  <div style="font-size:11px;color:#9AA5AD;">${s.date}</div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:8px;">
+          Isu Dilaporkan · ${isuList.length} isu
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:480px;">
+            <thead>
+              <tr style="background:#EEF8F8;color:#5B6774;text-transform:uppercase;font-size:10px;letter-spacing:.5px;">
+                <th style="padding:6px 8px;text-align:left;font-weight:700;">Item</th>
+                <th style="padding:6px 8px;text-align:left;font-weight:700;">Tarikh</th>
+                <th style="padding:6px 8px;text-align:left;font-weight:700;">Catatan Pemandu</th>
+                <th style="padding:6px 8px;text-align:left;font-weight:700;">Tindakan Penyelia</th>
+                <th style="padding:6px 8px;text-align:left;font-weight:700;">Status</th>
+              </tr>
+            </thead>
+            <tbody style="border:1px solid #DCE6ED;">${isuRows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  });
+
+  const isuTerbuka = totalIsuDilaporkan - totalIsuSelesai;
+
+  const reportHTML = `
+    <div style="font-family:'Public Sans',sans-serif;">
+      <div style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(15,42,74,.05),0 4px 14px rgba(15,42,74,.08);padding:24px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#5B6774;">Laporan Kenderaan Bulanan</div>
+        <div style="font-size:22px;font-weight:800;color:#0F2A4A;margin-top:6px;">Hospital Pitas</div>
+        <div style="font-size:16px;font-weight:600;color:#147D82;margin-top:4px;">${esc(bulanLabel)}</div>
+        <div style="font-size:12px;color:#9AA5AD;margin-top:4px;">Dijana: ${esc(tarikhJana)}</div>
+      </div>
+
+      <div style="background:#EEF8F8;border-radius:12px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:12px;">Ringkasan Flot Ambulans</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;">
+          ${[
+            ['Jumlah Ambulans',  ambulansPlates.length,   '#0F2A4A'],
+            ['Isu Dilaporkan',   totalIsuDilaporkan,      '#0F2A4A'],
+            ['Isu Diselesaikan', totalIsuSelesai,         '#1E8E5A'],
+            ['Isu Masih Terbuka',isuTerbuka,              '#C62828'],
+          ].map(([label, val, color]) => `
+            <div style="background:#fff;border-radius:8px;padding:12px;text-align:center;border:1px solid #DCE6ED;">
+              <div style="font-size:22px;font-weight:800;color:${color};">${val}</div>
+              <div style="font-size:11px;color:#5B6774;margin-top:2px;">${label}</div>
+            </div>`).join('')}
+        </div>
+        <div style="background:#FDEAEA;border:1px solid #FBBFBF;border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#C62828;text-transform:uppercase;">Jumlah Downtime Ambulans</div>
+            <div style="font-size:11px;color:#C62828;opacity:.8;margin-top:2px;">Gabungan semua ambulans bulan ini</div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:30px;font-weight:800;color:#C62828;">${totalDowntime}</span>
+            <span style="font-size:13px;color:#C62828;margin-left:4px;">hari</span>
+          </div>
+        </div>
+      </div>
+
+      ${vehicleSections.join('')}
+
+      <div style="text-align:center;font-size:11px;color:#9AA5AD;margin-top:8px;padding:12px;border-top:1px solid #DCE6ED;">
+        Laporan ini dijana secara automatik oleh Sistem VELOS · Hospital Pitas · ${esc(tarikhJana)}
+      </div>
+    </div>`;
+
+  const laporanContent = document.getElementById('laporanContent');
+  laporanContent.innerHTML = reportHTML;
+  laporanContent.style.display = 'block';
+  document.getElementById('btnLaporanCetak').style.display = 'inline-block';
 });
 
-document.getElementById('btnLaporanExport').addEventListener('click', function () {
-  if (!currentLaporanFiltered.length) return Swal.fire('Perhatian', 'Tiada rekod untuk dieksport. Sila tapis dahulu.', 'warning');
-  const rows = [['Tarikh', 'Masa', 'Kenderaan', 'Ringkasan Penemuan Kerosakan & Tindakan', 'Adakah Kenderaan Boleh Digunakan?', 'Tindakan Admin']];
-  currentLaporanFiltered.forEach(sub => rows.push([sub.tarikh, sub.masa, sub.kenderaan, sub.ringkasan, BOLEH_LABEL[sub.bolehDigunakan] || sub.bolehDigunakan, adminRemarksSummary(sub)]));
-  downloadCsv('laporan-bulanan-kenderaan.csv', rows);
+document.getElementById('btnLaporanCetak').addEventListener('click', function () {
+  window.print();
 });
 
 /* ---------------------------------------------------------------------
@@ -1095,6 +1578,8 @@ function loadProfilForm(plate) {
   if (plate === '__new__') {
     pfPlate.value = '';
     pfPlate.disabled = false;
+    document.getElementById('pfNoAset').value = '';
+    document.getElementById('pfNamaKenderaan').value = '';
     document.getElementById('pfJenis').value = '';
     document.getElementById('pfChasis').value = '';
     document.getElementById('pfEnjin').value = '';
@@ -1110,6 +1595,8 @@ function loadProfilForm(plate) {
     const p = vehicleProfiles[plate] || {};
     pfPlate.value = plate;
     pfPlate.disabled = true;
+    document.getElementById('pfNoAset').value = p.noAset || '';
+    document.getElementById('pfNamaKenderaan').value = p.namaKenderaan || '';
     document.getElementById('pfJenis').value = p.jenisKenderaan || '';
     document.getElementById('pfChasis').value = p.noChasis || '';
     document.getElementById('pfEnjin').value = p.noEnjin || '';
@@ -1137,6 +1624,8 @@ document.getElementById('profilForm').addEventListener('submit', async function 
   if (isNew && vehicleProfiles[plate]) return Swal.fire('Perhatian', 'Kenderaan dengan no. pendaftaran ini sudah wujud.', 'warning');
 
   const data = {
+    noAset: document.getElementById('pfNoAset').value.trim(),
+    namaKenderaan: document.getElementById('pfNamaKenderaan').value.trim(),
     jenisKenderaan: jenis,
     noChasis: document.getElementById('pfChasis').value.trim(),
     noEnjin: document.getElementById('pfEnjin').value.trim(),
@@ -1183,6 +1672,353 @@ btnProfilDelete.addEventListener('click', function () {
       Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
     }
   });
+});
+
+/* -----------------------------------------------------------------------
+   LAPORAN INSIDEN KENDERAAN
+----------------------------------------------------------------------- */
+/* -----------------------------------------------------------------------
+   LAPORAN INSIDEN KENDERAAN — ADMIN
+   Two independent collections:
+     vehicleIncidents  → admin's Kronologi Penyelia
+     insidenPenyata    → pemandu's individual statements (read-only here)
+----------------------------------------------------------------------- */
+const JENIS_LABEL = {
+  kemalangan: 'Kemalangan Jalan Raya',
+  kerosakan:  'Kerosakan Kenderaan',
+  lainalain:  'Lain-lain',
+};
+
+// ---- TAB A: KRONOLOGI PENYELIA (collection: vehicleIncidents) ----
+
+let kpCurrentId = null;
+let kpCurrentData = null;
+let kpKronologi = [];
+
+function kpShowList() {
+  document.getElementById('kpListView').style.display = 'block';
+  document.getElementById('kpCreateView').style.display = 'none';
+  document.getElementById('kpDetailView').style.display = 'none';
+  kpLoadList();
+}
+function kpShowCreate() {
+  document.getElementById('kpListView').style.display = 'none';
+  document.getElementById('kpCreateView').style.display = 'block';
+  document.getElementById('kpDetailView').style.display = 'none';
+  const sel = document.getElementById('kpKenderaan');
+  sel.innerHTML = '<option value="">Pilih kenderaan...</option>' +
+    Object.keys(vehicleProfiles).sort().map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  document.getElementById('kpTarikh').value = todayISO();
+  document.getElementById('kpMasa').value = pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
+}
+function kpShowDetail() {
+  document.getElementById('kpListView').style.display = 'none';
+  document.getElementById('kpCreateView').style.display = 'none';
+  document.getElementById('kpDetailView').style.display = 'block';
+}
+
+async function kpLoadList() {
+  const container = document.getElementById('kpListContainer');
+  container.innerHTML = '<p class="vx-empty-row">Memuatkan...</p>';
+  try {
+    const snap = await getDocs(query(collection(db, 'vehicleIncidents'), orderBy('timestamp','desc')));
+    const list = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    document.getElementById('kpListCount').textContent = `${list.length} laporan`;
+    container.innerHTML = list.length ? list.map(inc => `
+      <div class="vx-card" style="cursor:pointer;margin-bottom:12px;" data-kpid="${esc(inc._id)}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-weight:800;">${esc(inc.kenderaan)}</span>
+              <span class="fb ${inc.jenis==='kemalangan'?'danger':'warn'}">${esc(JENIS_LABEL[inc.jenis]||inc.jenis)}</span>
+            </div>
+            <div style="font-size:12px;color:var(--vx-muted);margin-top:4px;">${esc(inc.virId||inc._id)} · ${esc(inc.tarikhKejadian)}</div>
+          </div>
+          <span class="fb ${inc.status==='selesai'?'ok':'warn'}">${inc.status==='selesai'?'Selesai':'Dalam Proses'}</span>
+        </div>
+      </div>`).join('')
+    : '<div class="vx-card"><p class="vx-empty-row">Tiada laporan kronologi.</p></div>';
+    container.querySelectorAll('[data-kpid]').forEach(card => {
+      card.addEventListener('click', () => kpOpenDetail(card.dataset.kpid));
+    });
+  } catch(err) { Swal.fire('Ralat', err.message, 'error'); }
+}
+
+async function kpOpenDetail(id) {
+  try {
+    const snap = await getDoc(doc(db, 'vehicleIncidents', id));
+    if (!snap.exists()) return Swal.fire('Ralat', 'Rekod tidak dijumpai.', 'error');
+    kpCurrentId = id; kpCurrentData = snap.data();
+    const kronSnap = await getDocs(query(
+      collection(db, 'vehicleIncidents', id, 'kronologiPenyelia'), orderBy('order','asc')
+    ));
+    kpKronologi = kronSnap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    kpRenderDetail(); kpShowDetail();
+  } catch(err) { Swal.fire('Ralat', err.message, 'error'); }
+}
+
+function kpRenderDetail() {
+  const d = kpCurrentData;
+  document.getElementById('kpDetailVirId').textContent = d.virId || kpCurrentId;
+  const jBadge = document.getElementById('kpDetailJenisBadge');
+  jBadge.textContent = JENIS_LABEL[d.jenis]||d.jenis;
+  jBadge.className = 'fb '+(d.jenis==='kemalangan'?'danger':'warn');
+  const sBadge = document.getElementById('kpDetailStatusBadge');
+  sBadge.textContent = d.status==='selesai'?'Selesai':'Dalam Proses';
+  sBadge.className = 'fb '+(d.status==='selesai'?'ok':'warn');
+  document.getElementById('kpDetailSubHeader').textContent = `${d.kenderaan} · ${d.tarikhKejadian} · ${d.masaKejadian}`;
+
+  document.getElementById('kpButiranPanel').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      ${[['Jenis',JENIS_LABEL[d.jenis]||d.jenis],['Kenderaan',d.kenderaan],['Tarikh',d.tarikhKejadian],['Masa',d.masaKejadian]].map(([l,v])=>`
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--vx-muted);">${l}</div>
+          <div style="font-size:14px;margin-top:3px;">${esc(v)}</div>
+        </div>`).join('')}
+      <div style="grid-column:1/-1;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--vx-muted);">Lokasi</div>
+        <div style="font-size:14px;margin-top:3px;">${esc(d.lokasi)}</div>
+      </div>
+      <div style="grid-column:1/-1;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--vx-muted);">Butiran</div>
+        <div style="font-size:14px;margin-top:3px;line-height:1.5;">${esc(d.butiran)}</div>
+      </div>
+    </div>`;
+  kpRenderKronologi();
+}
+
+function kpRenderKronologi() {
+  const container = document.getElementById('kpKronologiList');
+  container.innerHTML = kpKronologi.length ? kpKronologi.map((row, i) => `
+    <div class="vx-card" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:11px;font-weight:700;color:var(--vx-teal);background:var(--vx-teal-light);padding:2px 8px;border-radius:20px;">#${i+1}</span>
+        <button class="vx-btn danger" style="padding:4px 8px;font-size:11px;" data-del-kron="${esc(row._id)}">Padam</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="vx-field" style="margin:0;"><label style="font-size:11px;">Tarikh</label>
+          <input type="text" class="kf" data-kron="${esc(row._id)}" data-f="tarikh" value="${esc(row.tarikh||'')}"></div>
+        <div class="vx-field" style="margin:0;"><label style="font-size:11px;">Masa</label>
+          <input type="text" class="kf" data-kron="${esc(row._id)}" data-f="masa" value="${esc(row.masa||'')}" placeholder="09:45"></div>
+      </div>
+      ${[['Perkara','perkara',2],['Tindakan','tindakan',2],['Pegawai Terlibat','pegawai',1]].map(([l,f,r])=>`
+        <div class="vx-field" style="margin-bottom:8px;"><label style="font-size:11px;">${l}</label>
+          <textarea class="kf" data-kron="${esc(row._id)}" data-f="${f}" rows="${r}">${esc(row[f]||'')}</textarea></div>`).join('')}
+    </div>`).join('')
+  : '<div style="color:var(--vx-muted);font-size:13px;padding:12px 0;">Tiada entri. Tambah entri pertama.</div>';
+
+  container.querySelectorAll('.kf').forEach(field => {
+    const save = async () => {
+      try {
+        await updateDoc(doc(db,'vehicleIncidents',kpCurrentId,'kronologiPenyelia',field.dataset.kron),{[field.dataset.f]:field.value});
+        const idx = kpKronologi.findIndex(r=>r._id===field.dataset.kron);
+        if(idx>=0) kpKronologi[idx][field.dataset.f] = field.value;
+      } catch(e){console.error(e);}
+    };
+    field.addEventListener('blur', save);
+    if(field.tagName==='INPUT') field.addEventListener('keydown',e=>{if(e.key==='Enter')field.blur();});
+  });
+  container.querySelectorAll('[data-del-kron]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await deleteDoc(doc(db,'vehicleIncidents',kpCurrentId,'kronologiPenyelia',btn.dataset.delKron));
+        kpKronologi = kpKronologi.filter(r=>r._id!==btn.dataset.delKron);
+        kpRenderKronologi();
+      } catch(e){Swal.fire('Ralat',e.message,'error');}
+    });
+  });
+}
+
+document.getElementById('btnTambahKronologi').addEventListener('click', async () => {
+  try {
+    const ref = await addDoc(collection(db,'vehicleIncidents',kpCurrentId,'kronologiPenyelia'),{
+      tarikh: kpCurrentData.tarikhKejadian||todayISO(), masa:'', perkara:'', tindakan:'', pegawai:'', order: kpKronologi.length,
+    });
+    kpKronologi.push({_id:ref.id, tarikh:kpCurrentData.tarikhKejadian||todayISO(), masa:'',perkara:'',tindakan:'',pegawai:'',order:kpKronologi.length});
+    kpRenderKronologi();
+  } catch(e){Swal.fire('Ralat',e.message,'error');}
+});
+
+document.getElementById('btnPrintKronologi').addEventListener('click', () => {
+  const d = kpCurrentData;
+  const rows = kpKronologi.map((r,i)=>`<tr>
+    <td style="border:1px solid #333;padding:6px;text-align:center;">${i+1}</td>
+    <td style="border:1px solid #333;padding:6px;text-align:center;white-space:nowrap;">${esc(r.tarikh)}</td>
+    <td style="border:1px solid #333;padding:6px;text-align:center;">${esc(r.masa)}</td>
+    <td style="border:1px solid #333;padding:6px;">${esc(r.perkara)}</td>
+    <td style="border:1px solid #333;padding:6px;">${esc(r.tindakan)}</td>
+    <td style="border:1px solid #333;padding:6px;">${esc(r.pegawai)}</td>
+  </tr>`).join('');
+  document.getElementById('kpPrintKronologiDoc').innerHTML = `
+    <div style="font-family:serif;padding:20px;max-width:750px;margin:0 auto;">
+      <div style="text-align:center;font-weight:bold;margin-bottom:16px;line-height:1.4;">
+        <div>LAPORAN KRONOLOGI KEJADIAN ${esc((JENIS_LABEL[d.jenis]||d.jenis).toUpperCase())}</div>
+        <div>MELIBATKAN KENDERAAN AMBULANS ${esc(d.kenderaan)}</div>
+      </div>
+      <div style="margin-bottom:14px;font-size:12px;line-height:1.8;">
+        <div><strong>Tarikh Kejadian:</strong> ${esc(d.tarikhKejadian)}</div>
+        <div><strong>Masa Kejadian:</strong> ${esc(d.masaKejadian)}</div>
+        <div><strong>Lokasi:</strong> ${esc(d.lokasi)}</div>
+        <div><strong>Butiran:</strong> ${esc(d.butiran)}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:30px;">
+        <thead><tr style="background:#eee;">
+          <th style="border:1px solid #333;padding:6px;">BIL</th>
+          <th style="border:1px solid #333;padding:6px;">TARIKH</th>
+          <th style="border:1px solid #333;padding:6px;">MASA (24JAM)</th>
+          <th style="border:1px solid #333;padding:6px;">PERKARA</th>
+          <th style="border:1px solid #333;padding:6px;">TINDAKAN</th>
+          <th style="border:1px solid #333;padding:6px;">PEGAWAI TERLIBAT</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;margin-top:40px;">
+        ${['Disediakan Oleh:','Disahkan Oleh:'].map(l=>`
+          <div style="flex:1;margin-right:20px;">
+            <div style="font-size:12px;font-weight:bold;">${l}</div>
+            <div style="border-bottom:1px solid #555;margin:30px 0 4px;"></div>
+            <div style="font-size:11px;">(................................................)</div>
+            <div style="font-size:11px;margin-top:2px;">Hospital Pitas</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  window.print();
+});
+
+document.getElementById('btnKpBaharu').addEventListener('click', kpShowCreate);
+document.getElementById('btnKpCreateBack').addEventListener('click', kpShowList);
+document.getElementById('btnKpDetailBack').addEventListener('click', kpShowList);
+
+document.getElementById('btnKpCipta').addEventListener('click', async () => {
+  const jenis=document.getElementById('kpJenis').value, kenderaan=document.getElementById('kpKenderaan').value,
+    tarikh=document.getElementById('kpTarikh').value, masa=document.getElementById('kpMasa').value,
+    lokasi=document.getElementById('kpLokasi').value.trim(), butiran=document.getElementById('kpButiran').value.trim();
+  if(!jenis||!kenderaan||!tarikh||!masa||!lokasi||!butiran)
+    return Swal.fire('Perhatian','Sila lengkapkan semua maklumat.','warning');
+  const dateStr=tarikh.replace(/-/g,'');
+  const existSnap=await getDocs(query(collection(db,'vehicleIncidents'),where('tarikhKejadian','==',tarikh)));
+  const virId=`VIR-${dateStr}-${String(existSnap.size+1).padStart(3,'0')}`;
+  const profile=vehicleProfiles[kenderaan]||{};
+  try {
+    const ref=await addDoc(collection(db,'vehicleIncidents'),{
+      virId, jenis, jenisLabel:JENIS_LABEL[jenis]||jenis, kenderaan, noAset:profile.noAset||'',
+      tarikhKejadian:tarikh, masaKejadian:masa, lokasi, butiran,
+      status:'draft', dibuatOleh:'PPP Shafiq', tarikhDibuat:todayISO(), timestamp:serverTimestamp(),
+    });
+    await kpOpenDetail(ref.id);
+  } catch(e){Swal.fire('Ralat',e.message,'error');}
+});
+
+document.getElementById('btnKpSelesai').addEventListener('click', async () => {
+  const res=await Swal.fire({title:'Tandakan sebagai Selesai?',icon:'question',showCancelButton:true,confirmButtonText:'Ya',cancelButtonText:'Batal'});
+  if(!res.isConfirmed) return;
+  try {
+    await updateDoc(doc(db,'vehicleIncidents',kpCurrentId),{status:'selesai'});
+    kpCurrentData.status='selesai'; kpRenderDetail();
+  } catch(e){Swal.fire('Ralat',e.message,'error');}
+});
+
+// ---- TAB B: PENYATA KAKITANGAN (read-only from insidenPenyata) ----
+
+async function pktLoad(filterTarikh='', filterKenderaan='') {
+  const container = document.getElementById('pktListContainer');
+  container.innerHTML = '<p class="vx-empty-row">Memuatkan...</p>';
+  try {
+    let q = query(collection(db, 'insidenPenyata'), orderBy('timestamp','desc'));
+    const snap = await getDocs(q);
+    let list = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    if (filterTarikh) list = list.filter(r => r.tarikhKejadian === filterTarikh);
+    if (filterKenderaan) list = list.filter(r => (r.kenderaan||'').toLowerCase().includes(filterKenderaan.toLowerCase()));
+    document.getElementById('pktListCount').textContent = `${list.length} penyata dijumpai`;
+    container.innerHTML = list.length ? list.map(p => `
+      <div class="vx-card" style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-weight:800;font-size:14px;">${esc(p.nama)}</div>
+            <div style="font-size:12px;color:var(--vx-muted);">${esc(p.jawatan)} · ${esc(p.tempat)}</div>
+            <div style="font-size:11px;color:var(--vx-muted);margin-top:2px;">${esc(p.kenderaan)} · ${esc(p.tarikhKejadian)}</div>
+          </div>
+          <button class="vx-btn ghost" style="font-size:12px;padding:6px 12px;" data-print-pkt="${esc(p._id)}">📄 Print</button>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--vx-muted);background:var(--vx-card-tint);padding:10px;border-radius:8px;white-space:pre-line;">${esc((p.penyata||'').slice(0,200))}${(p.penyata||'').length>200?'…':''}</div>
+      </div>`).join('')
+    : '<div class="vx-card"><p class="vx-empty-row">Tiada penyata kakitangan.</p></div>';
+
+    container.querySelectorAll('[data-print-pkt]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pData = list.find(p => p._id === btn.dataset.printPkt);
+        if (!pData) return;
+        const paras = (pData.penyata||'').split('\n\n').filter(Boolean);
+        document.getElementById('pktPrintDoc').innerHTML = `
+          <div style="font-family:serif;padding:28px 36px;max-width:650px;margin:0 auto;font-size:12px;line-height:1.6;">
+            <div style="margin-bottom:20px;">
+              <div>${esc(pData.nama)},</div>
+              <div>${esc(pData.jawatan)},</div>
+              <div>${esc(pData.tempat)},</div>
+              <div>Hospital Pitas.</div>
+            </div>
+            <div style="text-align:right;margin-bottom:20px;">${esc(pData.tarikhKejadian)}</div>
+            <div style="margin-bottom:16px;">
+              <div>Pengarah Hospital,</div>
+              <div>Hospital Pitas, Peti Surat 88,</div>
+              <div>89100, Pitas.</div>
+            </div>
+            <div style="margin-bottom:14px;">Tuan,</div>
+            <div style="font-weight:bold;text-align:center;margin-bottom:14px;text-transform:uppercase;">
+              PENYATA INDIVIDU — ${esc((JENIS_LABEL[pData.jenis]||pData.jenis||'INSIDEN').toUpperCase())} · ${esc(pData.kenderaan)}
+            </div>
+            <div style="margin-bottom:14px;">Dengan hormatnya perkara di atas adalah dirujuk.</div>
+            <div style="margin-bottom:14px;line-height:1.8;">
+              <div><strong>Nama:</strong> ${esc(pData.nama)}</div>
+              <div><strong>No. IC:</strong> ${esc(pData.ic)}</div>
+              <div><strong>Jawatan:</strong> ${esc(pData.jawatan)}</div>
+              <div><strong>Tempat Bertugas:</strong> ${esc(pData.tempat)}</div>
+              <div><strong>Tarikh Kejadian:</strong> ${esc(pData.tarikhKejadian)}</div>
+              <div><strong>Lokasi Kejadian:</strong> ${esc(pData.lokasi)}</div>
+              <div><strong>Anggaran Masa Kejadian:</strong> ${esc(pData.masaKejadian)}</div>
+            </div>
+            <div style="margin-bottom:30px;">${paras.map(p=>`<p style="margin:0 0 12px;">${esc(p)}</p>`).join('')}</div>
+            <div style="margin-bottom:40px;">Sekian, terima kasih.</div>
+            <div>
+              <div style="font-weight:bold;">Yang benar,</div>
+              <div style="border-bottom:1px solid #555;width:180px;margin:30px 0 6px;"></div>
+              <div style="font-weight:bold;">(${esc(pData.nama.toUpperCase())})</div>
+              <div>${esc(pData.jawatan)}</div>
+              <div>${esc(pData.tempat)}</div>
+              <div>Hospital Pitas</div>
+            </div>
+          </div>`;
+        window.print();
+      });
+    });
+  } catch(err) { Swal.fire('Ralat', err.message, 'error'); }
+}
+
+document.getElementById('btnPktFilter').addEventListener('click', () => {
+  pktLoad(document.getElementById('pktFilterTarikh').value, document.getElementById('pktFilterKenderaan').value.trim());
+});
+document.getElementById('btnPktReset').addEventListener('click', () => {
+  document.getElementById('pktFilterTarikh').value = '';
+  document.getElementById('pktFilterKenderaan').value = '';
+  pktLoad();
+});
+
+// ---- Top-level tab switching (Kronologi Penyelia / Penyata Kakitangan) ----
+document.querySelectorAll('.insiden-tab-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.insiden-tab-btn').forEach(b => b.classList.remove('vx-active-tab'));
+    document.querySelectorAll('.insiden-tab-panel').forEach(p => p.style.display = 'none');
+    btn.classList.add('vx-active-tab');
+    document.getElementById(btn.dataset.itab).style.display = 'block';
+    if (btn.dataset.itab === 'itab-penyata-kkt') pktLoad();
+    if (btn.dataset.itab === 'itab-kronologi-penyelia') kpShowList();
+  });
+});
+
+document.querySelectorAll('.vx-sidebar-link[data-section]').forEach(link => {
+  if (link.dataset.section === 'sec-insiden') {
+    link.addEventListener('click', () => setTimeout(kpShowList, 50));
+  }
 });
 </script>
 </body>

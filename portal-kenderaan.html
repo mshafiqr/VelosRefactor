@@ -14,13 +14,19 @@
   --vx-topbar:        #084E4E;
   --vx-sidebar:       #0A5C5C;
   --vx-gradient:      linear-gradient(135deg, #0F2A4A 0%, #0D4F54 50%, #147D82 100%);
+  --vx-sidebar-hover: rgba(255,255,255,0.08);
+  --vx-sidebar-active:rgba(255,255,255,0.18);
   --vx-teal:          #147D82;
   --vx-teal-light:    #E0F4F5;
+  --vx-teal-bright:   #7FDFDF;
   --vx-bg:            #EEF8F8;
   --vx-card:          #FFFFFF;
+  --vx-card-tint:     #F0FAFA;
   --vx-border:        #DCE6ED;
   --vx-text:          #0F2A4A;
   --vx-muted:         #5B6774;
+  --vx-sb-text:       #A8D4D4;
+  --vx-sb-label:      #5FAAAA;
   --vx-success:       #1E8E5A;
   --vx-success-light: #E3F4EB;
   --vx-danger:        #C62828;
@@ -33,6 +39,8 @@
   --vx-radius:        16px;
   --vx-radius-sm:     10px;
   --navbar-header-h:  56px;
+  --sidebar-w-collapsed: 0px;
+  --sidebar-w-expanded:  240px;
 }
 * { box-sizing: border-box; }
 body {
@@ -79,8 +87,51 @@ body {
 .vx-topbar-sub { font-size: 11px; color: #A8D4D4; font-weight: 500; }
 .btn-logout-top { background: var(--vx-danger); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
 .btn-logout-top:hover { background: #A82121; }
+.vx-sidebar-toggle-floating { width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.12); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: 700; font-family: inherit; }
+.vx-sidebar-toggle-floating:hover { background: rgba(255,255,255,0.22); }
 
-.vx-main { padding: calc(var(--navbar-header-h) + 18px) 14px 60px; max-width: 640px; margin: 0 auto; }
+/* ==================== SIDEBAR ==================== */
+.vx-sidebar {
+  position: fixed; top: var(--navbar-header-h); left: 0; bottom: 0;
+  width: var(--sidebar-w-expanded); background: var(--vx-gradient);
+  z-index: 999; overflow-x: hidden; overflow-y: auto; transition: width 0.18s ease;
+  display: flex; flex-direction: column; padding-top: 10px;
+}
+.vx-sidebar.vx-collapsed { width: 0; }
+#vxBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 998; display: none; }
+#vxBackdrop.vx-show { display: block; }
+.vx-sidebar-section-label { color: var(--vx-sb-label); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 14px 18px 8px; white-space: nowrap; }
+.vx-sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 8px 14px; }
+.vx-sidebar-link {
+  display: block; padding: 13px 18px; color: var(--vx-sb-text); text-decoration: none; font-size: 14px; font-weight: 600;
+  background: none; border: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.vx-sidebar-link:hover { background: var(--vx-sidebar-hover); color: #fff; }
+.vx-sidebar-link.vx-active { background: var(--vx-sidebar-active); color: var(--vx-teal-bright); border-left: 3px solid var(--vx-teal-bright); padding-left: 15px; }
+.vx-sidebar-icon { flex: 0 0 20px; display: inline-flex; align-items: center; justify-content: center; }
+.vx-sidebar-icon svg { width: 17px; height: 17px; display: block; }
+
+.vx-main {
+  padding: calc(var(--navbar-header-h) + 18px) 14px 60px;
+  max-width: 640px; margin: 0 auto;
+  margin-left: var(--sidebar-w-expanded);
+  transition: margin-left 0.18s ease;
+}
+.vx-main.vx-sidebar-collapsed { margin-left: 0; }
+@media (max-width: 900px) {
+  .vx-main, .vx-main.vx-sidebar-collapsed { margin-left: 0 !important; }
+  .vx-sidebar:not(.vx-collapsed) { width: min(78vw, 280px); box-shadow: 6px 0 24px rgba(0,0,0,0.3); }
+}
+
+.print-only { display: none; }
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .vx-topbar, .vx-sidebar, #vxBackdrop { display: none !important; }
+  .vx-main { margin-left: 0 !important; padding-top: 10px !important; }
+}
+
+.vx-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--vx-teal); margin-bottom: 4px; }
 
 /* ==================== NO VEHICLE STATE ==================== */
 .vx-empty-state { background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 40px 26px; text-align: center; margin-top: 40px; }
@@ -147,10 +198,7 @@ body {
 
 .vx-progress-count { text-align: center; font-size: 13px; color: var(--vx-muted); margin-top: -6px; margin-bottom: 18px; }
 
-/* ==================== TABS / SEMAKAN REKOD ==================== */
-.vx-tabs { display: flex; gap: 10px; margin-bottom: 18px; }
-.vx-tab { flex: 1; padding: 15px 10px; border-radius: 12px; border: 2px solid var(--vx-border); background: #fff; font-size: 15px; font-weight: 700; color: var(--vx-muted); cursor: pointer; font-family: inherit; }
-.vx-tab.active { border-color: var(--vx-teal); background: var(--vx-teal-light); color: var(--vx-teal); }
+/* ==================== SEMAKAN REKOD ==================== */
 .fb { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .fb.ok     { background: var(--vx-success-light); color: #0F6E56; }
 .fb.warn   { background: var(--vx-warning-light); color: #854F0B; }
@@ -198,6 +246,7 @@ body {
 <div id="appWrapper">
 <header class="vx-topbar">
   <div class="vx-topbar-left">
+    <button class="vx-sidebar-toggle-floating" id="vxSidebarToggle" title="Menu" aria-label="Menu">☰</button>
     <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
     <div>
       <div class="vx-topbar-title">VELOS — Kenderaan</div>
@@ -207,12 +256,20 @@ body {
   <button type="button" class="btn-logout-top" id="btnLogout">Log Keluar</button>
 </header>
 
-<div class="vx-main">
+<nav class="vx-sidebar vx-collapsed" id="vxSidebar">
+  <a href="#" class="vx-sidebar-link" onclick="window.open('index.html','_self');return false;" title="Laman Utama" style="display:flex;align-items:center;gap:12px;">
+    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/><path d="M9 21v-6h6v6"/></svg></span>
+    <span>Laman Utama</span>
+  </a>
+  <hr class="vx-sidebar-divider">
+  <div class="vx-sidebar-section-label">Portal Kenderaan</div>
+  <button class="vx-sidebar-link vx-active" id="sbBorangBaharu">Borang Baharu</button>
+  <button class="vx-sidebar-link" id="sbSemakanRekod">Semakan Rekod</button>
+  <button class="vx-sidebar-link" id="sbLaporanInsiden">Laporan Insiden Kenderaan</button>
+</nav>
+<div id="vxBackdrop"></div>
 
-  <div class="vx-tabs">
-    <button type="button" class="vx-tab active" id="tabFormBtn">Borang Baharu</button>
-    <button type="button" class="vx-tab" id="tabRecordsBtn">Semakan Rekod</button>
-  </div>
+<div class="vx-main">
 
   <div id="noVehicleState" class="vx-empty-state" style="display:none;">
     <p>Tiada kenderaan berdaftar. Hubungi pentadbir sistem.</p>
@@ -241,6 +298,79 @@ body {
     </div>
 
     <div id="recResultsContainer"></div>
+  </div>
+
+  <div id="insidenView" style="display:none;">
+
+    <!-- List / landing -->
+    <div id="ipListView">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <div class="vx-eyebrow">Portal Kenderaan</div>
+          <h2 style="font-size:18px;font-weight:800;margin:0;">Laporan Insiden</h2>
+        </div>
+        <button class="vx-btn primary" id="btnIpBaharu" style="flex:none;padding:12px 18px;">+ Laporan Baharu</button>
+      </div>
+      <div id="ipListContainer"></div>
+    </div>
+
+    <!-- Form: new personal statement -->
+    <div id="ipFormView" style="display:none;">
+      <button type="button" class="vx-btn ghost" id="btnIpFormBack" style="margin-bottom:16px;">← Kembali</button>
+      <div class="vx-card">
+        <h2 class="vx-card-title">Penyata Individu Baharu</h2>
+        <div class="vx-field">
+          <label for="ipNama">Nama Penuh</label>
+          <input type="text" id="ipNama" placeholder="Nama seperti dalam IC">
+        </div>
+        <div class="vx-field">
+          <label for="ipIc">No. IC</label>
+          <input type="text" id="ipIc" placeholder="XXXXXX-XX-XXXX">
+        </div>
+        <div class="vx-field">
+          <label for="ipJawatan">Jawatan</label>
+          <input type="text" id="ipJawatan" placeholder="Cth: Pemandu Kenderaan (PKA)">
+        </div>
+        <div class="vx-field">
+          <label for="ipTempat">Tempat Bertugas</label>
+          <input type="text" id="ipTempat" placeholder="Cth: Unit Kecemasan, Hospital Pitas">
+        </div>
+        <div class="vx-field">
+          <label for="ipKenderaan">Kenderaan Terlibat</label>
+          <input type="text" id="ipKenderaan" placeholder="Cth: BNU 9974">
+        </div>
+        <div class="vx-field">
+          <label for="ipJenis">Jenis Insiden</label>
+          <select id="ipJenis">
+            <option value="">Pilih jenis...</option>
+            <option value="kemalangan">Kemalangan Jalan Raya</option>
+            <option value="kerosakan">Kerosakan Kenderaan</option>
+            <option value="lainalain">Lain-lain</option>
+          </select>
+        </div>
+        <div class="vx-field">
+          <label for="ipTarikh">Tarikh Kejadian</label>
+          <input type="date" id="ipTarikh">
+        </div>
+        <div class="vx-field">
+          <label for="ipMasa">Anggaran Masa Kejadian</label>
+          <input type="time" id="ipMasa">
+        </div>
+        <div class="vx-field">
+          <label for="ipLokasi">Lokasi Kejadian</label>
+          <input type="text" id="ipLokasi" placeholder="Cth: KM 25, Jalan Berungis-Tenghilan">
+        </div>
+        <div class="vx-field">
+          <label for="ipPenyata">Penyata</label>
+          <textarea id="ipPenyata" rows="10"
+            placeholder="Tuliskan penyata anda secara kronologi. Terangkan tugas anda pada hari berkenaan, kejadian yang berlaku, dan tindakan yang anda ambil."></textarea>
+        </div>
+        <button class="vx-btn primary" id="btnIpSimPan" style="width:100%;">Simpan &amp; Print</button>
+      </div>
+    </div>
+
+    <!-- Print-only individual statement -->
+    <div class="print-only" id="ipPrintDoc" style="display:none;"></div>
   </div>
 
   <div id="formFlow" style="display:none;">
@@ -283,26 +413,33 @@ body {
         <label>Status Kenderaan</label>
         <button type="button" class="vx-choice-btn c-success" data-status="berfungsi">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg></span>
-          Berfungsi
+          Berfungsi — Di Hospital
         </button>
-        <button type="button" class="vx-choice-btn c-danger" data-status="rosak">
+        <button type="button" class="vx-choice-btn c-danger" data-status="tidak_berfungsi">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></span>
-          Rosak
+          Tidak Berfungsi — Di Hospital
         </button>
-        <button type="button" class="vx-choice-btn c-warning" data-status="dalam_pembaikan">
+        <button type="button" class="vx-choice-btn c-warning" data-status="di_bengkel">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3z"/></svg></span>
-          Sedang Dalam Pembaikan
+          Tidak Berfungsi — Di Bengkel
         </button>
-        <button type="button" class="vx-choice-btn c-info" data-status="dalam_penggunaan">
+        <div class="vx-inline-field" id="bengkelField">
+          <input type="text" id="inpNamaBengkel" placeholder="Nama bengkel...">
+          <input type="date" id="inpTarikhBengkel" style="margin-top:8px;">
+          <div class="vx-hint">Tarikh hantar ke bengkel</div>
+        </div>
+        <button type="button" class="vx-choice-btn c-info" data-status="sedang_digunakan">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span>
           Sedang Digunakan
         </button>
-        <button type="button" class="vx-choice-btn c-neutral" data-status="lain_lain">
+        <button type="button" class="vx-choice-btn c-neutral" data-status="dipinjam">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r="0.5" fill="currentColor"/><circle cx="12" cy="12" r="0.5" fill="currentColor"/><circle cx="16" cy="12" r="0.5" fill="currentColor"/></svg></span>
-          Lain-lain
+          Dipinjam — Di Fasiliti Lain
         </button>
-        <div class="vx-inline-field" id="statusLainLainField">
-          <input type="text" id="inpStatusLainLain" placeholder="Nyatakan status kenderaan...">
+        <div class="vx-inline-field" id="pinjamField">
+          <input type="text" id="inpNamaFasiliti" placeholder="Nama hospital / fasiliti...">
+          <input type="date" id="inpTarikhMulaPinjam" style="margin-top:8px;">
+          <div class="vx-hint">Tarikh mula dipinjam</div>
         </div>
       </div>
 
@@ -415,7 +552,18 @@ const ICON_ALERT_OCTAGON = '<svg viewBox="0 0 24 24" fill="none" stroke="current
 
 const PEMANDU_LIST = ['Ahmad Agar', 'Masnin', 'Rafaie', 'Jilie', 'Mazni', 'Nurikram', 'Rosley', 'Affendy', 'SN Reno', 'PPK Franli', 'PKA Fikri', 'PPK Shan', 'PPK Armay', 'PPK James', 'CC Dell', 'PPP Shafiq'];
 
-const STATUS_LABEL = { berfungsi: 'Berfungsi', rosak: 'Rosak', dalam_pembaikan: 'Sedang Dalam Pembaikan', dalam_penggunaan: 'Sedang Digunakan', lain_lain: 'Lain-lain' };
+const STATUS_LABEL = {
+  berfungsi:        'Berfungsi (Di Hospital)',
+  tidak_berfungsi:  'Tidak Berfungsi (Di Hospital)',
+  di_bengkel:       'Tidak Berfungsi (Di Bengkel)',
+  sedang_digunakan: 'Sedang Digunakan',
+  dipinjam:         'Dipinjam (Di Fasiliti Lain)',
+  // backward compat with pre-revamp status values:
+  rosak:            'Rosak',
+  dalam_pembaikan:  'Sedang Dalam Pembaikan',
+  dalam_penggunaan: 'Sedang Digunakan',
+  lain_lain:        'Lain-lain',
+};
 const BOLEH_LABEL = { selamat: 'Selamat', jarakDekat: 'Jarak Dekat Sahaja', tidakSelamat: 'Tidak Selamat' };
 const statusLabelOf = sub => STATUS_LABEL[sub.statusKenderaan] ? (STATUS_LABEL[sub.statusKenderaan] + (sub.statusKenderaan === 'lain_lain' && sub.statusLainLain ? ' — ' + sub.statusLainLain : '')) : sub.statusKenderaan;
 
@@ -485,6 +633,48 @@ loginForm.addEventListener('submit', async function (e) {
 });
 
 document.getElementById('btnLogout').addEventListener('click', function () { signOut(auth); });
+
+/* ---------------------------------------------------------------------
+   SIDEBAR
+--------------------------------------------------------------------- */
+let sidebarCollapsed = true; // pemandu starts collapsed
+const vxSidebar = document.getElementById('vxSidebar');
+const vxMain = document.querySelector('.vx-main');
+const vxBackdrop = document.getElementById('vxBackdrop');
+
+function applySidebarState() {
+  vxSidebar.classList.toggle('vx-collapsed', sidebarCollapsed);
+  vxMain.classList.toggle('vx-sidebar-collapsed', sidebarCollapsed || window.innerWidth <= 900);
+  vxBackdrop.classList.toggle('vx-show', !sidebarCollapsed && window.innerWidth <= 900);
+}
+applySidebarState();
+
+document.getElementById('vxSidebarToggle').addEventListener('click', function () {
+  sidebarCollapsed = !sidebarCollapsed;
+  applySidebarState();
+});
+vxBackdrop.addEventListener('click', function () { sidebarCollapsed = true; applySidebarState(); });
+
+function setSidebarActive(activeEl) {
+  document.querySelectorAll('#vxSidebar .vx-sidebar-link').forEach(l => l.classList.remove('vx-active'));
+  activeEl.classList.add('vx-active');
+}
+
+document.getElementById('sbBorangBaharu').addEventListener('click', function () {
+  showFormTab();
+  setSidebarActive(this);
+  if (window.innerWidth <= 900) { sidebarCollapsed = true; applySidebarState(); }
+});
+document.getElementById('sbSemakanRekod').addEventListener('click', function () {
+  showRecordsTab();
+  setSidebarActive(this);
+  if (window.innerWidth <= 900) { sidebarCollapsed = true; applySidebarState(); }
+});
+document.getElementById('sbLaporanInsiden').addEventListener('click', function () {
+  showInsidenView();
+  setSidebarActive(this);
+  if (window.innerWidth <= 900) { sidebarCollapsed = true; applySidebarState(); }
+});
 
 /* ---------------------------------------------------------------------
    CHECKLIST DEFINITIONS
@@ -603,20 +793,13 @@ selKenderaan.addEventListener('change', function () {
   selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
 });
 
-const statusLainLainField = document.getElementById('statusLainLainField');
-const inpStatusLainLain = document.getElementById('inpStatusLainLain');
-
 document.querySelectorAll('[data-status]').forEach(btn => {
   btn.addEventListener('click', function () {
     statusKenderaan = btn.getAttribute('data-status');
     document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    if (statusKenderaan === 'lain_lain') {
-      statusLainLainField.classList.add('open');
-    } else {
-      statusLainLainField.classList.remove('open');
-      inpStatusLainLain.value = '';
-    }
+    document.getElementById('bengkelField').classList.toggle('open', statusKenderaan === 'di_bengkel');
+    document.getElementById('pinjamField').classList.toggle('open', statusKenderaan === 'dipinjam');
   });
 });
 
@@ -633,9 +816,20 @@ document.getElementById('btnStep1Next').addEventListener('click', function () {
   if (!masa) return Swal.fire('Perhatian', 'Sila masukkan masa.', 'warning');
   if (odometer === '' || Number(odometer) < 0) return Swal.fire('Perhatian', 'Sila masukkan bacaan odometer.', 'warning');
   if (!statusKenderaan) return Swal.fire('Perhatian', 'Sila pilih status kenderaan.', 'warning');
-  if (statusKenderaan === 'lain_lain' && !inpStatusLainLain.value.trim()) return Swal.fire('Perhatian', 'Sila nyatakan status kenderaan.', 'warning');
+  if (statusKenderaan === 'di_bengkel') {
+    if (!document.getElementById('inpNamaBengkel').value.trim())
+      return Swal.fire('Perhatian', 'Sila masukkan nama bengkel.', 'warning');
+    if (!document.getElementById('inpTarikhBengkel').value)
+      return Swal.fire('Perhatian', 'Sila masukkan tarikh hantar ke bengkel.', 'warning');
+  }
+  if (statusKenderaan === 'dipinjam') {
+    if (!document.getElementById('inpNamaFasiliti').value.trim())
+      return Swal.fire('Perhatian', 'Sila masukkan nama fasiliti.', 'warning');
+    if (!document.getElementById('inpTarikhMulaPinjam').value)
+      return Swal.fire('Perhatian', 'Sila masukkan tarikh mula pinjam.', 'warning');
+  }
 
-  if (statusKenderaan === 'berfungsi') {
+  if (statusKenderaan === 'berfungsi' || statusKenderaan === 'tidak_berfungsi') {
     if (currentItems.length === 0 || currentItemsPlate !== selectedPlate) {
       currentItems = getItemsFor(selectedJenis);
       currentItemsPlate = selectedPlate;
@@ -757,7 +951,7 @@ document.querySelectorAll('[data-boleh]').forEach(btn => {
 });
 
 document.getElementById('btnStep3Back').addEventListener('click', function () {
-  if (statusKenderaan === 'berfungsi') goToStep(2); else goToStep(1);
+  if (statusKenderaan === 'berfungsi' || statusKenderaan === 'tidak_berfungsi') goToStep(2); else goToStep(1);
 });
 
 document.getElementById('btnSubmit').addEventListener('click', async function () {
@@ -787,7 +981,10 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
       masa: document.getElementById('inpMasa').value,
       odometer: Number(document.getElementById('inpOdometer').value),
       statusKenderaan: statusKenderaan,
-      statusLainLain: statusKenderaan === 'lain_lain' ? inpStatusLainLain.value.trim() : '',
+      namaBengkel:        statusKenderaan === 'di_bengkel' ? document.getElementById('inpNamaBengkel').value.trim() : '',
+      tarikhHantarBengkel:statusKenderaan === 'di_bengkel' ? document.getElementById('inpTarikhBengkel').value : '',
+      namaFasiliti:       statusKenderaan === 'dipinjam'   ? document.getElementById('inpNamaFasiliti').value.trim() : '',
+      tarikhMulaPinjam:   statusKenderaan === 'dipinjam'   ? document.getElementById('inpTarikhMulaPinjam').value : '',
       items: currentItems.map(it => ({ id: it.id, label: it.label, status: it.status, perihal: it.perihal || '', flag: it.flag || null })),
       ringkasan: ringkasan,
       bolehDigunakan: bolehDigunakan,
@@ -834,8 +1031,12 @@ function resetForNewEntry() {
   bolehDigunakan = null;
   currentItems = [];
   currentItemsPlate = null;
-  inpStatusLainLain.value = '';
-  statusLainLainField.classList.remove('open');
+  document.getElementById('inpNamaBengkel').value = '';
+  document.getElementById('inpTarikhBengkel').value = '';
+  document.getElementById('inpNamaFasiliti').value = '';
+  document.getElementById('inpTarikhMulaPinjam').value = '';
+  document.getElementById('bengkelField').classList.remove('open');
+  document.getElementById('pinjamField').classList.remove('open');
   document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('[data-boleh]').forEach(b => b.classList.remove('active'));
   selKenderaan.value = keepPlate;
@@ -845,32 +1046,25 @@ function resetForNewEntry() {
 }
 
 /* ---------------------------------------------------------------------
-   TABS / SEMAKAN REKOD
+   SEMAKAN REKOD
 --------------------------------------------------------------------- */
-const tabFormBtn = document.getElementById('tabFormBtn');
-const tabRecordsBtn = document.getElementById('tabRecordsBtn');
 const recordsView = document.getElementById('recordsView');
 let allSubmissionsCache = null;
 
 function showFormTab() {
-  tabFormBtn.classList.add('active');
-  tabRecordsBtn.classList.remove('active');
   recordsView.style.display = 'none';
+  document.getElementById('insidenView').style.display = 'none';
   const hasVehicles = Object.keys(vehicleProfiles).length > 0;
   noVehicleState.style.display = hasVehicles ? 'none' : 'block';
   formFlow.style.display = hasVehicles ? 'block' : 'none';
 }
 
 function showRecordsTab() {
-  tabFormBtn.classList.remove('active');
-  tabRecordsBtn.classList.add('active');
   noVehicleState.style.display = 'none';
   formFlow.style.display = 'none';
+  document.getElementById('insidenView').style.display = 'none';
   recordsView.style.display = 'block';
 }
-
-tabFormBtn.addEventListener('click', showFormTab);
-tabRecordsBtn.addEventListener('click', showRecordsTab);
 
 async function fetchAllSubmissions() {
   if (allSubmissionsCache) return allSubmissionsCache;
@@ -958,6 +1152,138 @@ function showRecordDetail(sub) {
     confirmButtonText: 'Tutup'
   });
 }
+
+/* -----------------------------------------------------------------------
+   LAPORAN INSIDEN — PEMANDU
+   Collection: insidenPenyata (separate from admin's vehicleIncidents)
+----------------------------------------------------------------------- */
+const IP_JENIS_LABEL = {
+  kemalangan: 'Kemalangan Jalan Raya',
+  kerosakan:  'Kerosakan Kenderaan',
+  lainalain:  'Lain-lain',
+};
+
+function showInsidenView() {
+  noVehicleState.style.display = 'none';
+  formFlow.style.display = 'none';
+  recordsView.style.display = 'none';
+  document.getElementById('insidenView').style.display = 'block';
+  ipShowList();
+}
+
+function ipShowList() {
+  document.getElementById('ipListView').style.display = 'block';
+  document.getElementById('ipFormView').style.display = 'none';
+  ipLoadList();
+}
+function ipShowForm() {
+  document.getElementById('ipListView').style.display = 'none';
+  document.getElementById('ipFormView').style.display = 'block';
+  document.getElementById('ipTarikh').value = todayISO();
+  document.getElementById('ipMasa').value = nowHM();
+}
+
+async function ipLoadList() {
+  const container = document.getElementById('ipListContainer');
+  container.innerHTML = '<p style="text-align:center;color:var(--vx-muted);padding:20px 0;">Memuatkan...</p>';
+  try {
+    const snap = await getDocs(query(collection(db, 'insidenPenyata'), orderBy('timestamp', 'desc')));
+    const list = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    container.innerHTML = list.length ? list.map(p => `
+      <div class="vx-rec-card" style="margin-bottom:12px;">
+        <div class="vx-rec-card-hd">
+          <div>
+            <div class="vx-rec-plate">${esc(p.nama)}</div>
+            <div class="vx-rec-meta">${esc(p.kenderaan)} · ${esc(p.tarikhKejadian)} · ${esc(IP_JENIS_LABEL[p.jenis]||p.jenis||'')}</div>
+          </div>
+          <button class="vx-btn ghost" style="flex:none;font-size:12px;padding:6px 10px;" data-ipprint="${esc(p._id)}">📄 Print</button>
+        </div>
+      </div>`).join('')
+    : '<div class="vx-rec-empty">Tiada laporan insiden disimpan.</div>';
+
+    container.querySelectorAll('[data-ipprint]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pData = list.find(p => p._id === btn.dataset.ipprint);
+        if (pData) ipPrint(pData);
+      });
+    });
+  } catch(err) { Swal.fire('Ralat', err.message, 'error'); }
+}
+
+function ipPrint(pData) {
+  const paras = (pData.penyata||'').split('\n\n').filter(Boolean);
+  document.getElementById('ipPrintDoc').innerHTML = `
+    <div style="font-family:serif;padding:28px 36px;max-width:650px;margin:0 auto;font-size:12px;line-height:1.6;">
+      <div style="margin-bottom:20px;">
+        <div>${esc(pData.nama)},</div>
+        <div>${esc(pData.jawatan)},</div>
+        <div>${esc(pData.tempat)},</div>
+        <div>Hospital Pitas.</div>
+      </div>
+      <div style="text-align:right;margin-bottom:20px;">${esc(pData.tarikhKejadian)}</div>
+      <div style="margin-bottom:16px;">
+        <div>Pengarah Hospital,</div>
+        <div>Hospital Pitas, Peti Surat 88,</div>
+        <div>89100, Pitas.</div>
+      </div>
+      <div style="margin-bottom:14px;">Tuan,</div>
+      <div style="font-weight:bold;text-align:center;margin-bottom:14px;text-transform:uppercase;">
+        PENYATA INDIVIDU — ${esc((IP_JENIS_LABEL[pData.jenis]||pData.jenis||'INSIDEN').toUpperCase())} · ${esc(pData.kenderaan)}
+      </div>
+      <div style="margin-bottom:14px;">Dengan hormatnya perkara di atas adalah dirujuk.</div>
+      <div style="margin-bottom:14px;line-height:1.8;">
+        <div><strong>Nama:</strong> ${esc(pData.nama)}</div>
+        <div><strong>No. IC:</strong> ${esc(pData.ic)}</div>
+        <div><strong>Jawatan:</strong> ${esc(pData.jawatan)}</div>
+        <div><strong>Tempat Bertugas:</strong> ${esc(pData.tempat)}</div>
+        <div><strong>Tarikh Kejadian:</strong> ${esc(pData.tarikhKejadian)}</div>
+        <div><strong>Lokasi Kejadian:</strong> ${esc(pData.lokasi)}</div>
+        <div><strong>Anggaran Masa Kejadian:</strong> ${esc(pData.masaKejadian)}</div>
+      </div>
+      <div style="margin-bottom:30px;">${paras.map(p=>`<p style="margin:0 0 12px;">${esc(p)}</p>`).join('')}</div>
+      <div style="margin-bottom:40px;">Sekian, terima kasih.</div>
+      <div>
+        <div style="font-weight:bold;">Yang benar,</div>
+        <div style="border-bottom:1px solid #555;width:180px;margin:30px 0 6px;"></div>
+        <div style="font-weight:bold;">(${esc(pData.nama.toUpperCase())})</div>
+        <div>${esc(pData.jawatan)}</div>
+        <div>${esc(pData.tempat)}</div>
+        <div>Hospital Pitas</div>
+      </div>
+    </div>`;
+  window.print();
+}
+
+document.getElementById('btnIpBaharu').addEventListener('click', ipShowForm);
+document.getElementById('btnIpFormBack').addEventListener('click', ipShowList);
+
+document.getElementById('btnIpSimPan').addEventListener('click', async () => {
+  const nama=document.getElementById('ipNama').value.trim(),
+    ic=document.getElementById('ipIc').value.trim(),
+    jawatan=document.getElementById('ipJawatan').value.trim(),
+    tempat=document.getElementById('ipTempat').value.trim(),
+    kenderaan=document.getElementById('ipKenderaan').value.trim(),
+    jenis=document.getElementById('ipJenis').value,
+    tarikh=document.getElementById('ipTarikh').value,
+    masa=document.getElementById('ipMasa').value,
+    lokasi=document.getElementById('ipLokasi').value.trim(),
+    penyata=document.getElementById('ipPenyata').value.trim();
+
+  if (!nama||!ic||!jawatan||!tempat||!kenderaan||!tarikh||!lokasi||!penyata)
+    return Swal.fire('Perhatian','Sila lengkapkan semua maklumat.','warning');
+
+  try {
+    const ref = await addDoc(collection(db,'insidenPenyata'),{
+      nama, ic, jawatan, tempat, kenderaan, jenis,
+      tarikhKejadian: tarikh, masaKejadian: masa, lokasi, penyata,
+      timestamp: serverTimestamp(),
+    });
+    ipPrint({ _id:ref.id, nama, ic, jawatan, tempat, kenderaan, jenis, tarikhKejadian:tarikh, masaKejadian:masa, lokasi, penyata });
+    ['ipNama','ipIc','ipJawatan','ipTempat','ipKenderaan','ipLokasi','ipPenyata'].forEach(id=>{document.getElementById(id).value='';});
+    document.getElementById('ipJenis').value='';
+    ipShowList();
+  } catch(err) { Swal.fire('Ralat', err.message, 'error'); }
+});
 
 /* ---------------------------------------------------------------------
    STEP NAV
