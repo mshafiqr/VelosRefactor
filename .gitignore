@@ -31,3 +31,6 @@ new-firestore-key.json
 
 playwright-report/
 test-results/
+
+playwright-report/
+test-results/
