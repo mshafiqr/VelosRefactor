@@ -2,5 +2,9 @@
   "dependencies": {
     "@firebase/app": "^0.16.0",
     "firebase-admin": "^14.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "dotenv": "^17.4.2"
   }
 }

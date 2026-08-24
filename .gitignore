@@ -28,3 +28,6 @@ Thumbs.db
 migrate.js
 old-rtdb-key.json
 new-firestore-key.json
+
+playwright-report/
+test-results/
