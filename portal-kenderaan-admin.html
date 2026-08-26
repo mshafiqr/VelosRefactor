@@ -1490,12 +1490,10 @@ document.getElementById('btnLaporanFilter').addEventListener('click', function (
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
           <div style="background:#EEF8F8;border-radius:8px;padding:12px;">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:8px;">Status Bulan Ini</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:8px;">Rekod Checklist Bulan Ini</div>
             ${[
-              ['Berfungsi',                dayCounts.berfungsi,       '#1E8E5A'],
-              ['Tidak Berfungsi',          dayCounts.tidak_berfungsi, '#C62828'],
-              ['Dipinjam',                 dayCounts.dipinjam,        '#C98A2E'],
-              ['Sedang Digunakan',         dayCounts.sedang_digunakan,'#147D82'],
+              ['Jumlah Pemeriksaan',       dayCounts.berfungsi,       '#1E8E5A'],
+              ['Kekerapan Rosak',          dayCounts.tidak_berfungsi, '#C62828'],
             ].map(([label, val, color]) => `
               <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
                 <span style="color:#5B6774;">${label}</span>
