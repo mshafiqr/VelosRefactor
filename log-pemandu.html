@@ -431,7 +431,9 @@ import {
   deleteDoc,
   onSnapshot,
   query,
-  where
+  where,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { pad2, classifyLiterFill } from "./velos-utils.js";
@@ -566,14 +568,64 @@ function initPortal() {
     console.error('Ralat memuat konfigurasi:', err);
   });
 
-  // Real-time trip log. Never poll.
-  unsubscribeLogPergerakan = onSnapshot(collection(db, 'logPergerakan'), function (snapshot) {
-    ambulanceData = snapshot.docs.map(function (d) { return d.data(); });
-    window.updateUserTable();
-  }, function (err) {
-    console.error('Ralat langganan logPergerakan:', err);
-  });
+  // Real-time trip log — scoped to current + previous month, the only two
+  // months this portal's month filter ever shows (setupMonthFilter below).
+  // Keeps reads flat as the collection grows, same pattern as admin.html's
+  // year-scoped listeners. loadOdometerBoundaryAnchors() below backfills
+  // each vehicle's last odometer reading from just before this window so
+  // computeOdometerMismatches() still catches a mismatch right at the
+  // boundary. Never poll.
+  const liveWindowStart = getLiveWindowStart();
+  unsubscribeLogPergerakan = onSnapshot(
+    query(collection(db, 'logPergerakan'), where('tarikh', '>=', liveWindowStart)),
+    function (snapshot) {
+      ambulanceData = snapshot.docs.map(function (d) { return d.data(); });
+      window.updateUserTable();
+    },
+    function (err) {
+      console.error('Ralat langganan logPergerakan:', err);
+    }
+  );
+  loadOdometerBoundaryAnchors(liveWindowStart);
   fetchFuelData();
+}
+
+function getLiveWindowStart() {
+  const d = new Date();
+  const prevD = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+  return prevD.getFullYear() + '-' + pad2(prevD.getMonth() + 1) + '-01';
+}
+
+async function loadOdometerBoundaryAnchors(windowStart) {
+  // One-time, bounded lookback -- not a listener. Only needs each active
+  // vehicle's single most recent trip before the live window; limit(500)
+  // caps the read regardless of how large the collection grows. (Verified
+  // 2026-08-26 against live data: worst-case vehicle rank was 25 of 123
+  // pre-window records -- 500 leaves large headroom as volume grows.)
+  boundaryAnchors = {};
+  try {
+    const snap = await getDocs(
+      query(
+        collection(db, 'logPergerakan'),
+        where('tarikh', '<', windowStart),
+        orderBy('tarikh', 'desc'),
+        limit(500)
+      )
+    );
+    snap.forEach(function (d) {
+      const item = d.data();
+      if (!item.kenderaan || typeof item.odoAkhir !== 'number') return;
+      const key = (item.tarikh || '') + 'T' + ((item.masa || '').split(' - ')[0] || '');
+      const existing = boundaryAnchors[item.kenderaan];
+      if (!existing || key > existing._key) {
+        boundaryAnchors[item.kenderaan] = { odoAkhir: item.odoAkhir, _key: key };
+      }
+    });
+  } catch (err) {
+    console.error('Ralat memuat titik rujukan odometer sebelum tetingkap langganan:', err);
+    boundaryAnchors = {};
+  }
+  window.updateUserTable();
 }
 
 async function fetchFuelData() {
@@ -621,6 +673,9 @@ function buildTimestamp() {
 let ambulanceData = [];
 let ambulansList = [];
 let tangkiCap = {};
+let boundaryAnchors = {};
+// kenderaan -> { odoAkhir, _key } -- last known reading per vehicle from just
+// before the live listener's window, seeded by loadOdometerBoundaryAnchors().
 
 // Edit mode -- set by window.editEntry, cleared by exitEditMode. Tracks
 // which trip is being edited and which logBahanApi fill docs existed
@@ -1099,21 +1154,26 @@ function resetFormFields() {
    TABLE RENDER + ODOMETER MISMATCH — pure client-side, unchanged from
    live. Fed by the onSnapshot-populated ambulanceData array.
 --------------------------------------------------------------------- */
-function computeOdometerMismatches(data) {
+function computeOdometerMismatches(data, anchors) {
+  anchors = anchors || {};
   const mismatches = new Map();
   const byVehicle = {};
   data.forEach(function (item) {
     if (!item.kenderaan || typeof item.odoAwal !== 'number' || typeof item.odoAkhir !== 'number') return;
     (byVehicle[item.kenderaan] = byVehicle[item.kenderaan] || []).push(item);
   });
-  Object.values(byVehicle).forEach(function (list) {
+  Object.keys(byVehicle).forEach(function (vehicle) {
+    const list = byVehicle[vehicle];
     list.sort(function (a, b) { return (a.tarikh + 'T' + (a.masa || '').split(' - ')[0]).localeCompare(b.tarikh + 'T' + (b.masa || '').split(' - ')[0]); });
-    for (let i = 1; i < list.length; i++) {
-      const prev = list[i - 1], curr = list[i];
-      if (curr.odoAwal !== prev.odoAkhir) {
+    // Seed with the boundary anchor (last reading before the live window) so
+    // the first trip in-window still gets checked against its true predecessor.
+    let prev = anchors[vehicle] ? { odoAkhir: anchors[vehicle].odoAkhir } : null;
+    list.forEach(function (curr) {
+      if (prev && curr.odoAwal !== prev.odoAkhir) {
         mismatches.set(curr.id, { prevAkhir: prev.odoAkhir, thisAwal: curr.odoAwal });
       }
-    }
+      prev = curr;
+    });
   });
   return mismatches;
 }
@@ -1130,7 +1190,7 @@ window.updateUserTable = function () {
     tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; color:gray;">Tiada rekod untuk bulan ini.</td></tr>';
     return;
   }
-  const odometerMismatches = computeOdometerMismatches(ambulanceData);
+  const odometerMismatches = computeOdometerMismatches(ambulanceData, boundaryAnchors);
   filteredData.forEach(function (item) {
     const cPax = (item.pesakitList ? item.pesakitList.length : 0);
     const cStep = (item.stepdownList ? item.stepdownList.length : 0);
