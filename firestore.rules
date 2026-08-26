@@ -150,6 +150,17 @@ service cloud.firestore {
       allow update, delete: if isAdmin() || isMaster();
     }
 
+    // ---- legacySubmissions ---------------------------------------------------
+    // Archived Google Form checklist data (pre-Portal Kenderaan), imported once
+    // via seed-legacy-checklist.js. Read-only "Rekod Lama" tab in the admin
+    // dashboard -- no write path from the app.
+    match /legacySubmissions/{plate} {
+      match /entries/{entryId} {
+        allow read:  if isAdmin() || isMaster() || isViewer();
+        allow write: if false;
+      }
+    }
+
     // ---- konfigurasi -------------------------------------------------------
     // Hospital-specific lists: pemandu, pengiring, kenderaan, wad, destinasi.
     // All authenticated accounts read; only admin/master write.

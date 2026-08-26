@@ -285,6 +285,7 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   <button class="vx-sidebar-link" data-section="sec-laporan">Laporan Bulanan</button>
   <button class="vx-sidebar-link" data-section="sec-insiden">Laporan Insiden Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-profil">Profil Kenderaan</button>
+  <button class="vx-sidebar-link" data-section="sec-legacy">Rekod Lama</button>
   <hr class="vx-sidebar-divider">
   <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">← Kembali ke Admin</button>
 </nav>
@@ -506,6 +507,32 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
         <button type="button" class="vx-btn danger" id="btnProfilDelete" style="display:none;">Padam Kenderaan</button>
       </div>
     </form>
+  </div>
+</section>
+
+<!-- ==================== SECTION: REKOD LAMA (LEGACY GOOGLE FORM) ==================== -->
+<section id="sec-legacy" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Rekod Lama (Checklist Google Form)</div>
+
+  <div class="vx-card">
+    <div class="vx-filter-row">
+      <div class="vx-filter-field" style="min-width:260px;">
+        <label>Pilih Kenderaan</label>
+        <select id="legacyFilterKenderaan"><option value="">Pilih kenderaan...</option></select>
+      </div>
+    </div>
+    <div class="vx-table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Tarikh</th><th>Masa</th><th>Pemandu</th><th>Odometer</th>
+            <th>Status Kenderaan</th><th>Boleh Digunakan</th><th>Ringkasan</th><th>Tindakan</th>
+          </tr>
+        </thead>
+        <tbody id="legacyBody"><tr><td colspan="8" class="vx-empty-row">Sila pilih kenderaan untuk memaparkan rekod lama.</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
@@ -857,6 +884,7 @@ async function loadAllData() {
     renderStatusSection();
     renderProfilDropdown();
     renderRekodKenderaanFilter();
+    renderLegacyKenderaanFilter();
   } catch (err) {
     Swal.fire('Ralat', 'Gagal memuatkan data: ' + (err.message || err), 'error');
   }
@@ -1703,6 +1731,91 @@ btnProfilDelete.addEventListener('click', function () {
     }
   });
 });
+
+/* ---------------------------------------------------------------------
+   SECTION: REKOD LAMA (LEGACY GOOGLE FORM) — read-only, one-time-imported
+   from seed-legacy-checklist.js. No edit/delete UI: this is an archival
+   view of legacySubmissions/{plate}/entries, not part of the live workflow.
+--------------------------------------------------------------------- */
+const legacyFilterKenderaan = document.getElementById('legacyFilterKenderaan');
+
+function renderLegacyKenderaanFilter() {
+  const plates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
+  const current = legacyFilterKenderaan.value;
+  legacyFilterKenderaan.innerHTML = '<option value="">Pilih kenderaan...</option>' +
+    plates.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  legacyFilterKenderaan.value = current;
+}
+
+legacyFilterKenderaan.addEventListener('change', async function () {
+  const plate = this.value;
+  const tbody = document.getElementById('legacyBody');
+  if (!plate) {
+    tbody.innerHTML = '<tr><td colspan="8" class="vx-empty-row">Sila pilih kenderaan untuk memaparkan rekod lama.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = '<tr><td colspan="8" class="vx-empty-row">Memuatkan...</td></tr>';
+  try {
+    const snap = await getDocs(collection(db, 'legacySubmissions', plate, 'entries'));
+    const entries = snap.docs.map(d => ({ _id: d.id, ...d.data() }))
+      .sort((a, b) => ((a.tarikh || '') + (a.masa || '') < (b.tarikh || '') + (b.masa || '') ? 1 : -1));
+
+    if (!entries.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="vx-empty-row">Tiada rekod lama untuk kenderaan ini.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = entries.map(e => {
+      const bolehTxt = e.bolehDigunakan || '';
+      const bolehCls = /tidak selamat/i.test(bolehTxt) ? 'danger' : /jarak dekat/i.test(bolehTxt) ? 'warn' : bolehTxt ? 'ok' : '';
+      const ringkasanShort = (e.ringkasan || '').length > 60 ? e.ringkasan.slice(0, 60) + '…' : (e.ringkasan || '—');
+      return `
+        <tr>
+          <td>${esc(e.tarikh)}</td>
+          <td>${esc(e.masa || '—')}</td>
+          <td>${esc(e.namaPemandu || '—')}</td>
+          <td>${esc(e.odometer || '—')}</td>
+          <td>${esc(e.statusKenderaan || '—')}</td>
+          <td>${bolehTxt ? `<span class="fb ${bolehCls}">${esc(bolehTxt)}</span>` : '—'}</td>
+          <td>${esc(ringkasanShort)}</td>
+          <td><button class="vx-btn ghost" data-legacy="${esc(e._id)}">Butiran</button></td>
+        </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('button[data-legacy]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const entry = entries.find(x => x._id === btn.getAttribute('data-legacy'));
+        showLegacyDetailModal(entry, plate);
+      });
+    });
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="8" class="vx-empty-row">Ralat memuatkan rekod.</td></tr>';
+    Swal.fire('Ralat', 'Gagal memuatkan rekod lama: ' + (err.message || err), 'error');
+  }
+});
+
+function showLegacyDetailModal(entry, plate) {
+  const checklistRows = Object.entries(entry.rawChecklist || {})
+    .map(([k, v]) => `<tr><td style="text-align:left;padding:4px 6px;">${esc(k)}</td><td style="text-align:left;padding:4px 6px;">${esc(v)}</td></tr>`)
+    .join('');
+  Swal.fire({
+    title: `${plate} — ${entry.tarikh}${entry.masa ? ' ' + entry.masa : ''}`,
+    html: `
+      <div style="text-align:left;font-size:13px;margin-bottom:12px;">
+        <p><strong>Pemandu:</strong> ${esc(entry.namaPemandu || '—')} &nbsp; <strong>Odometer:</strong> ${esc(entry.odometer || '—')}</p>
+        <p><strong>Status Kenderaan:</strong> ${esc(entry.statusKenderaan || '—')}</p>
+        <p><strong>Boleh Digunakan:</strong> ${esc(entry.bolehDigunakan || '—')}</p>
+        <p><strong>Ringkasan:</strong> ${esc(entry.ringkasan || '—')}</p>
+        <p><strong>No Request:</strong> ${esc(entry.noRequest || '—')}</p>
+      </div>
+      ${checklistRows
+        ? `<table style="width:100%;font-size:12px;"><tbody>${checklistRows}</tbody></table>`
+        : '<p style="color:#9AA5AD;font-style:italic;">Tiada butiran senarai semak (kenderaan tidak berfungsi).</p>'}
+    `,
+    width: 700,
+    confirmButtonText: 'Tutup'
+  });
+}
 
 /* -----------------------------------------------------------------------
    LAPORAN INSIDEN KENDERAAN
