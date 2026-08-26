@@ -29,6 +29,10 @@ migrate.js
 old-rtdb-key.json
 new-firestore-key.json
 
+# One-time legacy Google Form checklist import (source files + any admin key)
+oldData/
+serviceAccountKey.json
+
 playwright-report/
 test-results/
 
