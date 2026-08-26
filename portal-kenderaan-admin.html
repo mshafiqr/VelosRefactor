@@ -664,6 +664,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const PORTAL_EMAIL = "admin@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
+const VISITOR_EMAIL = "visitor@pitas.velos";
+const VISITOR_UID = '89fwBTQsc9dAB68P1RnMBgorxrg1';
+let isViewer = false;
 
 const daysSince = (dateStr) => {
   if (!dateStr) return -Infinity;
@@ -744,11 +747,13 @@ function stopInactivityWatch() {
 
 onAuthStateChanged(auth, function (user) {
   if (user) {
+    isViewer = user.uid === VISITOR_UID;
     loginView.style.display = 'none';
     appWrapper.style.display = 'block';
     initAdmin();
     startInactivityWatch();
   } else {
+    isViewer = false;
     loginView.style.display = 'flex';
     appWrapper.style.display = 'none';
     stopInactivityWatch();
@@ -766,7 +771,11 @@ loginForm.addEventListener('submit', async function (e) {
     try {
       await signInWithEmailAndPassword(auth, PORTAL_EMAIL, passwordInput.value);
     } catch (err) {
-      await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+      try {
+        await signInWithEmailAndPassword(auth, MASTER_EMAIL, passwordInput.value);
+      } catch (err2) {
+        await signInWithEmailAndPassword(auth, VISITOR_EMAIL, passwordInput.value);
+      }
     }
   } catch (err) {
     loginError.textContent = 'Kata laluan salah. Sila cuba lagi.';
@@ -1226,7 +1235,7 @@ function renderRekodTable() {
         <td>${esc(ringkasanShort)}</td>
         <td>
           <button class="vx-btn ghost" data-sub="${esc(sub._id)}">Butiran</button>
-          <button class="vx-btn danger" data-del="${esc(sub._id)}">Padam</button>
+          ${isViewer ? '' : `<button class="vx-btn danger" data-del="${esc(sub._id)}">Padam</button>`}
         </td>
       </tr>`;
   }).join('');
@@ -1395,25 +1404,25 @@ document.getElementById('btnLaporanFilter').addEventListener('click', function (
   const tarikhJana = new Date().toLocaleDateString('ms-MY', { day:'2-digit', month:'long', year:'numeric' })
     + ', ' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
 
-  let totalIsuDilaporkan = 0, totalIsuSelesai = 0, totalDowntime = 0;
+  let totalIsuDilaporkan = 0, totalIsuSelesai = 0;
+  const totalDowntime = ambulansPlates
+    .filter(p => vehicleProfiles[p].statusSemasa === 'rosak')
+    .reduce((sum, p) => sum + Math.max(0, daysSince(vehicleProfiles[p].downtimeStartDate)), 0);
 
   const vehicleSections = ambulansPlates.map(plate => {
     const profile = vehicleProfiles[plate];
     const plateSubs = monthSubs.filter(s => s.kenderaan === plate);
 
-    const dayCounts = { berfungsi: 0, tidak_berfungsi: 0, di_bengkel: 0, dipinjam: 0, sedang_digunakan: 0 };
+    const dayCounts = { berfungsi: 0, tidak_berfungsi: 0, dipinjam: 0, sedang_digunakan: 0 };
     plateSubs.forEach(s => {
       const bucket = statusBucketOf(s);
       if (bucket === 'berfungsi') dayCounts.berfungsi++;
-      else if (bucket === 'tidakBerfungsi') {
-        const wentToBengkel = s.statusFungsi ? !!s.perluKeBengkel : s.statusKenderaan === 'di_bengkel';
-        if (wentToBengkel) dayCounts.di_bengkel++; else dayCounts.tidak_berfungsi++;
-      }
+      else if (bucket === 'tidakBerfungsi') dayCounts.tidak_berfungsi++;
       else if (bucket === 'dipinjam')  dayCounts.dipinjam++;
       else if (bucket === 'digunakan') dayCounts.sedang_digunakan++;
     });
-    const downtime = dayCounts.tidak_berfungsi + dayCounts.di_bengkel;
-    totalDowntime += downtime;
+    const isRosak = profile.statusSemasa === 'rosak';
+    const downtimeDays = isRosak ? Math.max(0, daysSince(profile.downtimeStartDate)) : 0;
 
     const isuList = [];
     plateSubs.forEach(sub => {
@@ -1473,10 +1482,8 @@ document.getElementById('btnLaporanFilter').addEventListener('click', function (
             <div style="font-size:12px;color:#5B6774;margin-top:2px;">${esc(profile.namaKenderaan || '')} · No. Aset: ${esc(profile.noAset || '—')}</div>
           </div>
           <div style="text-align:right;flex-shrink:0;margin-left:12px;">
-            ${downtime > 0
-              ? `<div style="font-size:11px;color:#5B6774;">Jumlah Downtime</div>
-                 <div style="font-size:28px;font-weight:800;color:#C62828;line-height:1.1;">${downtime}</div>
-                 <div style="font-size:11px;font-weight:600;color:#C62828;">hari</div>`
+            ${isRosak
+              ? `<div style="font-size:13px;font-weight:800;color:#C62828;">ROSAK sejak ${esc(profile.downtimeStartDate || '—')} — ${downtimeDays} hari</div>`
               : `<div style="font-size:11px;font-weight:700;color:#1E8E5A;background:#E3F4EB;padding:4px 10px;border-radius:6px;">Tiada Downtime</div>`}
           </div>
         </div>
@@ -1486,8 +1493,7 @@ document.getElementById('btnLaporanFilter').addEventListener('click', function (
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5B6774;margin-bottom:8px;">Status Bulan Ini</div>
             ${[
               ['Berfungsi',                dayCounts.berfungsi,       '#1E8E5A'],
-              ['Tidak Berfungsi (Di Hospital)', dayCounts.tidak_berfungsi,'#C62828'],
-              ['Di Bengkel',               dayCounts.di_bengkel,      '#A82121'],
+              ['Tidak Berfungsi',          dayCounts.tidak_berfungsi, '#C62828'],
               ['Dipinjam',                 dayCounts.dipinjam,        '#C98A2E'],
               ['Sedang Digunakan',         dayCounts.sedang_digunakan,'#147D82'],
             ].map(([label, val, color]) => `
@@ -1633,7 +1639,7 @@ function loadProfilForm(plate) {
     document.getElementById('pfNextBrakeServiceDate').value = p.nextBrakeServiceDate || '';
     document.getElementById('pfNextServiceOdo').value = (p.nextServiceOdo !== undefined && p.nextServiceOdo !== null) ? p.nextServiceOdo : '';
     document.getElementById('pfLastBrakeDate').value = p.lastBrakePadDate || '';
-    btnProfilDelete.style.display = 'inline-block';
+    btnProfilDelete.style.display = isViewer ? 'none' : 'inline-block';
   }
 }
 
@@ -1819,7 +1825,7 @@ function kpRenderKronologi() {
     <div class="vx-card" style="margin-bottom:10px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         <span style="font-size:11px;font-weight:700;color:var(--vx-teal);background:var(--vx-teal-light);padding:2px 8px;border-radius:20px;">#${i+1}</span>
-        <button class="vx-btn danger" style="padding:4px 8px;font-size:11px;" data-del-kron="${esc(row._id)}">Padam</button>
+        ${isViewer ? '' : `<button class="vx-btn danger" style="padding:4px 8px;font-size:11px;" data-del-kron="${esc(row._id)}">Padam</button>`}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         <div class="vx-field" style="margin:0;"><label style="font-size:11px;">Tarikh</label>

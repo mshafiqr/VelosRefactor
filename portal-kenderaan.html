@@ -386,6 +386,31 @@ body {
         <select id="selKenderaan"><option value="">Pilih Kenderaan...</option></select>
       </div>
 
+      <div id="step1RosakBlock" style="display:none;">
+        <div id="rosakStatusCard" class="vx-card" style="border:2px solid var(--vx-danger);background:var(--vx-danger-light);box-shadow:none;padding:20px;">
+          <div style="font-size:18px;font-weight:800;color:var(--vx-danger);margin-bottom:10px;">🔴 <span id="rosakPlateLabel"></span> — ROSAK</div>
+          <div style="font-size:15px;color:var(--vx-text);margin-bottom:4px;">Downtime sejak: <strong id="rosakStartDateLabel"></strong></div>
+          <div style="font-size:15px;color:var(--vx-text);margin-bottom:18px;">Tempoh: <strong id="rosakDurationLabel"></strong></div>
+          <button type="button" class="vx-btn primary" id="btnRosakDiperbaiki" style="width:100%;">Kenderaan Sudah Diperbaiki</button>
+        </div>
+
+        <div id="rosakRepairForm" class="vx-card" style="display:none;">
+          <h2 class="vx-card-title">Pengesahan Pemulihan</h2>
+          <div class="vx-field">
+            <label for="inpRingkasanPembaikan">Ringkasan Pembaikan</label>
+            <textarea id="inpRingkasanPembaikan" placeholder="Nyatakan apa yang telah diperbaiki..."></textarea>
+          </div>
+          <div class="vx-field">
+            <label for="inpDisahkanOleh">Disahkan Oleh</label>
+            <input type="text" id="inpDisahkanOleh" placeholder="Nama pegawai yang mengesahkan...">
+          </div>
+          <div class="vx-nav-row">
+            <button type="button" class="vx-btn primary" id="btnSahkanPemulihan" style="width:100%;">Sahkan Pemulihan</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step1FormFields">
       <div class="vx-field">
         <label for="selPemandu">Nama Pemandu</label>
         <select id="selPemandu"><option value="">Pilih Nama Pemandu...</option></select>
@@ -435,6 +460,7 @@ body {
 
       <div class="vx-nav-row">
         <button type="button" class="vx-btn primary" id="btnStep1Next" disabled>Seterusnya</button>
+      </div>
       </div>
     </div>
 
@@ -827,6 +853,7 @@ function getPemanduValue() {
 selKenderaan.addEventListener('change', function () {
   selectedPlate = selKenderaan.value || null;
   selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
+  updateRosakGate();
 });
 
 const lokasiField = document.getElementById('lokasiField');
@@ -835,6 +862,85 @@ const btnStep1Next = document.getElementById('btnStep1Next');
 function updateStep1NextState() {
   btnStep1Next.disabled = !(statusFungsi && lokasiKenderaan);
 }
+
+/* ---------------------------------------------------------------------
+   DOWNTIME GATE — a vehicle marked 'rosak' skips the checklist entirely
+   and shows a persistent downtime card until repair is confirmed.
+--------------------------------------------------------------------- */
+const step1RosakBlock = document.getElementById('step1RosakBlock');
+const step1FormFields = document.getElementById('step1FormFields');
+const rosakStatusCard = document.getElementById('rosakStatusCard');
+const rosakRepairForm = document.getElementById('rosakRepairForm');
+
+function daysBetween(startISO, endISO) {
+  const start = new Date(startISO + 'T00:00:00');
+  const end = new Date(endISO + 'T00:00:00');
+  return Math.floor((end - start) / 86400000);
+}
+
+function updateRosakGate() {
+  const profile = selectedPlate ? vehicleProfiles[selectedPlate] : null;
+  const isRosak = !!(profile && profile.statusSemasa === 'rosak');
+  step1RosakBlock.style.display = isRosak ? 'block' : 'none';
+  step1FormFields.style.display = isRosak ? 'none' : 'block';
+  if (isRosak) {
+    rosakStatusCard.style.display = 'block';
+    rosakRepairForm.style.display = 'none';
+    document.getElementById('rosakPlateLabel').textContent = selectedPlate;
+    document.getElementById('rosakStartDateLabel').textContent = profile.downtimeStartDate || '—';
+    const days = profile.downtimeStartDate ? daysBetween(profile.downtimeStartDate, todayISO()) : 0;
+    document.getElementById('rosakDurationLabel').textContent = days + ' hari';
+  }
+}
+
+document.getElementById('btnRosakDiperbaiki').addEventListener('click', function () {
+  rosakStatusCard.style.display = 'none';
+  rosakRepairForm.style.display = 'block';
+});
+
+document.getElementById('btnSahkanPemulihan').addEventListener('click', async function () {
+  const ringkasanPembaikan = document.getElementById('inpRingkasanPembaikan').value.trim();
+  const disahkanOleh = document.getElementById('inpDisahkanOleh').value.trim();
+  if (!ringkasanPembaikan) return Swal.fire('Perhatian', 'Sila isikan ringkasan pembaikan.', 'warning');
+  if (!disahkanOleh) return Swal.fire('Perhatian', 'Sila masukkan nama pegawai yang mengesahkan.', 'warning');
+
+  const btn = this;
+  btn.disabled = true;
+  try {
+    const profile = vehicleProfiles[selectedPlate];
+    const downtimeStart = profile.downtimeStartDate;
+    const recoveryDate = todayISO();
+    const totalDays = daysBetween(downtimeStart, recoveryDate) + 1;
+
+    await addDoc(collection(db, 'downtimeHistory'), {
+      kenderaan: selectedPlate,
+      downtimeStart: downtimeStart,
+      recoveryDate: recoveryDate,
+      totalDays: totalDays,
+      ringkasanPembaikan: ringkasanPembaikan,
+      disahkanOleh: disahkanOleh,
+      timestamp: serverTimestamp()
+    });
+
+    const profileUpdate = { statusSemasa: 'berfungsi', downtimeStartDate: null };
+    await updateDoc(doc(db, 'vehicleProfiles', selectedPlate), profileUpdate);
+    Object.assign(profile, profileUpdate);
+
+    Swal.fire({ icon: 'success', title: 'Pemulihan berjaya direkod.', text: `Downtime: ${totalDays} hari.`, timer: 2000, showConfirmButton: false })
+      .then(function () {
+        document.getElementById('inpRingkasanPembaikan').value = '';
+        document.getElementById('inpDisahkanOleh').value = '';
+        selKenderaan.value = '';
+        selectedPlate = null;
+        selectedJenis = null;
+        updateRosakGate();
+      });
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal merekod pemulihan: ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false;
+  }
+});
 
 document.querySelectorAll('[data-statusfungsi]').forEach(btn => {
   btn.addEventListener('click', function () {
@@ -1035,9 +1141,7 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
     if (!tarikhDihantar) return Swal.fire('Perhatian', 'Sila masukkan tarikh dihantar ke bengkel.', 'warning');
     if (!puncaIsu) return Swal.fire('Perhatian', 'Sila nyatakan punca/isu kenderaan.', 'warning');
   }
-  if (!nextServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis enjin seterusnya.', 'warning');
-  if (!nextBrakeServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis brek seterusnya.', 'warning');
-  if (nextServiceOdo === '' || Number(nextServiceOdo) < 0) return Swal.fire('Perhatian', 'Sila masukkan odometer servis seterusnya.', 'warning');
+  if (nextServiceOdo !== '' && Number(nextServiceOdo) < 0) return Swal.fire('Perhatian', 'Odometer servis seterusnya tidak boleh negatif.', 'warning');
 
   const btn = this;
   btn.disabled = true;
@@ -1061,21 +1165,32 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
       namaBengkel: perluKeBengkel ? namaBengkel : null,
       tarikhDihantar: perluKeBengkel ? tarikhDihantar : null,
       puncaIsu: perluKeBengkel ? puncaIsu : null,
-      nextServiceDate: nextServiceDate,
-      nextBrakeServiceDate: nextBrakeServiceDate,
-      nextServiceOdo: Number(nextServiceOdo),
+      nextServiceDate: nextServiceDate || null,
+      nextBrakeServiceDate: nextBrakeServiceDate || null,
+      nextServiceOdo: nextServiceOdo === '' ? null : Number(nextServiceOdo),
       timestamp: serverTimestamp()
     };
 
     await addDoc(collection(db, 'checklistSubmissions'), submission);
 
-    const profileUpdate = { nextServiceDate: nextServiceDate, nextBrakeServiceDate: nextBrakeServiceDate, nextServiceOdo: Number(nextServiceOdo) };
+    const profileUpdate = {};
+    if (nextServiceDate) profileUpdate.nextServiceDate = nextServiceDate;
+    if (nextBrakeServiceDate) profileUpdate.nextBrakeServiceDate = nextBrakeServiceDate;
+    if (nextServiceOdo !== '') profileUpdate.nextServiceOdo = Number(nextServiceOdo);
     const brakeItem = currentItems.find(it => it.id === 'sistem_brek_minyak_brek');
     if (brakeItem && brakeItem.status === 'ok') {
       profileUpdate.lastBrakePadDate = todayISO();
     }
-    await updateDoc(doc(db, 'vehicleProfiles', selectedPlate), profileUpdate);
-    Object.assign(vehicleProfiles[selectedPlate], profileUpdate);
+    if (statusFungsi === 'rosak') {
+      profileUpdate.statusSemasa = 'rosak';
+      if (!vehicleProfiles[selectedPlate].downtimeStartDate) {
+        profileUpdate.downtimeStartDate = todayISO();
+      }
+    }
+    if (Object.keys(profileUpdate).length) {
+      await updateDoc(doc(db, 'vehicleProfiles', selectedPlate), profileUpdate);
+      Object.assign(vehicleProfiles[selectedPlate], profileUpdate);
+    }
     allSubmissionsCache = null;
 
     Swal.fire('Berjaya!', 'Rekod senarai semak telah dihantar.', 'success').then(resetForNewEntry);
@@ -1119,6 +1234,7 @@ function resetForNewEntry() {
   selectedPlate = keepPlate || null;
   selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
   goToStep(1);
+  updateRosakGate();
 }
 
 /* ---------------------------------------------------------------------

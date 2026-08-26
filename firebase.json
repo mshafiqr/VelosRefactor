@@ -10,6 +10,7 @@
       "CLAUDE.md",
       "AUTHENTICATION USER MANUAL.md",
       "migrate.js",
+      "seed-bnu9974-downtime.js",
       "firestore.rules",
       "package.json",
       "package-lock.json"

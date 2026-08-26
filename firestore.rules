@@ -124,7 +124,7 @@ service cloud.firestore {
     // after each submission (nextServiceDate/Odo, lastBrakePadDate). Only
     // admin creates/deletes vehicles, via Module 1.
     match /vehicleProfiles/{plate} {
-      allow read:   if isKenderaan() || isAdmin() || isMaster();
+      allow read:   if isKenderaan() || isAdmin() || isMaster() || isViewer();
       allow create: if isAdmin() || isMaster();
       allow update: if isKenderaan() || isAdmin() || isMaster();
       allow delete: if isAdmin() || isMaster();
@@ -134,10 +134,20 @@ service cloud.firestore {
     // Driver creates one per checklist run. Only admin updates (resolving
     // urgent flags) or deletes.
     match /checklistSubmissions/{id} {
-      allow read:   if isKenderaan() || isAdmin() || isMaster();
+      allow read:   if isKenderaan() || isAdmin() || isMaster() || isViewer();
       allow create: if isKenderaan() || isAdmin() || isMaster();
       allow update: if isAdmin() || isMaster();
       allow delete: if isAdmin() || isMaster();
+    }
+
+    // ---- downtimeHistory -----------------------------------------------------
+    // Written once per repair confirmation on the driver side (Portal Kenderaan)
+    // when a vehicleProfiles.statusSemasa 'rosak' -> 'berfungsi' transition is
+    // confirmed. Historical record only -- never updated or deleted in the app.
+    match /downtimeHistory/{id} {
+      allow read:   if isKenderaan() || isAdmin() || isMaster() || isViewer();
+      allow create: if isKenderaan() || isAdmin() || isMaster();
+      allow update, delete: if isAdmin() || isMaster();
     }
 
     // ---- konfigurasi -------------------------------------------------------
@@ -160,9 +170,11 @@ service cloud.firestore {
     // Admin's Kronologi Penyelia (Laporan Insiden Kenderaan). Pemandu never
     // reads or writes this collection -- see insidenPenyata below.
     match /vehicleIncidents/{id} {
-      allow read, write: if isAdmin() || isMaster();
+      allow read:  if isAdmin() || isMaster() || isViewer();
+      allow write: if isAdmin() || isMaster();
       match /kronologiPenyelia/{entryId} {
-        allow read, write: if isAdmin() || isMaster();
+        allow read:  if isAdmin() || isMaster() || isViewer();
+        allow write: if isAdmin() || isMaster();
       }
     }
 
