@@ -102,6 +102,10 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 - **Verbatim anchors.** Never assume code from memory. Read the actual file first.
 - **Language.** Malay/English mix for domain terms (`pemandu`, `kenderaan`, `permohonan`, `bahan api`). Match existing language per context.
 
+## Post-launch work log
+
+- **26 Aug 2026** — `log-pemandu.html`'s `logPergerakan` listener scoped to `tarikh >= start of previous month` (same pattern as `admin.html`'s year-scoped listeners), identified via a Playwright-based Firestore read audit as the largest driver of daily reads. Added a bounded boundary-anchor query (`limit(500)`, `orderBy('tarikh','desc')`, one-time not a listener) feeding `computeOdometerMismatches()` so the odometer-continuity check still catches a mismatch across month boundaries. 7/7 Playwright baseline tests passing (`tests/log-pemandu.spec.js`) before and after. Committed `f9ab005`, pushed to GitHub, deployed to production.
+
 ## What not to do
 
 - Do not touch `D:\ClaudeXVelos` or any live VELOS file.
