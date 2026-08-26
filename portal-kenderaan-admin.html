@@ -648,6 +648,7 @@ import {
   getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, updateDoc,
   query, where, orderBy, limit, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { pad2, todayISO } from "./velos-utils.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB9cJlR7APmejMx8lQEHfoWk4vaWF7hZCY",
@@ -664,8 +665,6 @@ const db = getFirestore(app);
 const PORTAL_EMAIL = "admin@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
 
-const pad2 = n => String(n).padStart(2, '0');
-const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
 const daysSince = (dateStr) => {
   if (!dateStr) return -Infinity;
   const then = new Date(dateStr + 'T00:00:00');
@@ -1265,7 +1264,6 @@ function deleteSubmission(subId) {
 
       renderRekodTable();
       renderStatusSection();
-      // Tindakan Segera re-renders on its own via the onSnapshot listener.
 
       Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Rekod dipadam', showConfirmButton: false, timer: 1800 });
     } catch (err) {

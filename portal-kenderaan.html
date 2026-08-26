@@ -550,6 +550,7 @@ import {
 import {
   getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, query, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { pad2, todayISO } from "./velos-utils.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB9cJlR7APmejMx8lQEHfoWk4vaWF7hZCY",
@@ -567,8 +568,6 @@ const PORTAL_EMAIL = "kenderaan@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
 
 const esc = s => (s === undefined || s === null) ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const pad2 = n => String(n).padStart(2, '0');
-const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
 const nowHM = () => { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
 
 const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>';
