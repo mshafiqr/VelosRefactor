@@ -318,7 +318,7 @@ body {
     <div id="ipFormView" style="display:none;">
       <button type="button" class="vx-btn ghost" id="btnIpFormBack" style="margin-bottom:16px;">← Kembali</button>
       <div class="vx-card">
-        <h2 class="vx-card-title">Penyata Individu Baharu</h2>
+        <h2 class="vx-card-title">Laporan Kronologi Kakitangan</h2>
         <div class="vx-field">
           <label for="ipNama">Nama Penuh</label>
           <input type="text" id="ipNama" placeholder="Nama seperti dalam IC">
@@ -361,7 +361,7 @@ body {
           <input type="text" id="ipLokasi" placeholder="Cth: KM 25, Jalan Berungis-Tenghilan">
         </div>
         <div class="vx-field">
-          <label for="ipPenyata">Penyata</label>
+          <label for="ipPenyata">Butiran Lengkap</label>
           <textarea id="ipPenyata" rows="10"
             placeholder="Tuliskan penyata anda secara kronologi. Terangkan tugas anda pada hari berkenaan, kejadian yang berlaku, dan tindakan yang anda ambil."></textarea>
         </div>
@@ -375,7 +375,7 @@ body {
 
   <div id="formFlow" style="display:none;">
 
-    <div class="vx-step-indicator" id="stepIndicator">Langkah 1 daripada 3</div>
+    <div class="vx-step-indicator" id="stepIndicator">Langkah 1 daripada 4</div>
 
     <!-- STEP 1 -->
     <div class="vx-card step-panel" id="step1">
@@ -411,40 +411,30 @@ body {
 
       <div class="vx-field">
         <label>Status Kenderaan</label>
-        <button type="button" class="vx-choice-btn c-success" data-status="berfungsi">
+        <button type="button" class="vx-choice-btn c-success" data-statusfungsi="berfungsi">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg></span>
-          Berfungsi — Di Hospital
+          Berfungsi
         </button>
-        <button type="button" class="vx-choice-btn c-danger" data-status="tidak_berfungsi">
+        <button type="button" class="vx-choice-btn c-danger" data-statusfungsi="rosak">
           <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></span>
-          Tidak Berfungsi — Di Hospital
+          Rosak
         </button>
-        <button type="button" class="vx-choice-btn c-warning" data-status="di_bengkel">
-          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3z"/></svg></span>
-          Tidak Berfungsi — Di Bengkel
+      </div>
+
+      <div class="vx-field" id="lokasiField" style="display:none;">
+        <label>Lokasi Semasa Kenderaan</label>
+        <button type="button" class="vx-choice-btn c-info" data-lokasi="diHospital">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          Berada di Hospital
         </button>
-        <div class="vx-inline-field" id="bengkelField">
-          <input type="text" id="inpNamaBengkel" placeholder="Nama bengkel...">
-          <input type="date" id="inpTarikhBengkel" style="margin-top:8px;">
-          <div class="vx-hint">Tarikh hantar ke bengkel</div>
-        </div>
-        <button type="button" class="vx-choice-btn c-info" data-status="sedang_digunakan">
-          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span>
-          Sedang Digunakan
+        <button type="button" class="vx-choice-btn c-neutral" data-lokasi="tidakDiHospital">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21l4-16h8l4 16"/><path d="M12 8v9"/></svg></span>
+          Tidak Berada di Hospital
         </button>
-        <button type="button" class="vx-choice-btn c-neutral" data-status="dipinjam">
-          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r="0.5" fill="currentColor"/><circle cx="12" cy="12" r="0.5" fill="currentColor"/><circle cx="16" cy="12" r="0.5" fill="currentColor"/></svg></span>
-          Dipinjam — Di Fasiliti Lain
-        </button>
-        <div class="vx-inline-field" id="pinjamField">
-          <input type="text" id="inpNamaFasiliti" placeholder="Nama hospital / fasiliti...">
-          <input type="date" id="inpTarikhMulaPinjam" style="margin-top:8px;">
-          <div class="vx-hint">Tarikh mula dipinjam</div>
-        </div>
       </div>
 
       <div class="vx-nav-row">
-        <button type="button" class="vx-btn primary" id="btnStep1Next">Seterusnya</button>
+        <button type="button" class="vx-btn primary" id="btnStep1Next" disabled>Seterusnya</button>
       </div>
     </div>
 
@@ -464,8 +454,8 @@ body {
       <h2 class="vx-card-title">Ringkasan &amp; Pengesahan</h2>
 
       <div class="vx-field">
-        <label for="inpRingkasan">Ringkasan Penemuan Kerosakan &amp; Tindakan</label>
-        <textarea id="inpRingkasan" placeholder="Nyatakan penemuan dan tindakan yang diambil..."></textarea>
+        <label for="inpRingkasan">Ringkasan Status Kenderaan</label>
+        <textarea id="inpRingkasan" placeholder="Nyatakan status semasa kenderaan..."></textarea>
       </div>
 
       <div class="vx-field">
@@ -489,6 +479,43 @@ body {
         <input type="text" id="inpPegawai" placeholder="Taip nama pegawai...">
       </div>
 
+      <div class="vx-nav-row">
+        <button type="button" class="vx-btn ghost" id="btnStep3Back">Kembali</button>
+        <button type="button" class="vx-btn primary" id="btnStep3Next">Seterusnya</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="vx-card step-panel" id="step4" style="display:none;">
+      <h2 class="vx-card-title">Maklumat Bengkel &amp; Servis</h2>
+
+      <div class="vx-field">
+        <label>Adakah Kenderaan Perlu Dihantar Ke Bengkel?</label>
+        <button type="button" class="vx-choice-btn c-warning" data-bengkel="ya">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3z"/></svg></span>
+          Ya
+        </button>
+        <button type="button" class="vx-choice-btn c-neutral" data-bengkel="tidak">
+          <span class="vx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></span>
+          Tidak
+        </button>
+      </div>
+
+      <div class="vx-inline-field" id="bengkelDetailField">
+        <div class="vx-field">
+          <label for="inpNamaBengkel">Nama Bengkel</label>
+          <input type="text" id="inpNamaBengkel" placeholder="Nama bengkel...">
+        </div>
+        <div class="vx-field">
+          <label for="inpTarikhDihantar">Tarikh Dihantar ke Bengkel</label>
+          <input type="date" id="inpTarikhDihantar">
+        </div>
+        <div class="vx-field" style="margin-bottom:0;">
+          <label for="inpPuncaIsu">Punca / Isu Kenderaan</label>
+          <textarea id="inpPuncaIsu" placeholder="Nyatakan sebab kenderaan dihantar ke bengkel..."></textarea>
+        </div>
+      </div>
+
       <div class="vx-field">
         <label for="inpNextServiceDate">Tarikh Servis Enjin Seterusnya</label>
         <input type="date" id="inpNextServiceDate">
@@ -505,7 +532,7 @@ body {
       </div>
 
       <div class="vx-nav-row">
-        <button type="button" class="vx-btn ghost" id="btnStep3Back">Kembali</button>
+        <button type="button" class="vx-btn ghost" id="btnStep4Back">Kembali</button>
         <button type="button" class="vx-btn primary" id="btnSubmit">Hantar Rekod</button>
       </div>
     </div>
@@ -565,7 +592,15 @@ const STATUS_LABEL = {
   lain_lain:        'Lain-lain',
 };
 const BOLEH_LABEL = { selamat: 'Selamat', jarakDekat: 'Jarak Dekat Sahaja', tidakSelamat: 'Tidak Selamat' };
-const statusLabelOf = sub => STATUS_LABEL[sub.statusKenderaan] ? (STATUS_LABEL[sub.statusKenderaan] + (sub.statusKenderaan === 'lain_lain' && sub.statusLainLain ? ' — ' + sub.statusLainLain : '')) : sub.statusKenderaan;
+const LOKASI_LABEL = { diHospital: 'Di Hospital', tidakDiHospital: 'Tidak Di Hospital' };
+const statusLabelOf = sub => {
+  if (sub.statusFungsi) {
+    const base = sub.statusFungsi === 'berfungsi' ? 'Berfungsi' : 'Rosak';
+    const lokasi = LOKASI_LABEL[sub.lokasiKenderaan] || sub.lokasiKenderaan;
+    return `${base} (${lokasi})`;
+  }
+  return STATUS_LABEL[sub.statusKenderaan] ? (STATUS_LABEL[sub.statusKenderaan] + (sub.statusKenderaan === 'lain_lain' && sub.statusLainLain ? ' — ' + sub.statusLainLain : '')) : sub.statusKenderaan;
+};
 
 /* ---------------------------------------------------------------------
    AUTH GATE
@@ -725,7 +760,9 @@ let selectedPlate = null;
 let selectedJenis = null;
 let currentItems = [];
 let currentItemsPlate = null;
-let statusKenderaan = null;
+let statusFungsi = null;
+let lokasiKenderaan = null;
+let perluKeBengkel = null;
 let bolehDigunakan = null;
 let appInitialized = false;
 
@@ -793,13 +830,29 @@ selKenderaan.addEventListener('change', function () {
   selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
 });
 
-document.querySelectorAll('[data-status]').forEach(btn => {
+const lokasiField = document.getElementById('lokasiField');
+const btnStep1Next = document.getElementById('btnStep1Next');
+
+function updateStep1NextState() {
+  btnStep1Next.disabled = !(statusFungsi && lokasiKenderaan);
+}
+
+document.querySelectorAll('[data-statusfungsi]').forEach(btn => {
   btn.addEventListener('click', function () {
-    statusKenderaan = btn.getAttribute('data-status');
-    document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+    statusFungsi = btn.getAttribute('data-statusfungsi');
+    document.querySelectorAll('[data-statusfungsi]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('bengkelField').classList.toggle('open', statusKenderaan === 'di_bengkel');
-    document.getElementById('pinjamField').classList.toggle('open', statusKenderaan === 'dipinjam');
+    lokasiField.style.display = 'block';
+    updateStep1NextState();
+  });
+});
+
+document.querySelectorAll('[data-lokasi]').forEach(btn => {
+  btn.addEventListener('click', function () {
+    lokasiKenderaan = btn.getAttribute('data-lokasi');
+    document.querySelectorAll('[data-lokasi]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateStep1NextState();
   });
 });
 
@@ -815,21 +868,10 @@ document.getElementById('btnStep1Next').addEventListener('click', function () {
   if (!tarikh) return Swal.fire('Perhatian', 'Sila masukkan tarikh.', 'warning');
   if (!masa) return Swal.fire('Perhatian', 'Sila masukkan masa.', 'warning');
   if (odometer === '' || Number(odometer) < 0) return Swal.fire('Perhatian', 'Sila masukkan bacaan odometer.', 'warning');
-  if (!statusKenderaan) return Swal.fire('Perhatian', 'Sila pilih status kenderaan.', 'warning');
-  if (statusKenderaan === 'di_bengkel') {
-    if (!document.getElementById('inpNamaBengkel').value.trim())
-      return Swal.fire('Perhatian', 'Sila masukkan nama bengkel.', 'warning');
-    if (!document.getElementById('inpTarikhBengkel').value)
-      return Swal.fire('Perhatian', 'Sila masukkan tarikh hantar ke bengkel.', 'warning');
-  }
-  if (statusKenderaan === 'dipinjam') {
-    if (!document.getElementById('inpNamaFasiliti').value.trim())
-      return Swal.fire('Perhatian', 'Sila masukkan nama fasiliti.', 'warning');
-    if (!document.getElementById('inpTarikhMulaPinjam').value)
-      return Swal.fire('Perhatian', 'Sila masukkan tarikh mula pinjam.', 'warning');
-  }
+  if (!statusFungsi) return Swal.fire('Perhatian', 'Sila pilih status kenderaan.', 'warning');
+  if (!lokasiKenderaan) return Swal.fire('Perhatian', 'Sila pilih lokasi semasa kenderaan.', 'warning');
 
-  if (statusKenderaan === 'berfungsi' || statusKenderaan === 'tidak_berfungsi') {
+  if (statusFungsi === 'berfungsi' && lokasiKenderaan === 'diHospital') {
     if (currentItems.length === 0 || currentItemsPlate !== selectedPlate) {
       currentItems = getItemsFor(selectedJenis);
       currentItemsPlate = selectedPlate;
@@ -951,19 +993,49 @@ document.querySelectorAll('[data-boleh]').forEach(btn => {
 });
 
 document.getElementById('btnStep3Back').addEventListener('click', function () {
-  if (statusKenderaan === 'berfungsi' || statusKenderaan === 'tidak_berfungsi') goToStep(2); else goToStep(1);
+  if (statusFungsi === 'berfungsi' && lokasiKenderaan === 'diHospital') goToStep(2); else goToStep(1);
 });
 
-document.getElementById('btnSubmit').addEventListener('click', async function () {
+document.getElementById('btnStep3Next').addEventListener('click', function () {
   const ringkasan = document.getElementById('inpRingkasan').value.trim();
   const pegawai = document.getElementById('inpPegawai').value.trim();
+
+  if (!ringkasan) return Swal.fire('Perhatian', 'Sila isikan ringkasan status kenderaan.', 'warning');
+  if (!bolehDigunakan) return Swal.fire('Perhatian', 'Sila pilih status kebolehgunaan kenderaan.', 'warning');
+  if (!pegawai) return Swal.fire('Perhatian', 'Sila masukkan nama pegawai mengesahkan.', 'warning');
+  goToStep(4);
+});
+
+/* ---------------------------------------------------------------------
+   STEP 4 — BENGKEL & SERVIS
+--------------------------------------------------------------------- */
+const bengkelDetailField = document.getElementById('bengkelDetailField');
+
+document.querySelectorAll('[data-bengkel]').forEach(btn => {
+  btn.addEventListener('click', function () {
+    perluKeBengkel = btn.getAttribute('data-bengkel') === 'ya';
+    document.querySelectorAll('[data-bengkel]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    bengkelDetailField.classList.toggle('open', perluKeBengkel);
+  });
+});
+
+document.getElementById('btnStep4Back').addEventListener('click', function () { goToStep(3); });
+
+document.getElementById('btnSubmit').addEventListener('click', async function () {
+  const namaBengkel = document.getElementById('inpNamaBengkel').value.trim();
+  const tarikhDihantar = document.getElementById('inpTarikhDihantar').value;
+  const puncaIsu = document.getElementById('inpPuncaIsu').value.trim();
   const nextServiceDate = document.getElementById('inpNextServiceDate').value;
   const nextBrakeServiceDate = document.getElementById('inpNextBrakeServiceDate').value;
   const nextServiceOdo = document.getElementById('inpNextServiceOdo').value;
 
-  if (!ringkasan) return Swal.fire('Perhatian', 'Sila isikan ringkasan penemuan.', 'warning');
-  if (!bolehDigunakan) return Swal.fire('Perhatian', 'Sila pilih status kebolehgunaan kenderaan.', 'warning');
-  if (!pegawai) return Swal.fire('Perhatian', 'Sila masukkan nama pegawai mengesahkan.', 'warning');
+  if (perluKeBengkel === null) return Swal.fire('Perhatian', 'Sila pilih sama ada kenderaan perlu dihantar ke bengkel.', 'warning');
+  if (perluKeBengkel) {
+    if (!namaBengkel) return Swal.fire('Perhatian', 'Sila masukkan nama bengkel.', 'warning');
+    if (!tarikhDihantar) return Swal.fire('Perhatian', 'Sila masukkan tarikh dihantar ke bengkel.', 'warning');
+    if (!puncaIsu) return Swal.fire('Perhatian', 'Sila nyatakan punca/isu kenderaan.', 'warning');
+  }
   if (!nextServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis enjin seterusnya.', 'warning');
   if (!nextBrakeServiceDate) return Swal.fire('Perhatian', 'Sila masukkan tarikh servis brek seterusnya.', 'warning');
   if (nextServiceOdo === '' || Number(nextServiceOdo) < 0) return Swal.fire('Perhatian', 'Sila masukkan odometer servis seterusnya.', 'warning');
@@ -980,15 +1052,16 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
       tarikh: document.getElementById('inpTarikh').value,
       masa: document.getElementById('inpMasa').value,
       odometer: Number(document.getElementById('inpOdometer').value),
-      statusKenderaan: statusKenderaan,
-      namaBengkel:        statusKenderaan === 'di_bengkel' ? document.getElementById('inpNamaBengkel').value.trim() : '',
-      tarikhHantarBengkel:statusKenderaan === 'di_bengkel' ? document.getElementById('inpTarikhBengkel').value : '',
-      namaFasiliti:       statusKenderaan === 'dipinjam'   ? document.getElementById('inpNamaFasiliti').value.trim() : '',
-      tarikhMulaPinjam:   statusKenderaan === 'dipinjam'   ? document.getElementById('inpTarikhMulaPinjam').value : '',
+      statusFungsi: statusFungsi,
+      lokasiKenderaan: lokasiKenderaan,
       items: currentItems.map(it => ({ id: it.id, label: it.label, status: it.status, perihal: it.perihal || '', flag: it.flag || null })),
-      ringkasan: ringkasan,
+      ringkasan: document.getElementById('inpRingkasan').value.trim(),
       bolehDigunakan: bolehDigunakan,
-      pegawaiMengesah: pegawai,
+      pegawaiMengesah: document.getElementById('inpPegawai').value.trim(),
+      perluKeBengkel: perluKeBengkel,
+      namaBengkel: perluKeBengkel ? namaBengkel : null,
+      tarikhDihantar: perluKeBengkel ? tarikhDihantar : null,
+      puncaIsu: perluKeBengkel ? puncaIsu : null,
       nextServiceDate: nextServiceDate,
       nextBrakeServiceDate: nextBrakeServiceDate,
       nextServiceOdo: Number(nextServiceOdo),
@@ -1027,18 +1100,22 @@ function resetForNewEntry() {
   document.getElementById('inpNextServiceDate').value = '';
   document.getElementById('inpNextBrakeServiceDate').value = '';
   document.getElementById('inpNextServiceOdo').value = '';
-  statusKenderaan = null;
+  document.getElementById('inpNamaBengkel').value = '';
+  document.getElementById('inpTarikhDihantar').value = '';
+  document.getElementById('inpPuncaIsu').value = '';
+  statusFungsi = null;
+  lokasiKenderaan = null;
+  perluKeBengkel = null;
   bolehDigunakan = null;
   currentItems = [];
   currentItemsPlate = null;
-  document.getElementById('inpNamaBengkel').value = '';
-  document.getElementById('inpTarikhBengkel').value = '';
-  document.getElementById('inpNamaFasiliti').value = '';
-  document.getElementById('inpTarikhMulaPinjam').value = '';
-  document.getElementById('bengkelField').classList.remove('open');
-  document.getElementById('pinjamField').classList.remove('open');
-  document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+  lokasiField.style.display = 'none';
+  bengkelDetailField.classList.remove('open');
+  document.querySelectorAll('[data-statusfungsi]').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[data-lokasi]').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[data-bengkel]').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('[data-boleh]').forEach(b => b.classList.remove('active'));
+  btnStep1Next.disabled = true;
   selKenderaan.value = keepPlate;
   selectedPlate = keepPlate || null;
   selectedJenis = selectedPlate ? (vehicleProfiles[selectedPlate].jenisKenderaan || 'jabatan') : null;
@@ -1296,7 +1373,8 @@ function goToStep(n, pushHistory = true) {
   document.getElementById('step1').style.display = n === 1 ? 'block' : 'none';
   document.getElementById('step2').style.display = n === 2 ? 'block' : 'none';
   document.getElementById('step3').style.display = n === 3 ? 'block' : 'none';
-  stepIndicator.textContent = `Langkah ${n} daripada 3`;
+  document.getElementById('step4').style.display = n === 4 ? 'block' : 'none';
+  stepIndicator.textContent = `Langkah ${n} daripada 4`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (pushHistory && historyGuardActive) {
     history.pushState({ vxGuard: true }, '', location.href);
