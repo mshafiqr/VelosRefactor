@@ -18,8 +18,14 @@
 // Ports must match firebase.json's "emulators" block.
 
 require('dotenv').config();
-const admin = require('firebase-admin');
-const { projects } = require('../../.firebaserc');
+const fs = require('fs');
+const path = require('path');
+const { initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { getFirestore } = require('firebase-admin/firestore');
+// .firebaserc has no recognized extension, so require() can't parse it as
+// JSON -- read and parse it explicitly instead.
+const { projects } = JSON.parse(fs.readFileSync(path.join(__dirname, '../../.firebaserc'), 'utf8'));
 
 const AUTH_EMULATOR_HOST = '127.0.0.1:9099';
 const FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080';
@@ -27,9 +33,11 @@ const FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080';
 process.env.FIREBASE_AUTH_EMULATOR_HOST = AUTH_EMULATOR_HOST;
 process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_EMULATOR_HOST;
 
-const app = admin.initializeApp({ projectId: projects.default });
-const auth = admin.auth(app);
-const db = admin.firestore(app);
+// firebase-admin v14 dropped the namespaced admin.auth()/admin.firestore()
+// API -- use the modular per-service imports instead.
+const app = initializeApp({ projectId: projects.default });
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // UIDs copied verbatim from firestore.rules — keep in sync with that file,
 // not with memory. If firestore.rules changes a UID, update it here too.
