@@ -1,0 +1,154 @@
+/* ============================================================
+   VELOS — Shared CSS (Extraction Phase 1)
+   ============================================================
+   NOTE ON NAMING: this is "Extraction Phase 1" of the monolith ->
+   modular refactor (Task 2), distinct from the "VELOS Design System
+   v1" / "Phase 2 rollout" comments already in some portal files --
+   those label an earlier, unrelated hand-copied design-system
+   rollout across portals. Don't conflate the two.
+
+   Scope: the classic design tokens (--primary etc.) and non-
+   navigation shared component CSS -- auth/login card, base table
+   row hover, SweetAlert2 overrides, a handful of small identical
+   utility rules -- duplicated across admin.html, admin-jkns.html,
+   admin-yearly.html, dispatch.html, borang-permohonan.html, and
+   log-pemandu.html. Verified byte-identical (outside any @media
+   block) across every file it's extracted from before being moved
+   here -- see the extraction script in this session's scratchpad.
+
+   Deliberately OUT of scope (left inline, untouched):
+   - Every --vx-* token and .vx-* class (sidebar/topbar/cards) in
+     any file -- that's Extraction Phase 2 (sidebar/topbar
+     extraction), not this pass.
+   - Anything inside an @media print block, in any file -- print/
+     slip layout (dispatch.html, borang-permohonan.html) must keep
+     overriding these shared rules exactly as it did when they were
+     inline; moving print CSS here risks leaking it into files that
+     never had it. See CLAUDE.md: print/slip templates preserve
+     structure and layout exactly.
+   - Rules that only LOOK similar but differ in real values across
+     files (:root's vx- half, body, .container, .card, h2, table/
+     th/td, .watermark-footer, label, button.btn-main, .btn-logout)
+     -- confirmed by diff to carry different padding/radius/shadow/
+     sizing per page, so left as genuine page-specific styling.
+   - The "PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)" mobile touch-
+     target block -- same intent everywhere but a different selector
+     list per file (each page's own button classes); unioning it
+     risked changing z-index/position behavior on elements that
+     never had it, so left inline per file for a more careful future
+     pass.
+   - about.html, index.html, portal-kenderaan.html,
+     portal-kenderaan-admin.html -- none of these use the classic
+     token/component set (about.html uses neither system at all;
+     the other three already run entirely on --vx-* naming, even for
+     auth/table/swal2), so there's nothing here for them to link to.
+   ============================================================ */
+
+:root {
+  --primary: #0F2A4A;
+  --primary-deep: #081A2E;
+  --secondary: #147D82;
+  --bg-color: #E9F1F6;
+  --card-bg: #ffffff;
+  --text-color: #1C2530;
+  --text-soft: #5B6774;
+  --success: #1E8E5A;
+  --danger: #C62828;
+  /* Same color, two names in use across files (dispatch.html uses
+     --amber; the rest use --warning) -- both kept as aliases rather
+     than renaming one everywhere, per the approved plan. */
+  --warning: #C98A2E;
+  --amber: #C98A2E;
+  --clear: #6C7A89;
+  --line: #DCE6ED;
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
+}
+
+/* ==================== AUTH GATE ==================== */
+#loginView {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.auth-card {
+  max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 16px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+  border-top: 4px solid var(--primary);
+}
+.auth-logo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #e9ecef;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
+/* Present in 5/6 files -- dispatch.html doesn't use this class (its
+   own auth input styling is untouched, left inline in that file). */
+.auth-password-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #DCE6ED; border-radius: 8px;
+  font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px;
+}
+.auth-password-input:focus { outline: none; border-color: var(--secondary); }
+.auth-submit-btn {
+  width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
+.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: var(--secondary); text-decoration: none; font-weight: 600; }
+.auth-back-link:hover { text-decoration: underline; }
+
+/* ==================== PAGE SHELL (admin.html, admin-jkns.html, admin-yearly.html only) ==================== */
+#secureDashboardWrapper { display: none; padding: 20px; }
+.print-avoid-break { page-break-inside: avoid; }
+
+/* ==================== TABLE ROW HOVER / STRIPE ==================== */
+/* Present in 5/6 files -- borang-permohonan.html has no plain table
+   in its base view, so no rule to remove there. */
+tr:nth-child(even) { background-color: #F6FAFC; }
+tbody tr:hover {
+  background-color: rgba(20, 125, 130, 0.08);
+  transition: background-color 0.15s ease;
+}
+
+/* ==================== INTERACTION (admin.html, admin-jkns.html, admin-yearly.html only) ==================== */
+button.btn-table-download { background-color: #6c757d; color: white; border: none; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
+a:not(.vx-sidebar-link):hover { color: var(--secondary); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .vx-sidebar-link:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* ==================== SWEETALERT2 OVERRIDES ==================== */
+.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
+.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
+.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
+.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
+.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
+.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+
+/* ==================== SMALL SHARED UTILITIES ==================== */
+/* .hide-print / .table-scroll: admin.html, admin-jkns.html, admin-yearly.html only. */
+.hide-print { display: table-cell; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* .form-group: borang-permohonan.html, dispatch.html, log-pemandu.html only. */
+.form-group { margin-bottom: 15px; }
