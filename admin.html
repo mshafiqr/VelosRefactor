@@ -1082,7 +1082,8 @@ import {
   onAuthStateChanged,
   signOut,
   setPersistence,
-  browserSessionPersistence
+  browserSessionPersistence,
+  connectAuthEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
   getFirestore,
@@ -1096,7 +1097,8 @@ import {
   query,
   where,
   documentId,
-  writeBatch
+  writeBatch,
+  connectFirestoreEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { pad2, todayISO, classifyLiterFill } from "./velos-utils.js";
@@ -1104,6 +1106,13 @@ import { pad2, todayISO, classifyLiterFill } from "./velos-utils.js";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Local-only: route to Firebase Emulator Suite when served from localhost.
+// No effect in production (velos-pitas.web.app / Firebase Hosting).
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}
 const PORTAL_EMAIL = "admin@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
 const VISITOR_EMAIL = "visitor@pitas.velos";
@@ -1663,6 +1672,49 @@ function computeMonthStats(monthStr) {
 // doc with just liter + optional odoPengisian). If a vehicle refuelled
 // with no trip logged that month, jarak/kadar can't be computed --
 // shown as "-" rather than a garbage NaN.
+
+/* ================================================================
+   FUEL CONSUMPTION FORMULA — VELOS (ADAPTASI LAMPIRAN F WP 4.1)
+   ================================================================
+   Formula ini adalah ADAPTASI kepada formula Lampiran F, Pekeliling
+   Perbendaharaan Malaysia WP 4.1 (Pengurusan Kenderaan Kerajaan,
+   berkuat kuasa 6 Julai 2026) — BUKAN pengecualian daripadanya.
+   VELOS kekal berasaskan kaedah pengiraan Lampiran F (baki awal +
+   belian − baki akhir), tetapi mengubah suai titik bacaan baki
+   awal/akhir bagi kesesuaian operasi ambulans.
+
+   KENAPA DIUBAHSUAI:
+   Lampiran F mengandaikan kenderaan yang beroperasi mengikut waktu
+   tetap, dengan bacaan tangki fizikal boleh dibuat pada 1hb dan
+   hujung bulan. Ambulans KKM beroperasi 24 jam, dengan pelbagai
+   pemandu bersilih ganti dalam satu syif — bacaan tangki berjadual
+   pada tarikh tetap tidak praktikal untuk kenderaan kecemasan
+   sebegini.
+
+   PENGECUALIAN — Fasal 6.3.4, WP 4.1 (M.S. 17/117):
+   "Kenderaan ambulan di bawah Kementerian Kesihatan Malaysia
+   dikecualikan daripada peraturan penggunaan Buku Log Kenderaan,
+   Kad Inden Bahan Api, Kad Sistem Bayaran Tol dan Parkir Tanpa Resit
+   serta pengurusan kunci kenderaan."
+
+   PENTING: Fasal ini mengecualikan PROSES pentadbiran (Buku Log
+   fizikal, Kad Inden, Kad Tol, pengurusan kunci) — BUKAN formula
+   pengiraan itu sendiri. VELOS masih mengira penggunaan bahan api
+   mengikut kaedah Lampiran F, cuma titik bacaan baki diubah suai
+   kepada isian pertama/terakhir bulan tersebut, bukan bacaan fizikal
+   tangki pada tarikh tetap.
+
+   Formula VELOS (disahkan melalui backfill Julai 2026):
+     i_val      = cap − first fill bulan semasa (proksi baki awal)
+     ii_belian  = jumlah semua isian bulan semasa
+     iii_val    = cap − last fill bulan semasa (proksi baki akhir)
+     c_guna     = i_val + ii_belian − iii_val
+     kadar      = jarak / c_guna
+
+   JANGAN ubah formula ini tanpa arahan eksplisit daripada pembangun
+   sistem. Rujuk bahagian "Fuel Calculation — Legal Basis" dalam
+   CLAUDE.md untuk penjelasan penuh.
+   ================================================================ */
 function computeFuelStatsForMonth(monthStr) {
   const normPlat = s => (s || '').toString().trim().toUpperCase().replace(/\s+/g, ' ');
   const firstFillOf = e => e.liter;
@@ -1710,6 +1762,13 @@ function computeFuelStatsForMonth(monthStr) {
   }
   return vFuelGroup;
 }
+
+// Pin-test capture only (see tests/fixtures-capture/capture-fuel-calc-pin.js):
+// exposes the two fuel-calc functions for page.evaluate() to call directly
+// and record their raw output before any future extraction/refactor.
+// No behavior change -- read-only functions, no side effects.
+window.computeMonthStats = computeMonthStats;
+window.computeFuelStatsForMonth = computeFuelStatsForMonth;
 
 window.toggleLogView = function () {
   isFullLogView = !isFullLogView;

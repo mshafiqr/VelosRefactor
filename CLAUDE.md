@@ -58,6 +58,61 @@ Firebase Auth, email/password. Shared role accounts — not individual staff acc
 
 No global gate. Each portal page checks its own auth state on load; no session → show that portal's login form. `firestore.rules` is the actual enforcement — the login form alone protects nothing. Passwords live in Firebase Console only, never in this repo.
 
+## Fuel Calculation — Legal Basis (CRITICAL — read before touching fuel logic)
+
+### VELOS adapts Lampiran F — it does not replace or bypass it
+
+`computeFuelStatsForMonth()` in `admin.html` uses the same underlying
+methodology as Lampiran F of WP 4.1 (baki awal + belian − baki akhir =
+penggunaan), adapted for ambulance operational reality. This is NOT an
+exemption from Lampiran F — it is an adaptation of it, legally grounded
+in Fasal 6.3.4 below. An earlier framing (13 Aug 2026) incorrectly
+described this as an exemption from the formula itself; that was
+corrected 14 Aug 2026 and reconfirmed by the system developer
+29 Aug 2026. Do not revert to the exemption framing.
+
+### The exemption — Fasal 6.3.4, M.S. 17/117
+
+Pekeliling Perbendaharaan Malaysia WP 4.1 (Pengurusan Kenderaan
+Kerajaan, berkuat kuasa 6 Julai 2026), Fasal 6.3.4 (M.S. 17/117):
+
+> "Kenderaan ambulan di bawah Kementerian Kesihatan Malaysia
+> dikecualikan daripada peraturan penggunaan Buku Log Kenderaan, Kad
+> Inden Bahan Api, Kad Sistem Bayaran Tol dan Parkir Tanpa Resit serta
+> pengurusan kunci kenderaan."
+
+**What this clause exempts:** the administrative process — the
+physical Buku Log Kenderaan, Kad Inden Bahan Api, Kad Sistem Bayaran
+Tol dan Parkir Tanpa Resit, and pengurusan kunci kenderaan.
+
+**What it does NOT exempt:** the underlying fuel-consumption formula.
+
+**What it requires:** KKM must create its own tatacara for recording
+ambulance usage and fuel expenditure. VELOS is that tatacara — built
+on an adapted version of the Lampiran F calculation, not a replacement
+of it.
+
+### Why the adaptation was necessary
+
+Lampiran F assumes a vehicle on a fixed schedule, where a physical
+tank reading can be taken on the 1st and last day of the month. KKM
+ambulances run 24 hours a day with multiple drivers rotating across
+shifts — a scheduled gauge reading on a fixed date doesn't fit that
+pattern. VELOS instead infers baki awal/baki akhir from the first and
+last fuel fill of the month, reliable only in combination with the
+full-fill SOP (drivers are required to fill to full every time).
+
+### Formula (validated via July 2026 backfill)
+
+- `i_val` (baki awal proxy) = `cap − first fill of current month`
+- `ii_belian` = sum of all fill litres this month
+- `iii_val` (baki akhir proxy) = `cap − last fill of current month`
+- `c_guna` = `i_val + ii_belian − iii_val`
+- `kadar` = `jarak / c_guna`
+
+**DO NOT change this formula or this legal framing without explicit
+instruction from the system developer.**
+
 ## Design tokens — carry over exactly
 
 ```css
@@ -105,6 +160,24 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 ## Post-launch work log
 
 - **26 Aug 2026** — `log-pemandu.html`'s `logPergerakan` listener scoped to `tarikh >= start of previous month` (same pattern as `admin.html`'s year-scoped listeners), identified via a Playwright-based Firestore read audit as the largest driver of daily reads. Added a bounded boundary-anchor query (`limit(500)`, `orderBy('tarikh','desc')`, one-time not a listener) feeding `computeOdometerMismatches()` so the odometer-continuity check still catches a mismatch across month boundaries. 7/7 Playwright baseline tests passing (`tests/log-pemandu.spec.js`) before and after. Committed `f9ab005`, pushed to GitHub, deployed to production.
+
+## Local Firebase Emulator (testing only)
+
+Opt-in local testing layer, additive to the live-site Playwright suite — production (`velos-pitas`) is completely unaffected. Every portal file only routes to the emulator when `location.hostname` is `localhost`/`127.0.0.1`; deployed to Hosting, the emulator-connect blocks never fire.
+
+1. **Start the emulators** (Auth :9099, Firestore :8080, UI :4000, Hosting :5000 — see `firebase.json`):
+   ```bash
+   firebase emulators:start
+   ```
+2. **Seed the 8 role accounts** into the Auth emulator (UID-pinned to `firestore.rules`, same passwords as `.env`). Idempotent — safe to re-run. Run once the emulators are up, in a second terminal:
+   ```bash
+   node tests/emulator/seed.js
+   ```
+   `tests/emulator/seed.js` also exports `seedFirestoreDocs(collectionPath, docsById)` for seeding arbitrary fixture documents (trips, fuel entries, etc.) from any test file.
+3. **Run the existing Playwright suite against the emulator** instead of live — a separate config, `npx playwright test` (no args) still defaults to live as before:
+   ```bash
+   npx playwright test --config=playwright.emulator.config.js
+   ```
 
 ## What not to do
 
