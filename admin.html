@@ -409,95 +409,19 @@ top: 15px !important;
 
 <div id="secureDashboardWrapper">
 
-<header class="vx-topbar hide-print" id="vxTopbar">
-  <div class="vx-topbar-left">
-    <button class="vx-sidebar-toggle-floating hide-print" id="vxSidebarToggle" onclick="window.vxToggleSidebar()" title="Buka/Tutup menu" aria-label="Buka/Tutup menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-    </button>
-    <img src="https://i.postimg.cc/3RHFdSvp/Jata-Negara.png" alt="Jata Negara">
-    <img src="https://i.postimg.cc/LXM3nC1j/HPTS.png" alt="Hospital Pitas">
-  </div>
-  <div class="vx-topbar-title">VELOS — Admin</div>
-  <div class="vx-topbar-right">
-    <span class="vx-status-badge"><span class="vx-status-dot">●</span> Sistem Aktif</span>
-    <span class="vx-role-badge">Edisi 4 · Versi 1.0</span>
-    <span class="vx-clock" id="vxClock">--:--</span>
-    <button id="btnRefreshTop" onclick="window.refreshDataSilently()" class="vx-topbar-sync hide-print" title="Segerak semula kapasiti kenderaan"> 🔄  Sync Data</button>
-    <button id="btnLogout" onclick="window.doLogout()" class="btn-logout-top hide-print">Log Keluar</button>
-  </div>
-</header>
-
-<nav class="vx-sidebar hide-print" id="vxSidebar">
-  <button class="vx-sidebar-link" onclick="window.open('index.html','_self')" title="Laman Utama">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/><path d="M9 21v-6h6v6"/></svg></span><span class="vx-sidebar-text">Laman Utama</span>
-  </button>
-  <hr class="vx-sidebar-divider">
-
-  <div class="vx-sidebar-section-label">Portal</div>
-  <button class="vx-sidebar-link" onclick="window.open('log-pemandu.html','_self')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></span><span class="vx-sidebar-text">Log Pemandu</span><span class="vx-portal-tag">01</span>
-  </button>
-  <button class="vx-sidebar-link" onclick="window.open('borang-permohonan.html','_self')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v5h5"/><path d="M8 13h8M8 17h8M8 9h3"/></svg></span><span class="vx-sidebar-text">Permohonan</span><span class="vx-portal-tag">02</span>
-  </button>
-  <button class="vx-sidebar-link" onclick="window.open('dispatch.html','_self')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg></span><span class="vx-sidebar-text">VCC</span><span class="vx-portal-tag">03</span>
-  </button>
-  <button class="vx-sidebar-link" onclick="window.open('portal-kenderaan-admin.html','_self')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="12" height="9" rx="1"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg></span><span class="vx-sidebar-text">Kenderaan (Penyelia)</span><span class="vx-portal-tag">04</span>
-  </button>
-
-  <hr class="vx-sidebar-divider">
-  <div class="vx-sidebar-section-label">VELOS NG 999</div>
-  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-mecc.html','_blank','noopener')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></span><span class="vx-sidebar-text">MECC Dashboard</span>
-  </button>
-  <button class="vx-sidebar-link" onclick="window.open('https://velos-ng999-dispatch-system.web.app/velos-supervisor.html','_blank','noopener')">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Supervisor Dashboard</span>
-  </button>
-
-  <hr class="vx-sidebar-divider">
-
-  <div class="vx-sidebar-section-label">Admin</div>
-  <a href="#sec-dashboard" class="vx-sidebar-link" data-vx-section="sec-dashboard">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="vx-sidebar-text">Dashboard</span>
-  </a>
-  <a href="#sec-log-pergerakan" class="vx-sidebar-link" data-vx-section="sec-log-pergerakan">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg></span><span class="vx-sidebar-text">Log Pergerakan</span>
-  </a>
-
-  <button class="vx-sidebar-link vx-sidebar-parent" id="vxLaporanParentToggle" onclick="window.vxToggleLaporanSubmenu()">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20"/></svg></span><span class="vx-sidebar-text">Laporan &amp; Statistik</span>
-    <span class="vx-sidebar-parent-chevron vx-sidebar-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-  </button>
-  <div class="vx-sidebar-subgroup" id="vxLaporanSubgroup">
-    <a href="#sec-laporan-pesakit" class="vx-sidebar-link" data-vx-section="sec-laporan-pesakit">
-      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></span><span class="vx-sidebar-text">Pesakit &amp; Rujukan</span>
-    </a>
-    <a href="#sec-laporan-kenderaan" class="vx-sidebar-link" data-vx-section="sec-laporan-kenderaan">
-      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15"/><path d="M3 21h11"/><path d="M13 9h2.2L18 11.8V17a1.5 1.5 0 0 1-3 0v-1a1 1 0 0 0-1-1h-1"/><path d="M6.5 7.5h4"/></svg></span><span class="vx-sidebar-text">Kenderaan &amp; Bahan Api</span>
-    </a>
-    <a href="#sec-laporan-staf" class="vx-sidebar-link" data-vx-section="sec-laporan-staf">
-      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg></span><span class="vx-sidebar-text">Laporan Staf</span>
-    </a>
-    <a href="#sec-laporan-vcc" class="vx-sidebar-link" data-vx-section="sec-laporan-vcc">
-      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><rect x="9" y="2" width="6" height="3.5" rx="1"/><path d="M8.5 13.5l2 2 4-4.5"/></svg></span><span class="vx-sidebar-text">Permohonan VCC</span>
-    </a>
-    <button class="vx-sidebar-link" onclick="window.open('admin-jkns.html','_self')">
-      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h6l4 4v14H6V3z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span><span class="vx-sidebar-text">Laporan JKNS</span>
-    </button>
-    <button class="vx-sidebar-link" onclick="window.open('admin-yearly.html','_self')">
-      <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></span><span class="vx-sidebar-text">Statistik Tahunan</span>
-    </button>
-  </div>
-
-  <a href="#sec-konfigurasi" class="vx-sidebar-link" data-vx-section="sec-konfigurasi">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.5 1.5M7.1 16.9l-1.5 1.5M18.4 18.4l-1.5-1.5M7.1 7.1 5.6 5.6"/></svg></span><span class="vx-sidebar-text">Konfigurasi</span>
-  </a>
-  <a href="#sec-sistem" class="vx-sidebar-link" data-vx-section="sec-sistem">
-    <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7 3v6c0 5-3 8.5-7 9.5-4-1-7-4.5-7-9.5v-6z"/><path d="M9 12l2 2 4-4.2"/></svg></span><span class="vx-sidebar-text">Sistem</span>
-  </a>
-</nav>
+<header id="vxTopbar"></header>
+<nav id="vxSidebar"></nav>
+<script src="ui-components.js"></script>
+<script>
+document.getElementById('vxTopbar').outerHTML = VxUI.renderVxTopbar({
+  title: 'VELOS — Admin', extraClass: ' hide-print', toggleExtraClass: ' hide-print', cluster: 'dashboard', showSync: true
+});
+document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
+  homeAsAnchor: false, extraClass: ' hide-print', activePortal: null,
+  kenderaanHref: 'portal-kenderaan-admin.html', kenderaanLabel: 'Kenderaan (Penyelia)',
+  showAbout: false, showAdminSection: true, adminHost: true, activeAdminItem: null, ng999Style: 'external'
+});
+</script>
 <div id="vxBackdrop"></div>
 
 <div class="vx-main-content" id="vxMainContent">
@@ -2115,41 +2039,7 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
 <script>
 /* navbar scroll spy */
 (function () {
-  var sidebar = document.getElementById('vxSidebar');
-  var mainContent = document.getElementById('vxMainContent');
-  var backdrop = document.getElementById('vxBackdrop');
-
-  function vxSyncBackdrop(collapsed) {
-    if (!backdrop) return;
-    backdrop.style.display = (!collapsed && window.innerWidth <= 768) ? 'block' : 'none';
-  }
-
-  window.vxToggleSidebar = function () {
-    if (!sidebar || !mainContent) return;
-    var collapsed = sidebar.classList.toggle('vx-collapsed');
-    mainContent.classList.toggle('vx-sidebar-collapsed', collapsed);
-    vxSyncBackdrop(collapsed);
-  };
-
-  if (backdrop) backdrop.addEventListener('click', window.vxToggleSidebar);
-
-  // Phone screens start with the sidebar closed (it's an overlay drawer
-  // there, see the @media (max-width:768px) rules) -- desktop keeps the
-  // full-expand default.
-  if (sidebar && mainContent && window.innerWidth <= 768) {
-    sidebar.classList.add('vx-collapsed');
-    mainContent.classList.add('vx-sidebar-collapsed');
-  }
-
-  var laporanToggle = document.getElementById('vxLaporanParentToggle');
-  var laporanSubgroup = document.getElementById('vxLaporanSubgroup');
-  window.vxToggleLaporanSubmenu = function () {
-    if (!laporanToggle || !laporanSubgroup) return;
-    var opening = !laporanToggle.classList.contains('vx-expanded');
-    laporanToggle.classList.toggle('vx-expanded', opening);
-    laporanSubgroup.classList.toggle('vx-expanded', opening);
-    if (opening) vxShowPage('sec-laporan-pesakit');
-  };
+  var vxNav = VxUI.initVxNav({ onLaporanExpand: function () { vxShowPage('sec-laporan-pesakit'); } });
 
   var monthInput = document.getElementById('pilihanBulan');
   function vxStepMonth(delta) {
@@ -2199,16 +2089,6 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
   };
   var allPages = document.querySelectorAll('.vx-page');
 
-  // On mobile the sidebar is an overlay drawer (see @media max-width:768px) --
-  // closing it after any navigation or tap on the content behind it is the
-  // expected drawer pattern, not just via the toggle button.
-  function vxCloseSidebarOnMobile() {
-    if (window.innerWidth > 768 || !sidebar || sidebar.classList.contains('vx-collapsed')) return;
-    sidebar.classList.add('vx-collapsed');
-    mainContent.classList.add('vx-sidebar-collapsed');
-    vxSyncBackdrop(true);
-  }
-
   function vxShowPage(targetId) {
     var groupIds = PAGE_GROUPS[targetId] || [targetId];
     allPages.forEach(function (el) {
@@ -2217,9 +2097,9 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
     sections.forEach(function (s) {
       s.link.classList.toggle('vx-active', s.link.getAttribute('data-vx-section') === targetId);
     });
-    if (mainContent) mainContent.scrollTop = 0;
+    if (vxNav.mainContent) vxNav.mainContent.scrollTop = 0;
     window.scrollTo(0, 0);
-    vxCloseSidebarOnMobile();
+    vxNav.closeSidebarOnMobile();
   }
   window.vxShowPage = vxShowPage;
 
@@ -2230,19 +2110,9 @@ window.addEventListener('afterprint', function () { document.title = 'VELOS — 
     });
   });
 
-  if (mainContent) mainContent.addEventListener('click', vxCloseSidebarOnMobile);
+  if (vxNav.mainContent) vxNav.mainContent.addEventListener('click', vxNav.closeSidebarOnMobile);
 
   vxShowPage('sec-dashboard');
-
-  var clockEl = document.getElementById('vxClock');
-  if (clockEl) {
-    var tickClock = function () {
-      var now = new Date();
-      clockEl.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-    };
-    tickClock();
-    setInterval(tickClock, 1000);
-  }
 })();
 </script>
 
