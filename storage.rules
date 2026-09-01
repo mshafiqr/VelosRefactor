@@ -29,9 +29,20 @@ service firebase.storage {
     // Fuel receipt images, uploaded from log-pemandu.html at save time.
     // Driver/admin/master may write; driver/admin/master/viewer may read
     // (admin.html's lihatResit viewer, plus the visitor read-only role).
+    //
+    // create is split from delete because request.resource (contentType,
+    // size) is only populated on create/update -- evaluating it on a
+    // delete request (used by deleteResitStorageFiles's cleanup, plus
+    // deleteEntry/deleteFuelEntry) would error out and deny every delete.
+    // No update case: the app always writes a fresh timestamped filename,
+    // never re-uploads to an existing path, so update stays unmatched
+    // (default-denied) rather than granted and unused.
     match /resit/{vehicleId}/{filename} {
-      allow read:  if isDriver() || isAdmin() || isMaster() || isViewer();
-      allow write: if isDriver() || isAdmin() || isMaster();
+      allow read:   if isDriver() || isAdmin() || isMaster() || isViewer();
+      allow create: if (isDriver() || isAdmin() || isMaster())
+                    && request.resource.contentType.matches('image/.*')
+                    && request.resource.size < 2 * 1024 * 1024;
+      allow delete: if isDriver() || isAdmin() || isMaster();
     }
 
     // ---- Default deny ---------------------------------------------------------
