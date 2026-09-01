@@ -1235,13 +1235,30 @@ window.deleteFuelEntry = function (id) {
     });
 };
 
+// Backward-compat, post Firebase Storage migration: a doc saved before
+// the migration holds a base64 data URI directly in resit (starts with
+// "data:image"); a doc saved after holds a Firebase Storage download URL.
+// SweetAlert2's imageUrl (and a plain <img src>) accepts either as-is, so
+// this exists to make that distinction explicit rather than assume every
+// resit value is one shape.
+function isBase64Resit(value) {
+  return typeof value === 'string' && value.indexOf('data:image') === 0;
+}
+
 // Single getDoc, only when the admin taps to view -- never onSnapshot,
 // never a bulk getDocs. Section 7, rules 2 & 3.
 window.lihatResit = function (fillId) {
   Swal.fire({ title: 'Memuat Resit...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
   getDoc(doc(db, 'resitBahanApi', String(fillId))).then(function (snap) {
-    if (snap.exists() && snap.data().resit) {
-      Swal.fire({ title: 'Resit Bahan Api', imageUrl: snap.data().resit, imageAlt: 'Resit Bahan Api', confirmButtonText: 'Tutup', width: 'auto' });
+    const resitValue = snap.exists() ? snap.data().resit : null;
+    if (resitValue) {
+      // isBase64Resit(resitValue) (defined above) distinguishes a
+      // pre-migration base64 data URI from a post-migration Storage
+      // download URL -- both are valid imageUrl sources as-is, so
+      // rendering doesn't branch on it, but the check exists so any
+      // future logic that needs to tell the two apart has one place to
+      // ask, instead of re-deriving the "data:image" prefix test.
+      Swal.fire({ title: 'Resit Bahan Api', imageUrl: resitValue, imageAlt: 'Resit Bahan Api', confirmButtonText: 'Tutup', width: 'auto' });
     } else {
       Swal.fire('Tiada Resit', 'Tiada resit disimpan untuk pengisian ini.', 'info');
     }
