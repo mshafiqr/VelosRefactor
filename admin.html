@@ -867,7 +867,6 @@ import {
   getDoc,
   getDocs,
   setDoc,
-  deleteDoc,
   onSnapshot,
   query,
   where,
@@ -1201,15 +1200,15 @@ window.deleteEntry = function (id) {
       if (!result.isConfirmed) return;
       Swal.fire({ title: 'Memproses Pemadaman...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
       const strId = String(id);
-      deleteDoc(doc(db, 'logPergerakan', strId))
-        .then(function () { return getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', Number(id)))); })
+      getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', Number(id))))
         .then(function (fuelSnap) {
-          const cascade = [];
+          const batch = writeBatch(db);
+          batch.delete(doc(db, 'logPergerakan', strId));
           fuelSnap.forEach(function (fd) {
-            cascade.push(deleteDoc(doc(db, 'logBahanApi', fd.id)));
-            cascade.push(deleteDoc(doc(db, 'resitBahanApi', fd.id)));
+            batch.delete(doc(db, 'logBahanApi', fd.id));
+            batch.delete(doc(db, 'resitBahanApi', fd.id));
           });
-          return Promise.all(cascade);
+          return batch.commit();
         })
         .then(function () {
           Swal.fire('Terpadam!', 'Rekod tersebut berjaya dibersihkan.', 'success');
@@ -1225,10 +1224,10 @@ window.deleteFuelEntry = function (id) {
     .then(function (result) {
       if (!result.isConfirmed) return;
       const strId = String(id);
-      Promise.all([
-        deleteDoc(doc(db, 'logBahanApi', strId)),
-        deleteDoc(doc(db, 'resitBahanApi', strId))
-      ]).then(function () {
+      const batch = writeBatch(db);
+      batch.delete(doc(db, 'logBahanApi', strId));
+      batch.delete(doc(db, 'resitBahanApi', strId));
+      batch.commit().then(function () {
         Swal.fire('Terpadam!', '', 'success');
       }).catch(function (err) {
         Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
