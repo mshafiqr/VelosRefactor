@@ -83,7 +83,7 @@
       right =
         '<div class="vx-topbar-right">\n' +
         '    <span class="vx-status-badge"><span class="vx-status-dot">●</span> Sistem Aktif</span>\n' +
-        '    <span class="vx-role-badge">Edisi 4 · Versi 1.0</span>\n' +
+        '    <span class="vx-role-badge">Edisi 5 · Versi 1.0</span>\n' +
         '    <span class="vx-clock" id="vxClock">--:--</span>' + sync + '\n' +
         '    <button id="btnLogout" onclick="window.doLogout()" class="btn-logout-top hide-print">Log Keluar</button>\n' +
         '  </div>';
