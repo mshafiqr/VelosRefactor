@@ -876,6 +876,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
   getStorage,
+  ref,
+  deleteObject,
   connectStorageEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { firebaseConfig } from "./firebase-config.js";
@@ -1196,9 +1198,38 @@ window.refreshDataSilently = function () {
   });
 };
 
+// Storage cleanup: a resitBahanApi doc's resit field is either a base64
+// data URI (pre-migration) or an https:// Storage download URL
+// (post-migration) -- only the URL case has a real file in the bucket to
+// remove. Reads each doc once (single getDoc per ID, never a bulk read --
+// Section 7 rule 3) and runs before any Firestore delete, mirroring how
+// log-pemandu.html's receipt upload runs before the Firestore write on
+// save. "already gone" (storage/object-not-found) is swallowed so a
+// retried delete doesn't fail on the second attempt for no reason; every
+// other Storage error aborts the whole delete rather than leaving
+// Firestore and Storage silently out of sync.
+function isStorageUrlResit(value) {
+  return typeof value === 'string' && value.indexOf('https://') === 0;
+}
+
+async function deleteResitStorageFiles(fillIds) {
+  for (const fillId of (fillIds || [])) {
+    const snap = await getDoc(doc(db, 'resitBahanApi', String(fillId)));
+    const resitValue = snap.exists() ? snap.data().resit : null;
+    if (!isStorageUrlResit(resitValue)) continue;
+    try {
+      await deleteObject(ref(storage, resitValue));
+    } catch (err) {
+      if (err.code !== 'storage/object-not-found') throw err;
+    }
+  }
+}
+
 /* ---------------------------------------------------------------------
    DELETE — trip cascades to every logBahanApi fill of that trip (via
-   the logId field) and each fill's own resitBahanApi doc.
+   the logId field) and each fill's own resitBahanApi doc. Storage files
+   behind a resitBahanApi doc (if any) are removed before the Firestore
+   batch commits -- see deleteResitStorageFiles above.
 --------------------------------------------------------------------- */
 window.deleteEntry = function (id) {
   Swal.fire({ title: 'Padam Rekod?', text: 'Rekod pergerakan ini (termasuk rekod bahan api) akan dipadam kekal!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Padam', cancelButtonText: 'Batal' })
@@ -1208,13 +1239,16 @@ window.deleteEntry = function (id) {
       const strId = String(id);
       getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', Number(id))))
         .then(function (fuelSnap) {
-          const batch = writeBatch(db);
-          batch.delete(doc(db, 'logPergerakan', strId));
-          fuelSnap.forEach(function (fd) {
-            batch.delete(doc(db, 'logBahanApi', fd.id));
-            batch.delete(doc(db, 'resitBahanApi', fd.id));
+          const fuelIds = fuelSnap.docs.map(function (fd) { return fd.id; });
+          return deleteResitStorageFiles(fuelIds).then(function () {
+            const batch = writeBatch(db);
+            batch.delete(doc(db, 'logPergerakan', strId));
+            fuelIds.forEach(function (fid) {
+              batch.delete(doc(db, 'logBahanApi', fid));
+              batch.delete(doc(db, 'resitBahanApi', fid));
+            });
+            return batch.commit();
           });
-          return batch.commit();
         })
         .then(function () {
           Swal.fire('Terpadam!', 'Rekod tersebut berjaya dibersihkan.', 'success');
@@ -1230,10 +1264,12 @@ window.deleteFuelEntry = function (id) {
     .then(function (result) {
       if (!result.isConfirmed) return;
       const strId = String(id);
-      const batch = writeBatch(db);
-      batch.delete(doc(db, 'logBahanApi', strId));
-      batch.delete(doc(db, 'resitBahanApi', strId));
-      batch.commit().then(function () {
+      deleteResitStorageFiles([strId]).then(function () {
+        const batch = writeBatch(db);
+        batch.delete(doc(db, 'logBahanApi', strId));
+        batch.delete(doc(db, 'resitBahanApi', strId));
+        return batch.commit();
+      }).then(function () {
         Swal.fire('Terpadam!', '', 'success');
       }).catch(function (err) {
         Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
