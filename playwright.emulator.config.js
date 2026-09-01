@@ -17,6 +17,11 @@ const base = require('./playwright.config');
 
 module.exports = defineConfig({
   ...base,
+  // Base config excludes tests/emulator/** so a plain `npx playwright test`
+  // can never point an emulator-only spec at production. This config's
+  // whole purpose is to run that directory (plus everything else) against
+  // the emulator instead -- reset the exclusion rather than inherit it.
+  testIgnore: [],
   use: {
     ...base.use,
     baseURL: 'http://127.0.0.1:5000',
