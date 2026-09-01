@@ -11,19 +11,15 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="velos-shared.css">
 <style>
-:root {
-  --primary: #0F2A4A; --primary-deep: #081A2E; --secondary: #147D82;
-  --bg-color: #E9F1F6; --card-bg: #ffffff; --text-color: #1C2530; --text-soft: #5B6774;
-  --success: #1E8E5A; --danger: #C62828; --amber: #C98A2E; --clear: #6C7A89;
-  --line: #DCE6ED; --radius: 12px; --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
-}
+/* Classic design tokens (--primary etc.) now live in velos-shared.css
+   (Extraction Phase 1). */
 body { font-family: 'Public Sans', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; -webkit-font-smoothing: antialiased; }
 
 .container { max-width: 1200px; margin: auto; display: block; }
 .card { background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
 h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; }
 
-.form-group { margin-bottom: 15px; }
+/* .form-group now in velos-shared.css. */
 label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
 input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE; }
 
@@ -38,11 +34,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13p
 th, td { padding: 12px 10px; border: none; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { background-color: var(--secondary); color: white; font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.3px; }
 tbody tr:last-child td { border-bottom: none; }
-tr:nth-child(even) { background-color: #F6FAFC; }
-tbody tr:hover {
-  background-color: rgba(20, 125, 130, 0.08);
-  transition: background-color 0.15s ease;
-}
+/* tr:nth-child(even) and tbody tr:hover now in velos-shared.css. */
 .badge-info { background-color: #e2e3e5; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;}
 
 .watermark-footer { text-align: center; font-size: 11px; color: #888; margin-top: 20px; padding-bottom: 20px; line-height: 1.5; font-weight: 500; }
@@ -84,12 +76,7 @@ display: flex; align-items: center; gap: 14px; font-family: inherit; min-height:
 .back-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer;
 font-family: inherit; font-size: 16px; font-weight: 600; color: var(--primary); padding: 8px 0; margin-bottom: 8px; min-height: 44px; }
 
-.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
-.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
-.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
-.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
-.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
-.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+/* SweetAlert2 overrides now in velos-shared.css. */
 
 /* ======================================================== */
 /* PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)                 */
@@ -105,18 +92,8 @@ user-select: none !important;
 }
 
 /* Login view — full-page auth gate card, per auth-gate-layout spec. */
-#loginView { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; }
-.auth-card { max-width: 420px; width: 100%; box-sizing: border-box; margin: 0 16px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); padding: 30px; border-top: 4px solid var(--primary); }
-.auth-logo-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 15px; }
-.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
-.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
-.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
-.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
-.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
-.auth-brand { text-align: center; margin-bottom: 20px; }
-.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
-.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
-.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
+/* #loginView, .auth-card, .auth-logo-row (+ children), .auth-brand
+   (+ children), .auth-portal-label now in velos-shared.css. */
 input[type="password"].auth-input,
 select.auth-select {
   width: 100%;
@@ -132,11 +109,8 @@ select.auth-select {
 }
 select.auth-select { font-weight: bold; background-color: #f8f9fa; }
 .auth-input, .auth-select { display: block; margin-left: auto; margin-right: auto; }
-.auth-submit-btn { width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
-.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
-.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
-.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: var(--secondary); text-decoration: none; font-weight: 600; }
-.auth-back-link:hover { text-decoration: underline; }
+/* .auth-submit-btn, .auth-submit-btn:disabled, .auth-error,
+   .auth-back-link now in velos-shared.css. */
 .btn-logout { background-color: var(--danger); color: white; border: none; border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; min-height: 44px; }
 
 /* ============================================================
