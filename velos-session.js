@@ -24,6 +24,9 @@ export function createInactivityWatcher(auth, signOut, ms) {
   return { start: start, stop: stop };
 }
 
+// Public landing-page badge counter (sistemMeta/badgeCounts) -- two numbers
+// only, no patient data. Recomputed from the full snapshot each time so a
+// stale write from either portal is harmless (see firestore.rules).
 export function updateBadgeCounts(db, setDoc, doc, list) {
   const menunggu = list.filter(function (i) { return i.status === 'Menunggu'; }).length;
   const diproses = list.filter(function (i) { return i.status === 'Diproses'; }).length;
