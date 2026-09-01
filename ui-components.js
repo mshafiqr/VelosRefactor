@@ -257,6 +257,19 @@
       tickClock();
       setInterval(tickClock, 1000);
     }
+
+    return {
+      sidebar: sidebar,
+      mainContent: mainContent,
+      backdrop: backdrop,
+      syncBackdrop: vxSyncBackdrop,
+      closeSidebarOnMobile: function () {
+        if (window.innerWidth > 768 || !sidebar || sidebar.classList.contains('vx-collapsed')) return;
+        sidebar.classList.add('vx-collapsed');
+        if (mainContent) mainContent.classList.add('vx-sidebar-collapsed');
+        vxSyncBackdrop(true);
+      }
+    };
   }
 
   global.VxUI = {
