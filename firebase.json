@@ -11,10 +11,20 @@
       "AUTHENTICATION USER MANUAL.md",
       "migrate.js",
       "seed-bnu9974-downtime.js",
+      "velos-read-audit.js",
       "firestore.rules",
       "storage.rules",
       "package.json",
-      "package-lock.json"
+      "package-lock.json",
+      "playwright.config.js",
+      "playwright.emulator.config.js",
+      "tests/**",
+      "test-results/**",
+      "playwright-report/**",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "firestore-debug.log",
+      "ui-debug.log"
     ],
     "cleanUrls": true,
     "trailingSlash": false
