@@ -1209,7 +1209,13 @@ window.refreshDataSilently = function () {
 // other Storage error aborts the whole delete rather than leaving
 // Firestore and Storage silently out of sync.
 function isStorageUrlResit(value) {
-  return typeof value === 'string' && value.indexOf('https://') === 0;
+  // Not "starts with https://" -- the real Storage service is TLS-only so
+  // that would work in production, but the local Storage emulator serves
+  // download URLs over plain http://, which would then be misread as "no
+  // file to clean up" and silently skip deleteObject(). The actual
+  // question is just "is this a URL, not a base64 blob" -- same test as
+  // isBase64Resit's inverse.
+  return typeof value === 'string' && value.length > 0 && value.indexOf('data:image') !== 0;
 }
 
 async function deleteResitStorageFiles(fillIds) {
