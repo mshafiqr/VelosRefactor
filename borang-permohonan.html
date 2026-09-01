@@ -142,48 +142,20 @@ body { pointer-events: auto !important; }
    .auth-error, .auth-back-link) now lives in velos-shared.css. */
 .btn-logout { background-color: var(--danger); color: white; border: none; border-radius: 7px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; min-height: 44px; }
 
-/* ============================================================
-   VELOS Design System v1 — navbar (Phase 2 rollout)
-   Shared visual language across all portals — do not modify
-   tokens without updating all portal files accordingly
-   ============================================================ */
-:root {
-  --vx-gradient:      linear-gradient(135deg, #0F2A4A 0%, #0D4F54 50%, #147D82 100%);
-  --vx-sidebar-hover: rgba(255,255,255,0.08);
-  --vx-sidebar-active:rgba(255,255,255,0.18);
-  --vx-teal-bright:   #7FDFDF;
-  --vx-sb-text:       #A8D4D4;
-  --vx-sb-label:      #5FAAAA;
-  --navbar-header-h:  52px;
-  --sidebar-w-expanded: 250px;
-}
+/* VELOS Design System v1 (--vx-* tokens) now lives in velos-shared.css
+   (Extraction Phase 2a). */
 body { padding: 0; }
-.vx-topbar {
-  position: fixed; top: 0; left: 0; right: 0; height: var(--navbar-header-h);
-  background: var(--vx-gradient); color: #fff; z-index: 1000;
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-  padding: 0 16px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-.vx-topbar-left { display: flex; align-items: center; gap: 10px; }
-.vx-topbar-left img { height: 32px; width: auto; object-fit: contain; }
-.vx-topbar-title { font-weight: 700; font-size: 15px; letter-spacing: 1px; white-space: nowrap; text-align: center; }
-.vx-topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+/* .vx-topbar, .vx-topbar-left (+ img), .vx-topbar-title, .vx-topbar-right
+   now in velos-shared.css. */
 .vx-topbar-right .btn-logout { padding: 6px 14px; font-size: 11px; border-radius: 6px; min-height: 0; }
 .vx-sidebar-toggle-floating {
   width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.12); color: #fff; border: none; border-radius: 8px;
   cursor: pointer; padding: 0;
 }
-.vx-sidebar-toggle-floating:hover { background: rgba(255,255,255,0.22); }
-.vx-sidebar-toggle-floating svg { width: 18px; height: 18px; display: block; }
-.vx-sidebar {
-  position: fixed; top: var(--navbar-header-h); left: 0; bottom: 0;
-  width: var(--sidebar-w-expanded); background: var(--vx-gradient);
-  z-index: 999; overflow-x: hidden; overflow-y: auto; transition: width 0.18s ease;
-  display: flex; flex-direction: column; padding-top: 8px;
-}
-.vx-sidebar.vx-collapsed { width: 0; }
-#vxBackdrop { position: fixed; inset: 0; background: transparent; z-index: 998; display: none; }
+/* .vx-sidebar-toggle-floating:hover and svg now in velos-shared.css. */
+/* .vx-sidebar (base), .vx-sidebar.vx-collapsed, #vxBackdrop now in
+   velos-shared.css. */
 .vx-sidebar-section-label {
   color: var(--vx-sb-label); font-size: 10px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 1.5px; padding: 14px 16px 6px; white-space: nowrap;
@@ -195,22 +167,20 @@ body { padding: 0; }
   background: none; border: none; width: calc(100% - 12px); margin: 1px 6px; border-radius: 8px;
   text-align: left; cursor: pointer; font-family: inherit;
 }
-.vx-sidebar-link:hover { background: var(--vx-sidebar-hover); color: #CBD5E0; }
-.vx-sidebar-link.vx-active { background: var(--vx-sidebar-active); color: var(--vx-teal-bright); }
+/* .vx-sidebar-link:hover and .vx-sidebar-link.vx-active now in
+   velos-shared.css. */
 .vx-sidebar-link.vx-soon { opacity: 0.45; cursor: default; pointer-events: none; }
 .vx-sidebar-icon { flex: 0 0 20px; display: inline-flex; align-items: center; justify-content: center; }
-.vx-sidebar-icon svg { width: 17px; height: 17px; display: block; }
+/* .vx-sidebar-icon svg now in velos-shared.css. */
 .vx-sidebar-text { flex: 1 1 auto; }
 .vx-portal-tag { font-size: 9px; font-weight: 700; color: var(--vx-sb-label); margin-left: auto; }
 .vx-main-content {
   padding: calc(var(--navbar-header-h) + 10px) 10px 10px;
   margin-left: var(--sidebar-w-expanded); transition: margin-left 0.18s ease;
 }
-.vx-main-content.vx-sidebar-collapsed { margin-left: 0; }
-@media (max-width: 768px) {
-  .vx-main-content, .vx-main-content.vx-sidebar-collapsed { margin-left: 0 !important; }
-  .vx-sidebar:not(.vx-collapsed) { width: min(78vw, 280px); box-shadow: 6px 0 24px rgba(0,0,0,0.3); }
-}
+/* .vx-main-content.vx-sidebar-collapsed and the
+   @media(max-width:768px){.vx-main-content,.vx-sidebar:not(.vx-collapsed)}
+   block now in velos-shared.css. */
 </style>
 </head>
 <body>
