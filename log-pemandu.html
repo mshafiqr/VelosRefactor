@@ -335,9 +335,7 @@ import {
   doc,
   getDoc,
   getDocs,
-  setDoc,
-  updateDoc,
-  deleteDoc,
+  writeBatch,
   onSnapshot,
   query,
   where,
@@ -987,10 +985,8 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
       btn.innerText = wasEditMode ? "Mengemaskini..." : "Menyimpan ke Awan..."; btn.disabled = true;
 
       const tripDocRef = doc(db, 'logPergerakan', String(unifiedID));
-      const tripWrite = wasEditMode ? updateDoc(tripDocRef, payload) : setDoc(tripDocRef, payload);
 
-      tripWrite
-        .then(function () { return saveFuelFills(fillPayloads, removedFillIds); })
+      buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, removedFillIds).commit()
         .then(function () {
           const msg = wasEditMode
             ? 'Rekod berjaya dikemaskini!'
@@ -1007,32 +1003,41 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
     });
 });
 
-// Section 7, rule 6, applied per fill: write that fill's receipt first,
-// then that fill's own fuel record. Rule 1: base64 never touches
-// logBahanApi -- resit is stripped from fuelDoc before that write.
-// Existing fills (isExisting, from edit mode) are updated in place via
-// updateDoc; brand new fills are created via setDoc. removedFillIds are
-// fills that existed before this edit but are no longer in the form --
-// cascade-deleted so nothing is left orphaned.
-async function saveFuelFills(fillPayloads, removedFillIds) {
+// Section 7, rule 6 in spirit: the receipt write and its fuel record are
+// staged into the same batch as the trip write itself, so all of it
+// commits together or none of it does -- no more trip-saved-but-fuel-
+// failed partial state. Rule 1: base64 never touches logBahanApi --
+// resit is stripped from fuelDoc before that write. Existing fills
+// (isExisting, from edit mode) are updated in place; brand new fills are
+// created. removedFillIds are fills that existed before this edit but
+// are no longer in the form -- cascade-deleted in the same batch so
+// nothing is left orphaned.
+function buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, removedFillIds) {
+  const batch = writeBatch(db);
+  if (wasEditMode) {
+    batch.update(tripDocRef, payload);
+  } else {
+    batch.set(tripDocRef, payload);
+  }
   for (const fill of fillPayloads) {
     const fillIdStr = String(fill.id);
     if (fill.resit && fill.resit.indexOf('data:image') === 0) {
-      await setDoc(doc(db, 'resitBahanApi', fillIdStr), { resit: fill.resit });
+      batch.set(doc(db, 'resitBahanApi', fillIdStr), { resit: fill.resit });
     }
     const fuelDoc = Object.assign({}, fill);
     delete fuelDoc.resit;
     delete fuelDoc.isExisting;
     if (fill.isExisting) {
-      await updateDoc(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
+      batch.update(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
     } else {
-      await setDoc(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
+      batch.set(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
     }
   }
   for (const removedId of (removedFillIds || [])) {
-    await deleteDoc(doc(db, 'logBahanApi', String(removedId)));
-    await deleteDoc(doc(db, 'resitBahanApi', String(removedId)));
+    batch.delete(doc(db, 'logBahanApi', String(removedId)));
+    batch.delete(doc(db, 'resitBahanApi', String(removedId)));
   }
+  return batch;
 }
 
 function resetFormFields() {
@@ -1136,17 +1141,15 @@ window.deleteEntry = function (id) {
       const strId = String(id);
       const numId = Number(id);
 
-      deleteDoc(doc(db, 'logPergerakan', strId))
-        .then(function () {
-          return getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', numId)));
-        })
+      getDocs(query(collection(db, 'logBahanApi'), where('logId', '==', numId)))
         .then(function (fuelSnap) {
-          const cascadeDeletes = [];
+          const batch = writeBatch(db);
+          batch.delete(doc(db, 'logPergerakan', strId));
           fuelSnap.forEach(function (fuelDoc) {
-            cascadeDeletes.push(deleteDoc(doc(db, 'logBahanApi', fuelDoc.id)));
-            cascadeDeletes.push(deleteDoc(doc(db, 'resitBahanApi', fuelDoc.id)));
+            batch.delete(doc(db, 'logBahanApi', fuelDoc.id));
+            batch.delete(doc(db, 'resitBahanApi', fuelDoc.id));
           });
-          return Promise.all(cascadeDeletes);
+          return batch.commit();
         })
         .then(function () {
           Swal.fire('Terpadam!', 'Rekod telah dipadam dari pangkalan awan.', 'success');
