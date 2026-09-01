@@ -874,18 +874,24 @@ import {
   writeBatch,
   connectFirestoreEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {
+  getStorage,
+  connectStorageEmulator
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { pad2, todayISO, classifyLiterFill } from "./velos-utils.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Local-only: route to Firebase Emulator Suite when served from localhost.
 // No effect in production (velos-pitas.web.app / Firebase Hosting).
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
   connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectStorageEmulator(storage, "localhost", 9199);
 }
 const PORTAL_EMAIL = "admin@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";

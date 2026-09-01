@@ -347,7 +347,8 @@ import {
   getStorage,
   ref,
   uploadBytes,
-  getDownloadURL
+  getDownloadURL,
+  connectStorageEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { pad2, classifyLiterFill } from "./velos-utils.js";
@@ -363,6 +364,7 @@ const storage = getStorage(app);
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
   connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectStorageEmulator(storage, "localhost", 9199);
 }
 const DRIVER_EMAIL = "driver@pitas.velos";
 const MASTER_EMAIL = "master@pitas.velos";
