@@ -343,6 +343,12 @@ import {
   limit,
   connectFirestoreEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { pad2, classifyLiterFill } from "./velos-utils.js";
 import { createInactivityWatcher, datalistLabel } from "./velos-session.js";
@@ -350,6 +356,7 @@ import { createInactivityWatcher, datalistLabel } from "./velos-session.js";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Local-only: route to Firebase Emulator Suite when served from localhost.
 // No effect in production (velos-pitas.web.app / Firebase Hosting).
@@ -883,7 +890,14 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
     document.getElementById('fuelFillsContainer').querySelectorAll('.fuel-fill-row').forEach(function (row) {
       const litVal = parseFloat(row.querySelector('.fuelFillLiter').value);
       if (!(litVal > 0)) hasInvalidFill = true;
-      fills.push({ liter: litVal, resit: row.querySelector('.fuelFillResit').dataset.base64 || "", existingFillId: row.dataset.fillId || null });
+      const resitInput = row.querySelector('.fuelFillResit');
+      const resitFile = resitInput.files && resitInput.files[0];
+      fills.push({
+        liter: litVal,
+        resit: resitInput.dataset.base64 || "",
+        resitFilename: resitFile ? resitFile.name : 'resit.jpg',
+        existingFillId: row.dataset.fillId || null
+      });
     });
 
     if (fills.length === 0 || hasInvalidFill) {
@@ -932,6 +946,11 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
         odoPengisian: oPengisian,
         liter: f.liter,
         resit: f.resit,
+        resitFilename: f.resitFilename,
+        // Captured now, before uploadPendingReceipts() overwrites resit
+        // with its Storage download URL -- buildSaveBatch() needs this
+        // flag rather than re-checking resit's prefix at batch time.
+        hasNewResit: typeof f.resit === 'string' && f.resit.indexOf('data:image') === 0,
         timestamp: buildTimestamp(),
         isExisting: !!f.existingFillId
       };
@@ -986,7 +1005,8 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
 
       const tripDocRef = doc(db, 'logPergerakan', String(unifiedID));
 
-      buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, removedFillIds).commit()
+      uploadPendingReceipts(fillPayloads)
+        .then(function () { return buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, removedFillIds).commit(); })
         .then(function () {
           const msg = wasEditMode
             ? 'Rekod berjaya dikemaskini!'
@@ -1003,15 +1023,45 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
     });
 });
 
-// Section 7, rule 6 in spirit: the receipt write and its fuel record are
-// staged into the same batch as the trip write itself, so all of it
-// commits together or none of it does -- no more trip-saved-but-fuel-
-// failed partial state. Rule 1: base64 never touches logBahanApi --
-// resit is stripped from fuelDoc before that write. Existing fills
-// (isExisting, from edit mode) are updated in place; brand new fills are
-// created. removedFillIds are fills that existed before this edit but
-// are no longer in the form -- cascade-deleted in the same batch so
-// nothing is left orphaned.
+// Firebase Storage migration: a fresh receipt is compressed to a base64
+// data URI exactly as before (compression logic untouched), then uploaded
+// to Storage at resit/{vehicleId}/{timestamp}_{filename} here -- BEFORE
+// any Firestore write. If an upload throws, this rejects and the .then()
+// chain in the click handler never reaches buildSaveBatch()/commit(), so
+// nothing is written to Firestore -- matches the "receipt first, abort
+// before the fuel record on failure" rule, just with Storage standing in
+// for the old direct-to-Firestore base64 write. Fills with no new photo
+// (hasNewResit false) are left untouched -- resit stays "" or, on an
+// untouched existing fill, is never sent at all.
+function dataUrlToBlob(dataUrl) {
+  const parts = dataUrl.split(',');
+  const mimeMatch = parts[0].match(/data:(.*?);base64/);
+  const binary = atob(parts[1]);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mimeMatch ? mimeMatch[1] : 'image/jpeg' });
+}
+
+async function uploadPendingReceipts(fillPayloads) {
+  for (const fill of fillPayloads) {
+    if (!fill.hasNewResit) continue;
+    const storagePath = 'resit/' + fill.kenderaan + '/' + Date.now() + '_' + fill.resitFilename;
+    const fileRef = ref(storage, storagePath);
+    await uploadBytes(fileRef, dataUrlToBlob(fill.resit));
+    fill.resit = await getDownloadURL(fileRef);
+  }
+}
+
+// Section 7, rule 6 in spirit: the resitBahanApi write (now a Storage URL,
+// see uploadPendingReceipts above) and the fuel record are staged into the
+// same batch as the trip write itself, so all of it commits together or
+// none of it does -- no more trip-saved-but-fuel-failed partial state.
+// Rule 1: neither base64 nor the URL touches logBahanApi -- resit is
+// stripped from fuelDoc before that write. Existing fills (isExisting,
+// from edit mode) are updated in place; brand new fills are created.
+// removedFillIds are fills that existed before this edit but are no
+// longer in the form -- cascade-deleted in the same batch so nothing is
+// left orphaned.
 function buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, removedFillIds) {
   const batch = writeBatch(db);
   if (wasEditMode) {
@@ -1021,11 +1071,13 @@ function buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, removedF
   }
   for (const fill of fillPayloads) {
     const fillIdStr = String(fill.id);
-    if (fill.resit && fill.resit.indexOf('data:image') === 0) {
+    if (fill.hasNewResit) {
       batch.set(doc(db, 'resitBahanApi', fillIdStr), { resit: fill.resit });
     }
     const fuelDoc = Object.assign({}, fill);
     delete fuelDoc.resit;
+    delete fuelDoc.resitFilename;
+    delete fuelDoc.hasNewResit;
     delete fuelDoc.isExisting;
     if (fill.isExisting) {
       batch.update(doc(db, 'logBahanApi', fillIdStr), fuelDoc);
