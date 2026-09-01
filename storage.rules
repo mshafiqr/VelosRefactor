@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// ============================================================================
+// VELOS — REVAMP — Storage Rules
+//
+// Mirrors firestore.rules' resitBahanApi access model (same account UIDs,
+// same roles): the driver uploads a receipt, driver/admin/master/viewer can
+// read it back. See CLAUDE.md Section 7 (receipt images) and firestore.rules
+// for the Firestore-side equivalent.
+// ============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ---- Account UIDs (mirrors firestore.rules) ----------------------------
+    function uidAdmin()  { return 'C9b8wUiNz7Z2zTnBMd8QBZlSJC33'; }
+    function uidDriver() { return '8xdF5F6v2Ggs9ekLyo7DNwnmbUC3'; }
+    function uidMaster() { return '0NnSA4HSbnaZejQAjQ1NOJ3Kt8d2'; }
+    function uidViewer() { return '89fwBTQsc9dAB68P1RnMBgorxrg1'; }
+
+    // ---- Role helpers --------------------------------------------------------
+    function signedIn() { return request.auth != null; }
+    function isAdmin()  { return signedIn() && request.auth.uid == uidAdmin(); }
+    function isDriver() { return signedIn() && request.auth.uid == uidDriver(); }
+    function isMaster() { return signedIn() && request.auth.uid == uidMaster(); }
+    function isViewer() { return signedIn() && request.auth.uid == uidViewer(); }
+
+    // ---- resit/{vehicleId}/{filename} -----------------------------------------
+    // Fuel receipt images, uploaded from log-pemandu.html at save time.
+    // Driver/admin/master may write; driver/admin/master/viewer may read
+    // (admin.html's lihatResit viewer, plus the visitor read-only role).
+    match /resit/{vehicleId}/{filename} {
+      allow read:  if isDriver() || isAdmin() || isMaster() || isViewer();
+      allow write: if isDriver() || isAdmin() || isMaster();
+    }
+
+    // ---- Default deny ---------------------------------------------------------
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

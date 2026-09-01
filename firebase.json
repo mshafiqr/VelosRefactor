@@ -12,6 +12,7 @@
       "migrate.js",
       "seed-bnu9974-downtime.js",
       "firestore.rules",
+      "storage.rules",
       "package.json",
       "package-lock.json"
     ],
@@ -20,6 +21,9 @@
   },
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "emulators": {
     "auth": { "port": 9099 },
