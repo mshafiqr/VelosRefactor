@@ -8,7 +8,7 @@ Rebuild of VELOS (Vehicle Logistics and Operations System), Hospital Pitas, from
 
 - **Working folder:** `D:\VelosRevamp` (this repo)
 - **Archived VELOS (DO NOT TOUCH):** `D:\ClaudeXVelos` — stays running untouched throughout. Never edit, only for reference files. 
-- **Firebase project:** new and separate from live VELOS, Spark (free) plan only.
+- **Firebase project:** new and separate from live VELOS. Was Spark (free) plan only through 1 Sept 2026; upgraded to Blaze (pay-as-you-go) 1–2 Sept 2026 specifically because Firebase Storage requires Blaze to provision (Google policy, not a VELOS design choice) — needed for fuel receipt images, see Firebase Storage section below.
 - **Maintainer:** Shafiq — sole developer, domain expert, no formal IT background. Expects direct answers and clear reasoning.
 
 ## Modules
@@ -26,7 +26,7 @@ Rebuild of VELOS (Vehicle Logistics and Operations System), Hospital Pitas, from
 
 ## Firestore schema
 
-`logPergerakan`, `logBahanApi` (no image data), `resitBahanApi` (receipt base64, doc ID = fuel record ID), `permohonanVCC`, `kapasitiKenderaan` (keyed by plat), `sistemMeta` (docs `backupStatus`, `lastFullReset`).
+`logPergerakan`, `logBahanApi` (no image data), `resitBahanApi` (doc ID = fuel record ID; `resit` field is either a legacy base64 data URI or, since the 2 Sept 2026 Storage migration, an https:// Firebase Storage download URL — see Firebase Storage section below), `permohonanVCC`, `kapasitiKenderaan` (keyed by plat), `sistemMeta` (docs `backupStatus`, `lastFullReset`).
 
 VCC ID format: `VCC-{YYMMDD}-{3-digit random}{C|M}` — `C` = Klinikal, `M` = Jabatan. This suffix is the only field distinguishing queue type. Preserve it exactly.
 
@@ -38,8 +38,17 @@ Date format is permanent: all VCC timestamps stay `dd/MM/yyyy HH:mm` strings in 
 2. Never attach an `onSnapshot` listener to `resitBahanApi`.
 3. Never bulk-read it — no `getDocs` on the whole collection, not for the dashboard, not for counting. One document at a time, only when the user taps to view a receipt.
 4. CSV export excludes it explicitly — never a column, never in scope.
-5. Size-check before writing; fail loudly. Over ~900KB base64 → refuse the save with a clear message. Never fail silently.
-6. Write the receipt first, then the fuel record. Reverse order reproduces the existing trip-saved-but-fuel-failed duplication bug.
+5. Size-check before writing; fail loudly. Over ~900KB base64 → refuse the save with a clear message, client-side, before it ever reaches Storage. Never fail silently. Since the Storage migration, `storage.rules` also enforces a 2MB hard cap and `image/*` content-type server-side, as a backstop behind the client check (a client can be bypassed; rules can't).
+6. Write the receipt first, then the fuel record. Originally meant literal write order: `resitBahanApi` before `logBahanApi`, because unbatched sequential writes could leave a trip saved with no matching fuel record if a later write failed. Since the write-batch atomicity fix (2 Sept 2026), trip + fuel doc + receipt doc all commit together in one `writeBatch` — order between them no longer matters, all-or-nothing. What still must happen in order: a fresh receipt uploads to Firebase Storage and resolves to a download URL *before* that batch is built; a Storage failure aborts before any Firestore write happens at all.
+
+## Firebase Storage (receipt images, since 2 Sept 2026)
+
+Fuel receipts are compressed to base64 client-side exactly as before (rule 5, unchanged), then uploaded to Firebase Storage at `resit/{vehicleId}/{timestamp}_{filename}` — only the resulting download URL is written into `resitBahanApi`'s `resit` field (still its own collection per rule 1 — the field/collection didn't change, only what the field holds).
+
+- **Backward compatibility, permanent:** a `resit` value starting with `data:image` is a pre-migration base64 doc; anything else is a post-migration Storage URL. Both render identically via `<img src>`/SweetAlert's `imageUrl`, no conversion needed. There is no backfill script — old docs stay base64 forever. Detect with the `data:image` prefix check (`isBase64Resit`/`isStorageUrlResit` helpers in `admin.html`/`log-pemandu.html`); never assume one shape.
+- **Cleanup on delete:** every place a `resitBahanApi` doc is deleted (`log-pemandu.html`'s `deleteEntry` and edit-mode removed-fill cleanup; `admin.html`'s `deleteEntry` and `deleteFuelEntry`) first checks, via `deleteResitStorageFiles()`, whether that doc's `resit` is a Storage URL, and if so deletes the underlying file with `deleteObject()` before the Firestore batch commits. `storage/object-not-found` is swallowed (safe on retry); any other Storage error aborts the whole delete rather than silently letting Firestore and Storage drift out of sync.
+- **`storage.rules`:** mirrors `firestore.rules`' `resitBahanApi` access (driver/admin/master write, +viewer read), plus server-side `image/*` content-type and <2MB size validation on `create` specifically — not `write`. `request.resource` is `null` on a `delete` request, so gating delete on `contentType`/`size` would error out and silently deny every cleanup call above.
+- **Local emulator:** Storage emulator on port 9199, wired into every portal's existing localhost-only emulator-connect guard alongside Auth/Firestore (see Local Firebase Emulator section).
 
 ## Authentication
 
@@ -145,7 +154,7 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 8. **VCC 7-day window:** `Menunggu`/`Diproses` requests are NEVER date-limited. Only the read-only Rekod view is. A stuck request must never silently vanish.
 9. **Tugasan Akan Datang:** `Diluluskan` requests with `tarikh >= today` come from a full-collection status read, NOT the windowed history query.
 10. **Print templates:** `borang-permohonan.html` print/slip templates — preserve structure and layout exactly. Flag anything broken or improvable rather than silently copying it forward.
-11. **Base64 receipts:** all six rules above (Section 7 of the brief) are mandatory.
+11. **Receipt storage:** all six rules above (Section 7 of the brief) are mandatory, base64 or Storage URL alike. See Firebase Storage section for what changed 2 Sept 2026 and what didn't.
 12. **Auth is rules, not UI:** a login form with permissive Security Rules protects nothing. Rules are the enforcement.
 
 ## Working discipline (Section 13 of the brief — in full)
@@ -160,12 +169,13 @@ Firestore `onSnapshot` listeners, not polling — except `resitBahanApi` (see re
 ## Post-launch work log
 
 - **26 Aug 2026** — `log-pemandu.html`'s `logPergerakan` listener scoped to `tarikh >= start of previous month` (same pattern as `admin.html`'s year-scoped listeners), identified via a Playwright-based Firestore read audit as the largest driver of daily reads. Added a bounded boundary-anchor query (`limit(500)`, `orderBy('tarikh','desc')`, one-time not a listener) feeding `computeOdometerMismatches()` so the odometer-continuity check still catches a mismatch across month boundaries. 7/7 Playwright baseline tests passing (`tests/log-pemandu.spec.js`) before and after. Committed `f9ab005`, pushed to GitHub, deployed to production.
+- **2 Sept 2026** — Multi-part session: (1) wrapped every multi-doc trip/fuel/receipt write and delete-cascade in both `log-pemandu.html` and `admin.html` in `writeBatch()` for atomicity (`37285b0`, `ea6526e`); (2) migrated fuel receipts from base64-in-Firestore to Firebase Storage, keeping `resitBahanApi` as its own collection per rule 1 — only the `resit` field's value changed, from base64 to an https:// download URL, with permanent backward-compat detection for pre-migration docs (`f856419`, `2b56e69`, `f86a100`); (3) added the Storage emulator (port 9199) to `firebase.json` and all 9 portal files' existing localhost-only emulator guard (`75745d3`); (4) fixed the resulting orphaned-Storage-file gap — deleting a `resitBahanApi` doc now deletes its underlying Storage file first via `deleteResitStorageFiles()`/`deleteObject()` (`230bbc1`, `4d4b29a`); (5) added `image/*` content-type + <2MB size validation to `storage.rules` on `create` only, not `delete` (`60f3534`, see What-not-to-do). Firebase project upgraded Spark → Blaze to enable Storage (Google requires Blaze to provision Storage on a project). Full Playwright suite green throughout: 26/26 automated smoke tests + 7/7 `log-pemandu.spec.js` baseline (manual-login, run interactively) after every change. All commits pushed to GitHub; `firebase deploy` run after each. No automated test yet exercises the new Storage upload/cleanup path specifically — existing suite is unchanged baseline/smoke coverage that happens to still pass; a dedicated emulator-based test for upload → URL-in-Firestore → delete → Storage-object-gone is the natural next addition (see `tests/emulator/`).
 
 ## Local Firebase Emulator (testing only)
 
 Opt-in local testing layer, additive to the live-site Playwright suite — production (`velos-pitas`) is completely unaffected. Every portal file only routes to the emulator when `location.hostname` is `localhost`/`127.0.0.1`; deployed to Hosting, the emulator-connect blocks never fire.
 
-1. **Start the emulators** (Auth :9099, Firestore :8080, UI :4000, Hosting :5000 — see `firebase.json`):
+1. **Start the emulators** (Auth :9099, Firestore :8080, Storage :9199, UI :4000, Hosting :5000 — see `firebase.json`):
    ```bash
    firebase emulators:start
    ```
@@ -188,4 +198,5 @@ Opt-in local testing layer, additive to the live-site Playwright suite — produ
 - Do not propose ISO date migration — permanent decision, never revisit.
 - Print/slip templates: preserve structure and layout exactly — flag anything broken or improvable rather than silently copying it forward.
 - Do not write any password into any file in this repo.
-- Do not put base64 image data anywhere except `resitBahanApi`.
+- Do not put base64 or image data anywhere except `resitBahanApi` (Firestore doc) / the `resit/` path in Firebase Storage.
+- Do not gate a Storage `delete` rule on `request.resource` fields (`contentType`, `size`, etc.) — they're `null` on delete and the rule will silently deny every cleanup call. Validate those only on `create`.
