@@ -14,12 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="velos-shared.css">
 <style>
-:root {
-  --primary: #0F2A4A; --secondary: #147D82; --bg-color: #E9F1F6; --card-bg: #ffffff;
-  --text-color: #1C2530; --text-soft: #5B6774; --success: #1E8E5A; --danger: #C62828;
-  --warning: #C98A2E; --line: #DCE6ED; --radius: 12px;
-  --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
-}
+/* Classic design tokens (--primary etc.) now live in velos-shared.css
+   (Extraction Phase 1). This block still defines the --vx-* system,
+   deferred to Extraction Phase 2. */
 /* ============================================================
    VELOS Design System v1
    Shared visual language across all portals — do not modify
@@ -71,67 +68,19 @@ body {
   min-height: 100vh;
 }
 
-/* ==================== AUTH GATE ==================== */
-#loginView {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-.auth-card {
-  max-width: 420px;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 16px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  padding: 30px;
-  border-top: 4px solid var(--primary);
-}
-.auth-logo-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px dashed #e9ecef;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
-}
-.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
-.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
-.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
-.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
-.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
-.auth-brand { text-align: center; margin-bottom: 20px; }
-.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
-.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
-.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
-.auth-password-input {
-  width: 100%; padding: 10px 14px; border: 1.5px solid #DCE6ED; border-radius: 8px;
-  font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px;
-}
-.auth-password-input:focus { outline: none; border-color: var(--secondary); }
-.auth-submit-btn {
-  width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none;
-  border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
-}
-.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
-.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
-.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: var(--secondary); text-decoration: none; font-weight: 600; }
-.auth-back-link:hover { text-decoration: underline; }
+/* Auth-gate CSS (#loginView, .auth-card and children, .auth-submit-btn,
+   .auth-error, .auth-back-link) now lives in velos-shared.css. */
 
 /* ==================== PAGE ==================== */
-#secureDashboardWrapper { display: none; padding: 20px; }
 .container { max-width: 1600px; margin: auto; display: block; }
 
 .card { background: var(--card-bg); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px; }
-.print-avoid-break { page-break-inside: avoid; }
+/* .print-avoid-break now in velos-shared.css. */
 
 h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; display: flex; align-items: center; justify-content: space-between;
 flex-wrap: wrap; gap: 10px;}
 
-button.btn-table-download { background-color: #6c757d; color: white; border: none; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; }
+/* button.btn-table-download now in velos-shared.css. */
 
 /* ==================== TEAL AS INTERACTION COLOR ==================== */
 button, .btn-table-download, .auth-submit-btn {
@@ -140,20 +89,12 @@ button, .btn-table-download, .auth-submit-btn {
 .btn-table-download:hover, .auth-submit-btn:hover:not(:disabled) {
   background-color: var(--secondary) !important;
 }
-a:not(.vx-sidebar-link):hover { color: var(--secondary); }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .vx-sidebar-link:focus-visible {
-  outline: 2px solid var(--secondary);
-  outline-offset: 2px;
-}
+/* a:not(.vx-sidebar-link):hover and the focus-visible rule now in velos-shared.css. */
 
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
 th, td { padding: 8px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { background-color: var(--primary); color: white; }
-tr:nth-child(even) { background-color: #F6FAFC; }
-tbody tr:hover {
-  background-color: rgba(20, 125, 130, 0.08);
-  transition: background-color 0.15s ease;
-}
+/* tr:nth-child(even) and tbody tr:hover now in velos-shared.css. */
 .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
@@ -166,15 +107,9 @@ tbody tr:hover {
 .alert-driver { background-color: #E0F4F5; color: #0F2A4A; border: 1px solid #147D82; }
 .alert-driver span { color: #147D82; }
 
-.hide-print { display: table-cell; }
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* .hide-print (base rule) and .table-scroll now in velos-shared.css. */
 
-.swal2-popup { border-radius: var(--radius, 12px) !important; font-family: 'Public Sans', sans-serif !important; }
-.swal2-title { color: var(--primary, #0F2A4A) !important; font-weight: 700 !important; }
-.swal2-confirm { background-color: var(--primary, #0F2A4A) !important; border-radius: 8px !important; box-shadow: none !important; }
-.swal2-cancel { border-radius: 8px !important; box-shadow: none !important; }
-.swal2-icon.swal2-success { border-color: var(--success, #1E8E5A) !important; color: var(--success, #1E8E5A) !important; }
-.swal2-icon.swal2-error { border-color: var(--danger, #C62828) !important; color: var(--danger, #C62828) !important; }
+/* SweetAlert2 overrides now in velos-shared.css. */
 
 /* ======================================================== */
 /* PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)                 */
