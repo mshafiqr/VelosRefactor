@@ -6,8 +6,9 @@ Revamp complete as of 1 August 2026. All four portals live at https://velos-pita
 
 Rebuild of VELOS (Vehicle Logistics and Operations System), Hospital Pitas, from GAS + HtmlService + Firebase Realtime Database onto plain HTML/CSS/JS + Cloud Firestore + Firebase Hosting. Same functionality, same UI/design language, kept identical.
 
-- **Working folder:** `D:\VelosRevamp` (this repo)
+- **Working folder:** `D:\VelosRefactor` (this repo)
 - **Archived VELOS (DO NOT TOUCH):** `D:\ClaudeXVelos` — stays running untouched throughout. Never edit, only for reference files. 
+- **Archived VELOS Revamp (DO NOT TOUCH):** `D:\VelosRevamp`
 - **Firebase project:** new and separate from live VELOS. Was Spark (free) plan only through 1 Sept 2026; upgraded to Blaze (pay-as-you-go) 1–2 Sept 2026 specifically because Firebase Storage requires Blaze to provision (Google policy, not a VELOS design choice) — needed for fuel receipt images, see Firebase Storage section below.
 - **Maintainer:** Shafiq — sole developer, domain expert, no formal IT background. Expects direct answers and clear reasoning.
 
