@@ -172,7 +172,7 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
 .tsg-detail th { font-size: 12px; }
 .vx-remark-cell { display: flex; gap: 6px; align-items: center; min-width: 200px; }
 .vx-remark-cell input { flex: 1; padding: 6px 9px; border: 1.5px solid var(--vx-border); border-radius: 6px; font-family: inherit; font-size: 12px; color: var(--vx-text); }
-.vx-remark-cell input:focus { outline: none; border-color: var(--vx-teal); }
+.vx-remark-cell input:focus { border-color: var(--vx-teal); }
 .vx-remark-cell .vx-btn { padding: 6px 10px; font-size: 11px; white-space: nowrap; }
 .vx-remark-saved { font-size: 10px; color: var(--vx-success); font-weight: 700; margin-left: 4px; }
 
@@ -181,7 +181,11 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
 .vx-field { margin-bottom: 4px; }
 .vx-field label { display: block; font-size: 13px; font-weight: 700; color: var(--vx-text); margin-bottom: 6px; }
 .vx-field input, .vx-field select, .vx-field textarea { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 8px; background: #fff; color: var(--vx-text); box-sizing: border-box; }
-.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus { outline: none; border-color: var(--vx-teal); }
+.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus { border-color: var(--vx-teal); }
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--vx-teal);
+  outline-offset: 1px;
+}
 .vx-field input:disabled { background: var(--vx-grey-light); color: var(--vx-muted); }
 .vx-field textarea { min-height: 70px; resize: vertical; }
 @media (max-width: 700px) { .vx-form-grid { grid-template-columns: 1fr; } }
