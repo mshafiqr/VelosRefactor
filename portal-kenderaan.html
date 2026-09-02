@@ -113,9 +113,12 @@ body {
 
 .vx-main {
   padding: calc(var(--navbar-header-h) + 18px) 14px 60px;
-  max-width: 640px; margin: 0 auto;
   margin-left: var(--sidebar-w-expanded);
   transition: margin-left 0.18s ease;
+}
+.vx-inner {
+  max-width: 640px;
+  margin: 0 auto;
 }
 .vx-main.vx-sidebar-collapsed { margin-left: 0; }
 @media (max-width: 900px) {
@@ -256,7 +259,7 @@ body {
   <button type="button" class="btn-logout-top" id="btnLogout">Log Keluar</button>
 </header>
 
-<nav class="vx-sidebar vx-collapsed" id="vxSidebar">
+<nav class="vx-sidebar" id="vxSidebar">
   <a href="#" class="vx-sidebar-link" onclick="window.open('index.html','_self');return false;" title="Laman Utama" style="display:flex;align-items:center;gap:12px;">
     <span class="vx-sidebar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/><path d="M9 21v-6h6v6"/></svg></span>
     <span>Laman Utama</span>
@@ -270,6 +273,7 @@ body {
 <div id="vxBackdrop"></div>
 
 <div class="vx-main">
+<div class="vx-inner">
 
   <div id="noVehicleState" class="vx-empty-state" style="display:none;">
     <p>Tiada kenderaan berdaftar. Hubungi pentadbir sistem.</p>
@@ -564,6 +568,7 @@ body {
     </div>
 
   </div>
+</div>
 </div>
 </div>
 

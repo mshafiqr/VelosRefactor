@@ -251,10 +251,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   padding: 0 16px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-.vx-topbar-left { display: flex; align-items: center; gap: 10px; }
+.vx-topbar-left { display: flex; align-items: center; gap: 10px; grid-column: 1; }
 .vx-topbar-left img { height: 32px; width: auto; object-fit: contain; }
-.vx-topbar-title { font-weight: 700; font-size: 15px; letter-spacing: 1px; white-space: nowrap; text-align: center; }
-.vx-topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.vx-topbar-title { font-weight: 700; font-size: 15px; letter-spacing: 1px; white-space: nowrap; text-align: center; grid-column: 2; }
+.vx-topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; grid-column: 3; }
 
 /* admin.html, admin-jkns.html, admin-yearly.html only. */
 .vx-status-badge { font-size: 11px; font-weight: 600; color: var(--vx-teal-bright); background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
