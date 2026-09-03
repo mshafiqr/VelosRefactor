@@ -798,6 +798,23 @@ id="stepJabPagiTotal">0</td></tr>
 <div class="stat-box" style="border-left-color: var(--danger); background: #fff;"><h3 id="statMohonTolak" style="color:var(--danger);">0</h3><p>Ditolak / Batal</p></div>
 </div>
 </div>
+
+<div id="sec-permohonan-rekod" class="card section-stats print-avoid-break" style="border: 2px solid var(--line); background-color: #f4f8fc; margin-top: 20px;">
+<h2 style="color: var(--primary); border-bottom-color: var(--primary);">
+<span>Rekod Permohonan Kenderaan (VCC)</span>
+</h2>
+<div style="display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;">
+<div>
+<label for="mohonExportStart" style="display:block; font-size:12px; color:var(--text-soft); margin-bottom:4px;">Tarikh Mula</label>
+<input type="date" id="mohonExportStart" class="editable-month-input">
+</div>
+<div>
+<label for="mohonExportEnd" style="display:block; font-size:12px; color:var(--text-soft); margin-bottom:4px;">Tarikh Akhir</label>
+<input type="date" id="mohonExportEnd" class="editable-month-input">
+</div>
+<button class="btn-table-download" onclick="window.downloadPermohonanRekodCSV()"> ⬇️  Muat Turun CSV</button>
+</div>
+</div>
 </div>
 
 <div id="sec-konfigurasi" class="vx-print-hide vx-page" style="margin-top:28px;">
@@ -881,7 +898,7 @@ import {
   connectStorageEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { firebaseConfig } from "./firebase-config.js";
-import { pad2, todayISO, classifyLiterFill } from "./velos-utils.js";
+import { pad2, todayISO, classifyLiterFill, parseTarikhMasaVELOS } from "./velos-utils.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2088,6 +2105,68 @@ window.downloadFuelRawCSV = function () {
   const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
   a.download = 'Log_Bahan_Api_Lengkap_' + targetedMonth + '.csv'; a.click();
+};
+
+// Rekod Permohonan Kenderaan (VCC) -- one-time getDocs on the whole
+// permohonanVCC collection (not the year-scoped in-memory permohonanData),
+// so the export is correct regardless of which year is loaded in the
+// dashboard. timestamp is a dd/MM/yyyy HH:mm string and is NOT
+// lexicographically sortable by date (pitfall #1), so the range filter
+// happens client-side via parseTarikhMasaVELOS, never a Firestore
+// where() clause on that field.
+window.downloadPermohonanRekodCSV = function () {
+  const startStr = document.getElementById('mohonExportStart').value;
+  const endStr = document.getElementById('mohonExportEnd').value;
+  if (!startStr || !endStr) return Swal.fire('Ralat', 'Sila pilih Tarikh Mula dan Tarikh Akhir.', 'warning');
+
+  const [sy, sm, sd] = startStr.split('-').map(Number);
+  const [ey, em, ed] = endStr.split('-').map(Number);
+  const rangeStart = new Date(sy, sm - 1, sd, 0, 0, 0);
+  const rangeEnd = new Date(ey, em - 1, ed, 23, 59, 59);
+  if (rangeStart > rangeEnd) return Swal.fire('Ralat', 'Tarikh Mula mesti sebelum atau sama dengan Tarikh Akhir.', 'warning');
+
+  Swal.fire({ title: 'Memuatkan rekod...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+  getDocs(collection(db, 'permohonanVCC')).then(function (snap) {
+    let filtered = snap.docs.map(function (d) { return d.data(); }).filter(function (item) {
+      const t = parseTarikhMasaVELOS(item.timestamp);
+      return t >= rangeStart && t <= rangeEnd;
+    }).sort(function (a, b) { return parseTarikhMasaVELOS(a.timestamp) - parseTarikhMasaVELOS(b.timestamp); });
+
+    if (filtered.length === 0) {
+      Swal.close();
+      return Swal.fire('Tiada Data', 'Tiada rekod permohonan dalam julat tarikh ini.', 'info');
+    }
+
+    // Field set is a union across all docs, not a fixed schema -- Klinikal
+    // (senaraiPesakitData, pengiringList, kategoriKes...) and Jabatan
+    // (kenderaanB, tarikhKembali, kategoriPermohonan...) requests carry
+    // different fields, and every field must be exported (no column
+    // dropped just because one request type doesn't have it).
+    let fields = [];
+    let seen = {};
+    filtered.forEach(function (item) {
+      Object.keys(item).forEach(function (k) { if (!seen[k]) { seen[k] = true; fields.push(k); } });
+    });
+
+    function csvCell(val) {
+      if (val === undefined || val === null) return '""';
+      const str = (typeof val === 'object') ? JSON.stringify(val) : String(val);
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+
+    let csvRows = [fields.map(csvCell).join(',')];
+    filtered.forEach(function (item) {
+      csvRows.push(fields.map(function (f) { return csvCell(item[f]); }).join(','));
+    });
+
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
+    a.download = 'rekod-permohonan-' + startStr + '-' + endStr + '.csv'; a.click();
+    Swal.close();
+  }).catch(function (err) {
+    Swal.fire('Ralat', err.message || String(err), 'error');
+  });
 };
 
 window.addEventListener('beforeprint', function () {
