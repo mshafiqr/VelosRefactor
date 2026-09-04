@@ -20,7 +20,19 @@ body { font-family: 'Public Sans', sans-serif; background-color: var(--bg-color)
 
 .container { max-width: 800px; margin: auto; display: block; }
 .card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; }
-h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
+h2 { margin: 0 0 16px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+h2 .card-num {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 h3 { font-size: 14px; color: #555; margin-top: 20px; margin-bottom: 10px; background: #e9ecef; padding: 10px; border-radius: 4px; border-left: 4px solid var(--secondary);
 }
 
@@ -305,7 +317,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <div id="vccNotice" style="display:none; padding: 10px; margin-top: 15px; border-radius: 4px; font-size: 13px; font-weight: bold; text-align: center;"></div>
 <div id="sectionA" style="display:none;">
 <div class="card">
-<h2>Maklumat Perjalanan Klinikal</h2>
+<h2><span class="card-num">1</span>Waktu Perjalanan</h2>
 <p style="font-size:12px; color:gray; margin-top:-10px;">Panduan : Sila isikan tarikh dan masa bertolak yang diperlukan untuk menghantar pesakit.</p>
 <div class="form-group">
 <label>Tarikh Bertolak</label>
@@ -317,13 +329,13 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 </div>
 </div>
 <div class="card">
-<h2>Maklumat Pesakit</h2>
+<h2><span class="card-num">2</span>Maklumat Pesakit</h2>
 <p style="font-size:12px; color:gray; margin-top:-10px;">Panduan : Setiap satu permohonan boleh dibuat bagi seorang pesakit atau lebih (Maksimum 10 pesakit). Namun, anda hendaklah mengisi maklumat destinasi dengan betul bagi setiap pesakit yang dimohon bagi memudahkan proses penyelarasan pergerakan kenderaan oleh pihak VCC. </p>
 <div id="patientContainer"></div>
 <button type="button" class="btn-add" onclick="tambahPesakit()">+ Tambah Pesakit Ke Dalam Pergerakan Ini</button>
 </div>
 <div class="card">
-<h2>Maklumat Pasukan Pengiring</h2>
+<h2><span class="card-num">3</span>Maklumat Pasukan Pengiring</h2>
 <p style="font-size:12px; color:gray; margin-top:-10px;">Sila masukkan nama sehingga 3 pegawai pengiring (jika ada).</p>
 <div class="form-group">
 <label>Pegawai Pengiring 1</label>
@@ -342,7 +354,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 </div>
 </div>
 <div class="card">
-<h2>Maklumat Pemohon</h2>
+<h2><span class="card-num">4</span>Maklumat Pemohon</h2>
 <div class="form-group">
 <label>Nama Penuh Pemohon</label>
 <input type="text" id="namaA" placeholder="Contoh: Shafiq Raffi / SN Siti" class="req-a">
@@ -359,7 +371,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 </div>
 <div id="sectionB" style="display:none;">
 <div class="card">
-<h2>Maklumat Pemohon (Kenderaan Jabatan)</h2>
+<h2><span class="card-num">1</span>Maklumat Pemohon</h2>
 <div class="form-group">
 <label>Nama Penuh Pemohon</label>
 <input type="text" id="namaB" placeholder="Contoh: Pn. Siti / En. Abu" class="req-b">
@@ -378,7 +390,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 </div>
 </div>
 <div class="card">
-<h2>Maklumat Perjalanan Jabatan</h2>
+<h2><span class="card-num">2</span>Maklumat Perjalanan</h2>
 <div class="form-group">
 <label>Kenderaan Dipohon</label>
 <select id="kenderaanB" class="req-b" onchange="checkManual('kenderaanB', 'kenderaanManualGroupB', 'kenderaanManualB')">
@@ -414,9 +426,9 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 </div>
 </div>
 
-<div class="time-group" style="background: #fffdf5; padding: 10px; border: 1px dashed #ffc107; border-radius: 4px; margin-bottom: 15px;">
+<div class="time-group" style="margin-bottom: 15px;">
 <div class="form-group" style="margin-bottom:0;">
-<label>Tarikh Kembali (Return)</label>
+<label>Tarikh Kembali</label>
 <input type="date" id="tarikhKembaliB" class="req-b">
 </div>
 <div class="form-group" style="margin-bottom:0;">
@@ -462,7 +474,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <button type="button" id="rekodToggleJ" onclick="tukarRekodType('Jabatan')">Jabatan</button>
 </div>
 <div class="card" id="rekodSection" style="border: 2px solid var(--secondary);">
-<h2 style="color: var(--secondary); border-bottom-color: var(--secondary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+<h2 style="color: var(--secondary); border-bottom-color: var(--secondary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; text-transform: uppercase;">
 <span>Rekod Permohonan Kenderaan (<span id="vccTypeLabel">Klinikal</span>)</span>
 <button type="button" onclick="muatTurunPermohonanAwan()" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold; min-height:44px;"> 🔄  Sync</button>
 </h2>
@@ -791,7 +803,6 @@ ${btnPadam}
 <option value="Rujukan Biasa">Rujukan Biasa</option>
 <option value="Temujanji">Temujanji</option>
 </select>
-<p style="font-size:11px; color:gray; margin-top:5px; margin-bottom:0;"><strong>Kecemasan</strong>: mengancam nyawa/anggota, perlu tindakan segera. <strong>Biasa</strong>: rujukan berjadual tanpa risiko segera. <strong>Temujanji</strong>: lawatan susulan/klinik pakar berjadual.</p>
 </div>
 <div class="form-group">
 <label>Keadaan Pesakit</label>
@@ -811,7 +822,7 @@ ${btnPadam}
 </div>
 <div class="form-group full-width">
 <label>Keperluan Pasukan Tambahan / Peralatan Lain</label>
-<input type="text" id="keperluanA_${pId}" placeholder="Cth: Oksigen 15L/min, Infusion Pump, Dr pengiring...">
+<input type="text" id="keperluanA_${pId}" placeholder="Cth: Oxygen / Suction">
 </div>
 <div class="form-group full-width">
 <label>Waris</label>
