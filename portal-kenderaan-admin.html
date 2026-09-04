@@ -12,6 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="auth-gate.css">
+<link rel="stylesheet" href="vx-shared.css">
 <style>
 :root {
   --vx-topbar:        #084E4E;
@@ -163,11 +164,8 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
 .vx-field { margin-bottom: 4px; }
 .vx-field label { display: block; font-size: 13px; font-weight: 700; color: var(--vx-text); margin-bottom: 6px; }
 .vx-field input, .vx-field select, .vx-field textarea { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 8px; background: #fff; color: var(--vx-text); box-sizing: border-box; }
-.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus { border-color: var(--vx-teal); }
-input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--vx-teal);
-  outline-offset: 1px;
-}
+/* .vx-field input/select/textarea:focus border-color and
+   input/select/textarea:focus-visible outline now in vx-shared.css. */
 .vx-field input:disabled { background: var(--vx-grey-light); color: var(--vx-muted); }
 .vx-field textarea { min-height: 70px; resize: vertical; }
 @media (max-width: 700px) { .vx-form-grid { grid-template-columns: 1fr; } }

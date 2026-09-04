@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="auth-gate.css">
+<link rel="stylesheet" href="vx-shared.css">
 <style>
 :root {
   --vx-topbar:        #084E4E;
@@ -133,7 +134,7 @@ body {
 .vx-field input[type="text"], .vx-field input[type="date"], .vx-field input[type="time"], .vx-field input[type="number"], .vx-field select, .vx-field textarea {
   width: 100%; padding: 14px 16px; font-size: 17px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 10px; background: #fff; color: var(--vx-text); box-sizing: border-box;
 }
-.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus { border-color: var(--vx-teal); }
+/* .vx-field input/select/textarea:focus border-color now in vx-shared.css. */
 .vx-field textarea { min-height: 110px; resize: vertical; font-family: inherit; }
 .vx-hint { font-size: 13px; color: var(--vx-muted); margin-top: 6px; }
 
@@ -151,10 +152,7 @@ body {
 .vx-inline-field.open { display: block; }
 .vx-inline-field input { width: 100%; padding: 13px 16px; font-size: 16px; font-family: inherit; border: 1.5px solid var(--vx-border); border-radius: 10px; box-sizing: border-box; }
 .vx-inline-field input:focus { border-color: var(--vx-teal); }
-input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--vx-teal);
-  outline-offset: 1px;
-}
+/* input/select/textarea:focus-visible outline now in vx-shared.css. */
 
 /* Checklist groups */
 .vx-group-hd { font-size: 13px; font-weight: 800; color: var(--vx-teal); text-transform: uppercase; letter-spacing: 1px; margin: 26px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--vx-teal-light); }

@@ -130,6 +130,47 @@ input[disabled], select[disabled] {
   color: #6c757d;
 }
 
+/* ==================== FORM FIELD BOX MODEL ====================
+   Was duplicated byte-identically in dispatch.html, borang-permohonan.html,
+   and log-pemandu.html's own <style> blocks (log-pemandu.html's version
+   omitted textarea from the selector, but that page has no <textarea>
+   elements, so adding it here changes nothing there). Centralizing so a
+   future padding/radius/etc. change reaches all three -- plus
+   admin.html/admin-jkns.html/admin-yearly.html, which never had this
+   rule at all (no <select> exists on any of the three, confirmed by
+   grep, and every classed input there -- .editable-month-input,
+   .jkns-input, .vx-year-nav input -- already sets its own width/padding
+   at higher specificity, so this is invisible on those). The one
+   exception is .vx-month-nav input[type=month] (admin.html,
+   admin-jkns.html), which didn't set its own width -- given a page-local
+   `width: auto` fix in each file below rather than extracted here, per
+   this file's existing convention of leaving 2-file-only rules inline
+   (see the Phase 2a header note above on .vx-month-nav). */
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 7px;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-family: inherit;
+  background: #FDFEFE;
+}
+/* Textarea border was duplicated identically in dispatch.html and
+   borang-permohonan.html -- kept separate from the input/select glow
+   rule above deliberately: textareas currently have no glow, just this
+   thin border, and centralizing it here doesn't change that. */
+textarea {
+  border: 1px solid var(--line);
+}
+/* Guards the width:100% above from stretching checkboxes/radios.
+   admin.html's 3 checkboxes had no such guard before (the old shared
+   rule never set width at all, so they were never at risk);
+   borang-permohonan.html already has its own equivalent guard, which
+   this doesn't change (same value, higher specificity there). */
+input[type="checkbox"], input[type="radio"] {
+  width: auto;
+}
+
 /* ============================================================
    VELOS — Shared CSS (Extraction Phase 2a)
    ============================================================

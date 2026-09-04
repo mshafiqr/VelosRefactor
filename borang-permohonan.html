@@ -26,10 +26,12 @@ h3 { font-size: 14px; color: #555; margin-top: 20px; margin-bottom: 10px; backgr
 
 /* .form-group now in velos-shared.css. */
 label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #333; }
-input, select, textarea { width: 100%; padding: 10px; border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE;
-}
-textarea { border: 1px solid var(--line); }
-input:focus, select:focus, textarea:focus { border-color: var(--secondary); }
+/* input/select/textarea box model + textarea border now in velos-shared.css. */
+/* input/select focus border-color also now in velos-shared.css --
+   textarea:focus kept here since it's not shared: dispatch.html's
+   textareas don't change border-color on focus at all, so this can't
+   be centralized without changing dispatch.html's behavior too. */
+textarea:focus { border-color: var(--secondary); }
 input[type="checkbox"] { width: auto; transform: scale(1.2); margin-right: 10px; }
 .time-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 

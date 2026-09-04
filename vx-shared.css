@@ -1,0 +1,25 @@
+/* ============================================================
+   VELOS — Shared CSS for the --vx-only pages
+   ============================================================
+   portal-kenderaan.html and portal-kenderaan-admin.html don't link
+   velos-shared.css (see that file's own header on why: they run
+   entirely on --vx-* naming, not the classic --primary/--secondary
+   system). This is their equivalent -- currently just the two rules
+   that were byte-identical between them.
+
+   Deliberately NOT extracted: .vx-field input/select/textarea's own
+   base rule. Its width/padding/font-size/border-radius genuinely
+   differ (portal-kenderaan.html: 14px 16px padding, 17px font, 10px
+   radius, mobile touch-sized; portal-kenderaan-admin.html: 10px 12px
+   padding, 14px font, 8px radius, desktop-dense) -- forcing one
+   file's sizing onto the other would be a real style change, not
+   consolidation. Each file keeps that rule inline.
+   ============================================================ */
+
+.vx-field input:focus, .vx-field select:focus, .vx-field textarea:focus {
+  border-color: var(--vx-teal);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--vx-teal);
+  outline-offset: 1px;
+}
