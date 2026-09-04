@@ -1314,6 +1314,13 @@ async function buildSaveBatch(tripDocRef, payload, wasEditMode, fillPayloads, re
 function resetFormFields() {
   document.getElementById('patientsContainer').innerHTML = '';
   document.getElementById('stepdownPatientsContainer').innerHTML = '';
+  // addPatientRow()/addStepdownRow() pre-fill from these on purpose --
+  // convenience when adding a 2nd/3rd patient to the SAME trip. Clear
+  // them here so the next trip's first row starts blank instead of
+  // inheriting the just-submitted trip's wad/destinasi.
+  localStorage.removeItem('v2_saved_p_wad');
+  localStorage.removeItem('v2_saved_p_destinasi');
+  localStorage.removeItem('v2_saved_stepdown_wad');
   ['nota', 'kenderaan', 'namaPemandu', 'namaPemandu2', 'namaPengiringInput', 'namaPengiring2', 'namaPengiring3', 'masaMula', 'masaTamat', 'odoAwal', 'odoAkhir', 'odoPengisian'].forEach(function (id) {
     document.getElementById(id).value = ''; document.getElementById(id).dispatchEvent(new Event('change'));
   });
