@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link rel="stylesheet" href="auth-gate.css">
 <style>
 :root {
   --vx-topbar:        #084E4E;
@@ -47,27 +48,8 @@
 * { box-sizing: border-box; }
 body { font-family: 'Public Sans', sans-serif; background: var(--vx-bg); color: var(--vx-text); margin: 0; min-height: 100vh; }
 
-/* ==================== AUTH GATE ==================== */
-#loginView { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-.auth-card { max-width: 420px; width: 100%; box-sizing: border-box; background: var(--vx-card); border-radius: var(--vx-radius); box-shadow: var(--vx-shadow); padding: 30px; border-top: 4px solid var(--vx-text); }
-.auth-logo-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 15px; }
-.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
-.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
-.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
-.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
-.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
-.auth-brand { text-align: center; margin-bottom: 20px; }
-.auth-brand .auth-brand-line1 { color: var(--vx-text); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
-.auth-brand .auth-brand-line2 { color: var(--vx-text); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
-.auth-portal-label { font-size: 13px; color: var(--vx-muted); text-align: center; margin-bottom: 20px; }
-.auth-password-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--vx-border); border-radius: 8px; font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px; }
-.auth-password-input:focus { outline: none; border-color: var(--vx-teal); }
-.auth-submit-btn { width: 100%; background: var(--vx-text); color: #fff; padding: 11px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
-.auth-submit-btn:hover:not(:disabled) { background: var(--vx-teal); }
-.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
-.auth-error { display: none; color: var(--vx-danger); font-size: 13px; text-align: center; margin-top: 8px; }
-.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: var(--vx-teal); text-decoration: none; font-weight: 600; }
-.auth-back-link:hover { text-decoration: underline; }
+/* AUTH GATE (#loginView, .auth-card and children) now in
+   auth-gate.css, shared by every portal's login screen. */
 
 /* ==================== TOPBAR / SIDEBAR ==================== */
 #appWrapper { display: none; }

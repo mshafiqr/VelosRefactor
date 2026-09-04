@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="velos-shared.css">
+<link rel="stylesheet" href="auth-gate.css">
 <style>
 /* Classic design tokens (--primary etc.) now live in velos-shared.css
    (Extraction Phase 1). */
@@ -25,16 +26,36 @@ h3 { font-size: 14px; color: #555; margin-top: 20px; margin-bottom: 10px; backgr
 
 /* .form-group now in velos-shared.css. */
 label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #333; }
-input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE;
+input, select, textarea { width: 100%; padding: 10px; border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE;
 }
+textarea { border: 1px solid var(--line); }
 input:focus, select:focus, textarea:focus { border-color: var(--secondary); }
 input[type="checkbox"] { width: auto; transform: scale(1.2); margin-right: 10px; }
 .time-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 button.btn-main { background-color: var(--primary); color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 15px;
-font-weight: bold; box-shadow: 0 4px 6px rgba(0,86,179,0.3);}
-button.btn-add { background-color: var(--secondary); color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100%;
-margin-bottom: 15px;}
+font-weight: bold; box-shadow: 0 4px 6px rgba(0,86,179,0.3); position: sticky; bottom: 15px; z-index: 10;}
+button.btn-add {
+  background: transparent;
+  border: 1.5px solid var(--secondary);
+  box-shadow: 0 0 0 3px rgba(20, 125, 130, 0.12), 0 0 10px rgba(20, 125, 130, 0.2);
+  color: var(--secondary);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 15px;
+  font-family: inherit;
+}
+button.btn-add:hover {
+  box-shadow: 0 0 0 4px rgba(20, 125, 130, 0.18), 0 0 16px rgba(20, 125, 130, 0.3);
+}
 .btn-remove { background-color: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 44px;}
 .btn-status-check { background-color: #17a2b8; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;
 box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; margin-bottom: 20px;}
@@ -120,12 +141,24 @@ margin-bottom: 25px;
 /* ======================================================== */
 /* PEMBAIKAN PERANTI MUDAH ALIH (SAFE MODE)                 */
 /* ======================================================== */
-button, select, .btn-main, .btn-add, .btn-remove, .btn-status-check,
+button:not(.btn-main), select, .btn-add, .btn-remove, .btn-status-check,
 .btn-add-p, .btn-add-stepdown, .btn-remove-patient, .btn-lulus, .btn-tolak,
 .swal2-confirm, .swal2-cancel {
 touch-action: manipulation !important;
 -webkit-tap-highlight-color: transparent !important;
 position: relative !important;
+z-index: 50 !important;
+cursor: pointer !important;
+pointer-events: auto !important;
+user-select: none !important;
+}
+/* .btn-main kept out of the block above: its own position: sticky (so
+   the Simpan button sticks to the viewport bottom while scrolling)
+   would otherwise be beaten by that block's position: relative
+   !important, since !important wins regardless of selector order. */
+.btn-main {
+touch-action: manipulation !important;
+-webkit-tap-highlight-color: transparent !important;
 z-index: 50 !important;
 cursor: pointer !important;
 pointer-events: auto !important;
@@ -416,9 +449,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 </div>
 </div>
 </div>
-<div id="btnSubmitDiv" style="display: none;">
-<button type="button" id="btnHantar" class="btn-main">Hantar Permohonan Kenderaan</button>
-</div>
+<button type="button" id="btnHantar" class="btn-main" style="display: none;">Hantar Permohonan Kenderaan</button>
 </form>
 </div>
 
@@ -836,7 +867,7 @@ document.getElementById('jenisPerjalanan').addEventListener('change', function (
   const val = this.value;
   document.getElementById('sectionA').style.display = (val === 'A') ? 'block' : 'none';
   document.getElementById('sectionB').style.display = (val === 'B') ? 'block' : 'none';
-  document.getElementById('btnSubmitDiv').style.display = 'block';
+  document.getElementById('btnHantar').style.display = 'block';
   const noticeDiv = document.getElementById('vccNotice');
   noticeDiv.style.display = 'block';
   if (val === 'A') {
@@ -1377,7 +1408,7 @@ function resetBorang() {
   document.getElementById('patientContainer').innerHTML = '';
   patientIndex = 0; window.tambahPesakit();
   document.getElementById('sectionA').style.display = 'none'; document.getElementById('sectionB').style.display = 'none';
-  document.getElementById('btnSubmitDiv').style.display = 'none'; document.getElementById('jenisPerjalanan').value = '';
+  document.getElementById('btnHantar').style.display = 'none'; document.getElementById('jenisPerjalanan').value = '';
   document.getElementById('tarikhA').value = todayDate; document.getElementById('tarikhB').value = todayDate; document.getElementById('tarikhKembaliB').value = todayDate;
   window.scrollTo({ top: document.getElementById('rekodSection').offsetTop - 20, behavior: 'smooth' });
   window.kembaliKeMenu();

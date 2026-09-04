@@ -8,13 +8,20 @@
    rollout across portals. Don't conflate the two.
 
    Scope: the classic design tokens (--primary etc.) and non-
-   navigation shared component CSS -- auth/login card, base table
-   row hover, SweetAlert2 overrides, a handful of small identical
-   utility rules -- duplicated across admin.html, admin-jkns.html,
+   navigation shared component CSS -- base table row hover,
+   SweetAlert2 overrides, a handful of small identical utility
+   rules -- duplicated across admin.html, admin-jkns.html,
    admin-yearly.html, dispatch.html, borang-permohonan.html, and
    log-pemandu.html. Verified byte-identical (outside any @media
    block) across every file it's extracted from before being moved
    here -- see the extraction script in this session's scratchpad.
+
+   The auth/login card (#loginView, .auth-card and children) used
+   to live here too, but has since moved to its own auth-gate.css,
+   shared by all 8 portal files that have a login gate -- including
+   portal-kenderaan.html and portal-kenderaan-admin.html, which
+   don't use the rest of this file's classic token/component set.
+   See auth-gate.css's own header for why.
 
    Deliberately OUT of scope (left inline, untouched):
    - Every --vx-* token and .vx-* class (sidebar/topbar/cards) in
@@ -41,7 +48,8 @@
      portal-kenderaan-admin.html -- none of these use the classic
      token/component set (about.html uses neither system at all;
      the other three already run entirely on --vx-* naming, even for
-     auth/table/swal2), so there's nothing here for them to link to.
+     table/swal2), so there's nothing in THIS file for them to link
+     to -- auth-gate.css is the one exception, see above.
    ============================================================ */
 
 :root {
@@ -64,58 +72,6 @@
   --radius: 12px;
   --shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
 }
-
-/* ==================== AUTH GATE ==================== */
-#loginView {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-.auth-card {
-  max-width: 420px;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 16px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  padding: 30px;
-  border-top: 4px solid var(--primary);
-}
-.auth-logo-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px dashed #e9ecef;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
-}
-.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
-.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
-.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
-.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
-.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
-.auth-brand { text-align: center; margin-bottom: 20px; }
-.auth-brand .auth-brand-line1 { color: var(--primary); font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
-.auth-brand .auth-brand-line2 { color: var(--primary); font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
-.auth-portal-label { font-size: 13px; color: var(--text-soft); text-align: center; margin-bottom: 20px; }
-/* Present in 5/6 files -- dispatch.html doesn't use this class (its
-   own auth input styling is untouched, left inline in that file). */
-.auth-password-input {
-  width: 100%; padding: 10px 14px; border: 1.5px solid #DCE6ED; border-radius: 8px;
-  font-size: 14px; font-family: inherit; box-sizing: border-box; margin-bottom: 10px;
-}
-.auth-password-input:focus { outline: none; border-color: var(--secondary); }
-.auth-submit-btn {
-  width: 100%; background: var(--primary); color: #fff; padding: 11px; border: none;
-  border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
-}
-.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
-.auth-error { display: none; color: var(--danger); font-size: 13px; text-align: center; margin-top: 8px; }
-.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: var(--secondary); text-decoration: none; font-weight: 600; }
-.auth-back-link:hover { text-decoration: underline; }
 
 /* ==================== PAGE SHELL (admin.html, admin-jkns.html, admin-yearly.html only) ==================== */
 #secureDashboardWrapper { display: none; padding: 20px; }
@@ -152,6 +108,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 /* .form-group: borang-permohonan.html, dispatch.html, log-pemandu.html only. */
 .form-group { margin-bottom: 15px; }
+
+/* ==================== FORM FIELD BORDER / FOCUS GLOW ====================
+   --secondary is #147D82 -> rgb(20, 125, 130); rgba() values below are
+   that color's components, not a separate hardcoded color. */
+input, select {
+  border: 1.5px solid var(--secondary);
+  box-shadow: 0 0 6px rgba(20, 125, 130, 0.22), 0 0 12px rgba(20, 125, 130, 0.12);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 10px rgba(20, 125, 130, 0.5), 0 0 22px rgba(20, 125, 130, 0.35);
+}
+input:disabled, select:disabled,
+input[disabled], select[disabled] {
+  border: 1px solid #dee2e6;
+  box-shadow: none;
+  background: #e9ecef;
+  color: #6c757d;
+}
 
 /* ============================================================
    VELOS — Shared CSS (Extraction Phase 2a)

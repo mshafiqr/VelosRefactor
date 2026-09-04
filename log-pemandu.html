@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25" integrity="sha384-nLoOnA/BDh8A/jxqtckg4DumuCGOBYUnNJLZdQz/zfYNp3wcjGSoWTAzgko06G/2" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="velos-shared.css">
+<link rel="stylesheet" href="auth-gate.css">
 <style>
 /* Classic design tokens (--primary etc.) now live in velos-shared.css
    (Extraction Phase 1). */
@@ -17,11 +18,21 @@ body { font-family: 'Public Sans', sans-serif; background-color: var(--bg-color)
 .form-title { text-align: center; padding: 14px 10px 20px; font-size: 19px; font-weight: 800; color: var(--primary); letter-spacing: 0.3px; text-transform: uppercase; }
 .container { max-width: 800px; margin: auto; display: block; }
 .card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; }
-h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; font-size: 18px; }
+h2 {
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  font-size: 17px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid var(--primary);
+  color: var(--primary);
+}
 h3 { font-size: 14px; color: #555; margin-top: 20px; margin-bottom: 10px; background: #e9ecef; padding: 10px; border-radius: 4px; }
 /* .form-group now in velos-shared.css. */
 label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
-input, select { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE; }
+input, select { width: 100%; padding: 10px; border-radius: 7px; box-sizing: border-box; font-size: 14px; font-family: inherit; background: #FDFEFE; }
 .time-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .patient-block { background: #fdfdfd; border: 1px dashed #b5b5b5; padding: 12px; border-radius: 6px; margin-bottom: 10px; }
 .fuel-block { background: #fffdf5; border: 1px dashed #ffc107; padding: 15px; border-radius: 6px; margin-bottom: 20px; margin-top: 25px; }
@@ -31,11 +42,78 @@ input, select { width: 100%; padding: 10px; border: 1px solid var(--line); borde
 @media (max-width: 500px) { .fuel-row-inputs { grid-template-columns: 1fr; } }
 .btn-remove-patient { background: var(--danger); color: white; border: none; padding: 8px 10px; font-size: 12px; border-radius: 7px; cursor: pointer; margin-top: 10px;
 width: 100%; font-weight: bold; }
-button.btn-main { background-color: var(--primary); color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 15px;
-font-weight: bold; position: sticky; bottom: 15px; z-index: 10; box-shadow: 0 4px 6px rgba(0,86,179,0.3);}
-.btn-add-p, .btn-add-stepdown { color: white; border: none; padding: 12px; border-radius: 7px; cursor: pointer; font-size: 13px; margin-bottom: 15px; font-weight: bold;
-width: 100%; }
-.btn-add-p { background-color: var(--secondary); } .btn-add-stepdown { background-color: #6f42c1; }
+button.btn-main {
+  background-color: var(--primary);
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: inherit;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  bottom: 15px;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(15, 42, 74, 0.35);
+}
+.btn-add-p {
+  background: transparent;
+  border: 1.5px solid var(--secondary);
+  box-shadow: 0 0 0 3px rgba(20, 125, 130, 0.12), 0 0 10px rgba(20, 125, 130, 0.2);
+  color: var(--secondary);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-family: inherit;
+}
+.btn-add-p:hover {
+  box-shadow: 0 0 0 4px rgba(20, 125, 130, 0.18), 0 0 16px rgba(20, 125, 130, 0.3);
+}
+.btn-add-stepdown {
+  background: transparent;
+  border: 1.5px solid #6f42c1;
+  box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.12), 0 0 10px rgba(111, 66, 193, 0.2);
+  color: #6f42c1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-family: inherit;
+}
+.btn-add-stepdown:hover {
+  box-shadow: 0 0 0 4px rgba(111, 66, 193, 0.18), 0 0 16px rgba(111, 66, 193, 0.3);
+}
+
+/* Batal Kemaskini — override back to solid, since it shares btn-add-p */
+#btnCancelEdit {
+  background: #6c757d !important;
+  border: none !important;
+  color: white !important;
+}
 .auto-badge { background: #e2e3e5; color: #383d41; padding: 3px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; float: right; }
 
 table { width: 100%; min-width: 1100px; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
@@ -69,12 +147,24 @@ tbody tr:last-child td { border-bottom: none; }
 
 .watermark-footer { text-align: center; font-size: 11px; color: #888; margin-top: 20px; padding-bottom: 20px; line-height: 1.5; font-weight: 500; }
 
-button, select, .btn-main, .btn-add, .btn-remove, .btn-status-check,
+button:not(.btn-main), select, .btn-add, .btn-remove, .btn-status-check,
 .btn-add-p, .btn-add-stepdown, .btn-remove-patient, .btn-lulus, .btn-tolak,
 .swal2-confirm, .swal2-cancel {
 touch-action: manipulation !important;
 -webkit-tap-highlight-color: transparent !important;
 position: relative !important;
+z-index: 50 !important;
+cursor: pointer !important;
+pointer-events: auto !important;
+user-select: none !important;
+}
+/* .btn-main kept out of the block above: its own position: sticky (so
+   the Simpan button sticks to the viewport bottom while scrolling)
+   would otherwise be beaten by that block's position: relative
+   !important, since !important wins regardless of selector order. */
+.btn-main {
+touch-action: manipulation !important;
+-webkit-tap-highlight-color: transparent !important;
 z-index: 50 !important;
 cursor: pointer !important;
 pointer-events: auto !important;
@@ -130,6 +220,63 @@ body { padding: 0; }
 /* .vx-main-content.vx-sidebar-collapsed and the
    @media(max-width:768px){.vx-main-content,.vx-sidebar:not(.vx-collapsed)}
    block now in velos-shared.css. */
+
+/* Card section headers */
+h2 .card-num {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card 2 purple accent */
+.card-pesakit h2 { color: #6f42c1; border-bottom-color: #6f42c1; }
+.card-pesakit h2 .card-num { background: #6f42c1; }
+
+/* Alert boxes */
+.alert-warning {
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-left: 4px solid #f59e0b;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #78350f;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  line-height: 1.55;
+}
+.alert-warning .aw-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.alert-warning strong { display: block; font-size: 12px; margin-bottom: 2px; color: #92400e; }
+
+.alert-info {
+  background: #f0f9ff;
+  border: 1px solid #93c5fd;
+  border-left: 4px solid #3b82f6;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #1e3a5f;
+  line-height: 1.55;
+}
+.alert-info .info-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #2563eb;
+  display: block;
+  margin-bottom: 4px;
+}
 </style>
 </head>
 <body>
@@ -177,9 +324,11 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <div class="vx-main-content" id="vxMainContent">
 <div class="container">
 <div class="form-title">Borang Maklumat Pergerakan</div>
-<div class="card">
-<h2 id="formHeader">Butiran Pergerakan</h2>
 <form id="logForm" novalidate>
+<!-- CARD 1 — Butiran Pergerakan -->
+<div class="card">
+<h2 id="formHeader"><span class="card-num">1</span>Butiran Pergerakan</h2>
+
 <div class="form-group"><label>Tarikh</label><input type="date" id="tarikh" required></div>
 <div class="form-group">
 <label>Masa Perjalanan (Mulai - Hingga)</label>
@@ -219,7 +368,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <div class="form-group" id="manualPemanduGroup" style="display: none;">
 <label>Nama Pemandu Baharu</label><input type="text" id="namaPemanduManual" placeholder="Taip nama pemandu...">
 </div>
-<button type="button" id="btnToggleMorePemandu" class="btn-add-p" style="margin-top: 8px;">➕ Tambah Pemandu</button>
+<button type="button" id="btnToggleMorePemandu" class="btn-add-p" style="margin-top: 8px;">+ Tambah Pemandu</button>
 <div id="morePemanduGroup" style="display: none; margin-top: 10px;">
 <div class="form-group">
 <label>Nama Pemandu 2 (Jika Ada)</label>
@@ -232,19 +381,7 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <label>Nama Pemandu 2 Baharu</label><input type="text" id="namaPemandu2Manual" placeholder="Taip nama pemandu...">
 </div>
 </div>
-<div class="form-group">
-<label>Nama Pengiring</label>
-<input list="senaraiPengiring" id="namaPengiringInput" placeholder="Taip atau pilih nama pengiring..." required>
-<datalist id="senaraiPengiring">
-<option value="Tiada Pengiring"></option>
-</datalist>
-<button type="button" id="btnToggleMorePengiring" class="btn-add-p" style="margin-top: 8px;">➕ Tambah Pengiring</button>
-<div id="morePengiringGroup" style="display: none; margin-top: 10px;">
-<div style="margin-bottom: 10px;"><label>Nama Pengiring 2</label><input list="senaraiPengiring" id="namaPengiring2" placeholder="Taip atau pilih nama pengiring..."></div>
-<div><label>Nama Pengiring 3</label><input list="senaraiPengiring" id="namaPengiring3" placeholder="Taip atau pilih nama pengiring..."></div>
-</div>
-</div>
-<div class="form-group">
+<div class="form-group" style="margin-top:14px;">
 <label>Tujuan</label>
 <select id="nota">
 <option value="" selected>Pilih Tujuan...</option>
@@ -254,22 +391,63 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <div class="form-group" id="manualNotaGroup" style="display: none;">
 <label>Tujuan Lain</label><input type="text" id="notaManual" placeholder="Taip catatan tugas...">
 </div>
-<p style="font-size:12px; color:gray; margin-top:-10px;">Panduan : Sila klik butang merah "Padam Kes" sekiranya perjalanan tidak melibatkan penghantaran pesakit. Sekiranya mengambil pesakit, sila klik pada butang ungu "Tambah Pesakit Stepdown/Retrieval".</p>
+
+</div>
+
+<!-- CARD 2 — Butiran Pesakit & Pengiring -->
+<div class="card card-pesakit">
+<h2><span class="card-num">2</span>Butiran Pesakit &amp; Pengiring</h2>
+
+<div class="alert-warning">
+<span class="aw-icon">⚠️</span>
+<div>
+<strong>Kenderaan Jabatan?</strong>
+Sekiranya perjalanan tidak melibatkan pesakit, sila abaikan bahagian ini dan teruskan pada Bahagian 3 - Bacaan Odometer (Km)
+</div>
+</div>
+
+<div class="alert-info">
+<span class="info-label">Panduan Pengisian</span>
+Sila klik butang merah <strong>"Padam Kes"</strong> sekiranya perjalanan tidak melibatkan penghantaran pesakit. Sekiranya mengambil pesakit, sila klik pada butang <strong>"Tambah Pesakit Stepdown/Retrieval"</strong>.
+</div>
+
+<div class="form-group">
+<label>Nama Pengiring</label>
+<input list="senaraiPengiring" id="namaPengiringInput" placeholder="Taip atau pilih nama pengiring..." required>
+<datalist id="senaraiPengiring">
+<option value="Tiada Pengiring"></option>
+</datalist>
+<button type="button" id="btnToggleMorePengiring" class="btn-add-p" style="margin-top: 8px;">+ Tambah Pengiring</button>
+<div id="morePengiringGroup" style="display: none; margin-top: 10px;">
+<div style="margin-bottom: 10px;"><label>Nama Pengiring 2</label><input list="senaraiPengiring" id="namaPengiring2" placeholder="Taip atau pilih nama pengiring..."></div>
+<div><label>Nama Pengiring 3</label><input list="senaraiPengiring" id="namaPengiring3" placeholder="Taip atau pilih nama pengiring..."></div>
+</div>
+</div>
+
 <h3>Senarai Pesakit Dihantar</h3>
 <div id="patientsContainer"></div>
 <button type="button" id="btnAddPatient" class="btn-add-p">+ Tambah Pesakit Ke Dalam Kenderaan</button>
+
 <h3 style="background-color: #d1ecf1; color: #0c5460;">Senarai Pesakit Diambil (Stepdown)</h3>
 <div id="stepdownPatientsContainer"></div>
 <button type="button" id="btnAddStepdownPatient" class="btn-add-stepdown">+ Tambah Pesakit Stepdown / Retrieval</button>
+</div>
+
+<!-- CARD 3 — Odometer -->
+<div class="card">
+<h2><span class="card-num">3</span>Bacaan Odometer (Km)</h2>
 <div class="odo-block">
-<h3 style="background-color: #d4edda; color: #155724; margin-top: 0; padding: 10px; border-radius: 4px;">Bacaan Odometer (Km)</h3>
 <div class="fuel-row-inputs">
 <div><label>Odometer Awal</label><input type="number" id="odoAwal" placeholder="Cth: 150000" required></div>
 <div><label>Odometer Akhir</label><input type="number" id="odoAkhir" placeholder="Cth: 150300" required></div>
 </div>
 </div>
+</div>
+
+<!-- CARD 4 — Bahan Api -->
+<div class="card">
+<h2><span class="card-num">4</span>⛽ Butiran Pengisian Bahan Api</h2>
 <div class="fuel-block">
-<h3 style="background-color: #fff3cd; color: #856404; margin-top: 0; padding: 10px; border-radius: 4px;"> ⛽  Butiran Pengisian Bahan Api</h3>
 <div class="form-group" style="margin-bottom: 0;">
 <label>Adakah kenderaan ini mengisi bahan api (minyak) semasa pergerakan ini?</label>
 <select id="isRefueled" style="border-color: #ffc107; background-color: #ffffff;">
@@ -283,13 +461,15 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <div><label>Odometer Semasa Pengisian (Pilihan)</label><input type="number" id="odoPengisian" placeholder="Cth: 150150"></div>
 </div>
 <div id="fuelFillsContainer" style="margin-top: 15px;"></div>
-<button type="button" id="btnAddFuelFill" class="btn-add-p" style="margin-top: 5px;">➕ Tambah Pengisian</button>
+<button type="button" id="btnAddFuelFill" class="btn-add-p" style="margin-top: 5px;">+ Tambah Pengisian</button>
 </div>
 </div>
+</div>
+
+<!-- Simpan + Batal — outside cards, as-is -->
 <button type="button" id="btnSimpanLog" class="btn-main">Simpan Rekod Perjalanan</button>
-<button type="button" id="btnCancelEdit" class="btn-add-p" style="display:none; background-color:#6c757d; margin-top:8px;">Batal Kemaskini</button>
+<button type="button" id="btnCancelEdit" class="btn-add-p" style="display:none; margin-top:8px;">Batal Kemaskini</button>
 </form>
-</div>
 <div class="card" style="border-top: 3px solid var(--secondary);">
 <h2 style="color: var(--secondary); border-bottom-color: var(--secondary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
 <span>Laporan Log Pergerakan Kenderaan</span>
@@ -1263,7 +1443,7 @@ function exitEditMode() {
   editMode = false;
   editTripId = null;
   editExistingFillIds = [];
-  document.getElementById('formHeader').innerText = 'Butiran Pergerakan';
+  document.getElementById('formHeader').innerHTML = '<span class="card-num">1</span>Butiran Pergerakan';
   document.getElementById('btnSimpanLog').innerText = 'Simpan Rekod Perjalanan';
   document.getElementById('btnCancelEdit').style.display = 'none';
 }
@@ -1284,7 +1464,7 @@ window.editEntry = function (id) {
   editTripId = item.id;
   editExistingFillIds = [];
 
-  document.getElementById('formHeader').innerText = 'Kemaskini Rekod Pergerakan';
+  document.getElementById('formHeader').innerHTML = '<span class="card-num">1</span>Kemaskini Rekod Pergerakan';
   document.getElementById('btnSimpanLog').innerText = 'Kemaskini Rekod Perjalanan';
   document.getElementById('btnSimpanLog').disabled = true;
   document.getElementById('btnSimpanLog').innerText = 'Memuat data bahan api...';
@@ -1417,13 +1597,13 @@ document.getElementById('btnToggleMorePengiring').addEventListener('click', func
   const grp = document.getElementById('morePengiringGroup');
   const isHidden = grp.style.display === 'none';
   grp.style.display = isHidden ? 'block' : 'none';
-  this.innerText = isHidden ? '➖ Sembunyikan Pengiring' : '➕ Tambah Pengiring';
+  this.innerText = isHidden ? '− Sembunyikan Pengiring' : '+ Tambah Pengiring';
 });
 document.getElementById('btnToggleMorePemandu').addEventListener('click', function () {
   const grp = document.getElementById('morePemanduGroup');
   const isHidden = grp.style.display === 'none';
   grp.style.display = isHidden ? 'block' : 'none';
-  this.innerText = isHidden ? '➖ Sembunyikan Pemandu 2' : '➕ Tambah Pemandu';
+  this.innerText = isHidden ? '− Sembunyikan Pemandu 2' : '+ Tambah Pemandu';
 });
 window.addPatientRow();
 window.resetFuelFillRows();

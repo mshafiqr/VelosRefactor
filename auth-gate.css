@@ -1,0 +1,75 @@
+/* ============================================================
+   VELOS — Shared Auth Gate CSS
+   ============================================================
+   Single canonical source for every portal's login screen
+   (#loginView / .auth-card and children). Linked by all 8 portal
+   files that have a login gate: log-pemandu.html,
+   borang-permohonan.html, dispatch.html, admin.html,
+   admin-jkns.html, admin-yearly.html, portal-kenderaan.html,
+   portal-kenderaan-admin.html. Edit here once -- every portal's
+   auth gate updates together, no per-file duplication.
+
+   Hardcoded hex values (not var(--primary) / var(--vx-teal) etc.)
+   so this file works standalone regardless of which token system
+   (classic --primary/--secondary vs --vx-*) the page linking it
+   uses. Values match the classic system's tokens 1:1 --
+   --primary=#0F2A4A=--vx-text, --secondary=#147D82=--vx-teal,
+   --danger=#C62828=--vx-danger, --text-soft=#5B6774=--vx-muted,
+   --card-bg=#ffffff=--vx-card.
+   ============================================================ */
+
+#loginView {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.auth-card {
+  max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15,42,74,0.07), 0 4px 14px rgba(15,42,74,0.09);
+  padding: 30px;
+  border-top: 4px solid #0F2A4A;
+}
+.auth-logo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #e9ecef;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.auth-logo-row .auth-logo-left { flex: 1; text-align: left; }
+.auth-logo-row .auth-logo-center { flex: 2; text-align: center; }
+.auth-logo-row .auth-logo-right { flex: 1; text-align: right; }
+.auth-logo-center .auth-org-line1 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+.auth-logo-center .auth-org-line2 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7f8c8d; }
+.auth-brand { text-align: center; margin-bottom: 20px; }
+.auth-brand .auth-brand-line1 { color: #0F2A4A; font-weight: 900; font-size: 12px; letter-spacing: 0.5px; }
+.auth-brand .auth-brand-line2 { color: #0F2A4A; font-weight: 700; font-size: 18px; letter-spacing: 3px; margin-top: 2px; }
+.auth-portal-label { font-size: 13px; color: #5B6774; text-align: center; margin-bottom: 20px; }
+.auth-password-input {
+  width: 100%; max-width: 300px; padding: 12px; border: 2px solid #147D82; border-radius: 6px;
+  font-size: 15px; text-align: center; font-family: inherit; box-sizing: border-box; margin: 0 auto 15px;
+  display: block;
+  box-shadow: 0 0 6px rgba(20, 125, 130, 0.22), 0 0 12px rgba(20, 125, 130, 0.12);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.auth-password-input:focus {
+  outline: none; border-color: #147D82;
+  box-shadow: 0 0 10px rgba(20, 125, 130, 0.5), 0 0 22px rgba(20, 125, 130, 0.35);
+}
+.auth-submit-btn {
+  width: 100%; background: #0F2A4A; color: #fff; padding: 11px; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.auth-submit-btn:hover:not(:disabled) { background: #147D82; }
+.auth-submit-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+.auth-error { display: none; color: #C62828; font-size: 13px; text-align: center; margin-top: 8px; }
+.auth-back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: #147D82; text-decoration: none; font-weight: 600; }
+.auth-back-link:hover { text-decoration: underline; }
