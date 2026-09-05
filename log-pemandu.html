@@ -402,13 +402,8 @@ document.getElementById('vxSidebar').outerHTML = VxUI.renderVxSidebar({
 <span class="aw-icon">⚠️</span>
 <div>
 <strong>Kenderaan Jabatan?</strong>
-Sekiranya perjalanan tidak melibatkan pesakit, sila abaikan bahagian ini dan teruskan pada Bahagian 3 - Bacaan Odometer (Km)
+Sila klik pada butang merah "Padam Kes" sekiranya perjalanan tidak melibatkan penghantaran pesakit. Sekiranya mengambil pesakit, sila klik pada butang "Tambah Pesakit Stepdown/Retrieval".
 </div>
-</div>
-
-<div class="alert-info">
-<span class="info-label">Panduan Pengisian</span>
-Sila klik butang merah <strong>"Padam Kes"</strong> sekiranya perjalanan tidak melibatkan penghantaran pesakit. Sekiranya mengambil pesakit, sila klik pada butang <strong>"Tambah Pesakit Stepdown/Retrieval"</strong>.
 </div>
 
 <div class="form-group">
@@ -1028,8 +1023,12 @@ document.getElementById('btnSimpanLog').addEventListener('click', function (e) {
   });
 
   if (!isValid) {
-    let labelText = firstInvalid.previousElementSibling ? firstInvalid.previousElementSibling.innerText : 'Kotak Wajib';
-    Swal.fire('Maklumat Tidak Lengkap', 'Sila isikan ruangan: ' + labelText, 'warning');
+    if (firstInvalid.classList.contains('p-wad') || firstInvalid.classList.contains('p-destinasi')) {
+      Swal.fire('Maklumat Tidak Lengkap', 'Sila isikan maklumat Senarai Pesakit atau Klik Padam Kes untuk perjalanan tanpa pesakit', 'warning');
+    } else {
+      let labelText = firstInvalid.previousElementSibling ? firstInvalid.previousElementSibling.innerText : 'Kotak Wajib';
+      Swal.fire('Maklumat Tidak Lengkap', 'Sila isikan ruangan: ' + labelText, 'warning');
+    }
     setTimeout(function () { firstInvalid.focus(); }, 300);
     return;
   }
