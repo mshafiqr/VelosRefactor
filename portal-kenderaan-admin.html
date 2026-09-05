@@ -267,6 +267,7 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   <button class="vx-sidebar-link vx-active" data-section="sec-status">Status Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-rekod">Semakan Rekod</button>
   <button class="vx-sidebar-link" data-section="sec-laporan">Laporan Bulanan</button>
+  <button class="vx-sidebar-link" data-section="sec-downtime">Rekod Downtime</button>
   <button class="vx-sidebar-link" data-section="sec-insiden">Laporan Insiden Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-profil">Profil Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-profil-pemandu">Profil Pemandu</button>
@@ -403,6 +404,58 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   </div>
 
   <div id="laporanContent" style="display:none;"></div>
+</section>
+
+<!-- ==================== SECTION: REKOD DOWNTIME ==================== -->
+<section id="sec-downtime" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Rekod Downtime</div>
+
+  <div class="vx-card">
+    <div class="vx-filter-row">
+      <div class="vx-filter-field">
+        <label>Pilih Kenderaan</label>
+        <select id="downtimeFilterKenderaan"><option value="">Semua Kenderaan</option></select>
+      </div>
+      <div class="vx-filter-field">
+        <label>Dari</label>
+        <input type="date" id="downtimeFilterDari">
+      </div>
+      <div class="vx-filter-field">
+        <label>Hingga</label>
+        <input type="date" id="downtimeFilterHingga">
+      </div>
+      <div class="vx-filter-field">
+        <label>Status</label>
+        <select id="downtimeFilterStatus">
+          <option value="semua">Semua</option>
+          <option value="open">Terbuka</option>
+          <option value="closed">Selesai</option>
+        </select>
+      </div>
+      <div class="vx-filter-field">
+        <button class="vx-btn" id="btnDowntimeFilter">Tapis</button>
+      </div>
+      <div class="vx-filter-field">
+        <button class="vx-btn ghost" id="btnDowntimeExport">Eksport CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="vx-summary-grid" id="downtimeSummaryGrid" style="margin-top:16px;"></div>
+
+  <div class="vx-card" style="margin-top:16px;">
+    <div class="vx-table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Kenderaan</th><th>Tarikh Mula</th><th>Tarikh Selesai</th><th>Tempoh</th><th>Sebab</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="downtimeBody"><tr><td colspan="6" class="vx-empty-row">Sila tekan "Tapis" untuk memaparkan rekod.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
 <!-- ==================== SECTION 4: PROFIL KENDERAAN ==================== -->
@@ -866,6 +919,7 @@ let vehicleProfiles = {};      // plate -> profile data
 let driverProfiles = {};       // nama -> profile data
 let allSubmissions = [];       // sorted desc by timestamp, each carries _id, _date (JS Date)
 let latestByPlate = {};        // plate -> submission
+let allDowntimeHistory = [];   // downtimeHistory docs -- closed downtime events (never updated/deleted)
 
 async function initAdmin() {
   if (adminInitialized) return;
@@ -901,11 +955,15 @@ async function loadAllData() {
       if (!latestByPlate[sub.kenderaan]) latestByPlate[sub.kenderaan] = sub;
     });
 
+    const dtSnap = await getDocs(collection(db, 'downtimeHistory'));
+    allDowntimeHistory = dtSnap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+
     renderStatusSection();
     renderProfilDropdown();
     renderProfilPemanduDropdown();
     renderRekodKenderaanFilter();
     renderLegacyKenderaanFilter();
+    renderDowntimeKenderaanFilter();
   } catch (err) {
     Swal.fire('Ralat', 'Gagal memuatkan data: ' + (err.message || err), 'error');
   }
@@ -982,6 +1040,9 @@ function renderStatusTable() {
                      sub && sub.bolehDigunakan === 'jarakDekat'   ? 'warn'   :
                      sub && sub.bolehDigunakan === 'tidakSelamat' ? 'danger' : '';
     const bolehLbl = sub ? (BOLEH_LABEL[sub.bolehDigunakan] || '—') : '—';
+    const downtimeIndicator = profile.statusSemasa === 'rosak'
+      ? `<div style="font-size:11px;font-weight:700;color:var(--vx-danger);margin-top:2px;">🔴 Downtime sejak ${esc(profile.downtimeStartDate || '—')} (${Math.max(0, daysSince(profile.downtimeStartDate) + 1)} hari)</div>`
+      : '';
 
     return `
       <tr class="vx-status-row" data-plate="${esc(plate)}" style="cursor:pointer;">
@@ -992,6 +1053,7 @@ function renderStatusTable() {
         <td class="${sc}" style="vertical-align:middle;">
           <div style="font-weight:700;font-size:12px;">${esc(sLabel)}</div>
           ${sDetail ? `<div style="font-size:11px;opacity:.8;">${esc(sDetail)}</div>` : ''}
+          ${downtimeIndicator}
         </td>
         <td>${bolehCls ? `<span class="fb ${bolehCls}">${esc(bolehLbl)}</span>` : `<span style="color:var(--vx-grey)">—</span>`}</td>
         <td class="${enjin.cls}" style="vertical-align:middle;">
@@ -1252,6 +1314,100 @@ function renderRekodKenderaanFilter() {
   const plates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
   sel.innerHTML = '<option value="">Semua Kenderaan</option>' + plates.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
 }
+
+/* ---------------------------------------------------------------------
+   SECTION: REKOD DOWNTIME
+   Built on top of two existing pieces, no new collection:
+   - allDowntimeHistory (downtimeHistory docs)   -> closed downtime events
+   - vehicleProfiles[plate].statusSemasa/downtimeStartDate/downtimeSebab
+     -> the one currently-open downtime per vehicle, if any
+--------------------------------------------------------------------- */
+function renderDowntimeKenderaanFilter() {
+  const sel = document.getElementById('downtimeFilterKenderaan');
+  const plates = Object.keys(vehicleProfiles).sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="">Semua Kenderaan</option>' + plates.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+}
+
+function buildDowntimeRows() {
+  const closed = allDowntimeHistory.map(d => ({
+    kenderaan: d.kenderaan,
+    tarikhMula: d.downtimeStart,
+    tarikhSelesai: d.recoveryDate,
+    tempohHari: d.totalDays,
+    sebab: d.sebab || '',
+    status: 'closed'
+  }));
+  const open = Object.keys(vehicleProfiles)
+    .filter(p => vehicleProfiles[p].statusSemasa === 'rosak')
+    .map(p => ({
+      kenderaan: p,
+      tarikhMula: vehicleProfiles[p].downtimeStartDate,
+      tarikhSelesai: null,
+      tempohHari: Math.max(0, daysSince(vehicleProfiles[p].downtimeStartDate) + 1),
+      sebab: vehicleProfiles[p].downtimeSebab || '',
+      status: 'open'
+    }));
+  return open.concat(closed);
+}
+
+let currentDowntimeFiltered = [];
+
+function renderDowntimeTable() {
+  const plate       = document.getElementById('downtimeFilterKenderaan').value;
+  const dari        = document.getElementById('downtimeFilterDari').value;
+  const hingga      = document.getElementById('downtimeFilterHingga').value;
+  const statusFilter = document.getElementById('downtimeFilterStatus').value;
+
+  let rows = buildDowntimeRows();
+  if (plate)  rows = rows.filter(r => r.kenderaan === plate);
+  if (dari)   rows = rows.filter(r => (r.tarikhMula || '') >= dari);
+  if (hingga) rows = rows.filter(r => (r.tarikhMula || '') <= hingga);
+  if (statusFilter !== 'semua') rows = rows.filter(r => r.status === statusFilter);
+  rows.sort((a, b) => (a.tarikhMula < b.tarikhMula ? 1 : -1));
+
+  currentDowntimeFiltered = rows;
+
+  const tbody = document.getElementById('downtimeBody');
+  tbody.innerHTML = rows.length ? rows.map(r => `
+    <tr${r.status === 'open' ? ' style="background:var(--vx-danger-light);"' : ''}>
+      <td style="font-weight:700;">${esc(r.kenderaan)}</td>
+      <td>${esc(r.tarikhMula || '—')}</td>
+      <td>${esc(r.tarikhSelesai || '—')}</td>
+      <td>${r.tempohHari.toFixed(1)} hari</td>
+      <td>${esc(r.sebab || '—')}</td>
+      <td>${r.status === 'open' ? '🔴 Terbuka' : '✅ Selesai'}</td>
+    </tr>`).join('') : '<tr><td colspan="6" class="vx-empty-row">Tiada rekod downtime dijumpai.</td></tr>';
+
+  const jumlahKejadian = rows.length;
+  const jumlahTempoh   = rows.reduce((sum, r) => sum + r.tempohHari, 0);
+  const countByPlate   = {};
+  rows.forEach(r => { countByPlate[r.kenderaan] = (countByPlate[r.kenderaan] || 0) + 1; });
+  let topPlate = '—', topCount = 0;
+  Object.keys(countByPlate).forEach(p => {
+    if (countByPlate[p] > topCount) { topCount = countByPlate[p]; topPlate = p; }
+  });
+
+  document.getElementById('downtimeSummaryGrid').innerHTML = [
+    { label: 'Jumlah Kejadian Downtime', val: String(jumlahKejadian) },
+    { label: 'Jumlah Tempoh Downtime',   val: jumlahTempoh.toFixed(1) + ' hari' },
+    { label: 'Paling Kerap Downtime',    val: topCount ? `${topPlate} (${topCount})` : '—' },
+  ].map(t => `<div class="vx-summary-tile">
+    <div class="tile-val">${esc(t.val)}</div>
+    <div class="tile-label">${esc(t.label)}</div>
+  </div>`).join('');
+}
+
+document.getElementById('btnDowntimeFilter').addEventListener('click', renderDowntimeTable);
+
+document.getElementById('btnDowntimeExport').addEventListener('click', function () {
+  if (!currentDowntimeFiltered.length) return Swal.fire('Perhatian', 'Tiada rekod untuk dieksport. Sila tapis dahulu.', 'warning');
+  const rows = [['Kenderaan', 'Tarikh Mula', 'Tarikh Selesai', 'Tempoh (hari)', 'Sebab', 'Status']];
+  currentDowntimeFiltered.forEach(r => rows.push([
+    r.kenderaan, r.tarikhMula || '', r.tarikhSelesai || '', r.tempohHari.toFixed(1),
+    r.sebab || '', r.status === 'open' ? 'Terbuka' : 'Selesai'
+  ]));
+  downloadCsv(`rekod-downtime-${todayISO()}.csv`, rows);
+});
 
 function filterSubmissions(plate, monthStr) {
   return allSubmissions.filter(sub => {

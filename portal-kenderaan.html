@@ -913,15 +913,17 @@ document.getElementById('btnSahkanPemulihan').addEventListener('click', async fu
 
     await addDoc(collection(db, 'downtimeHistory'), {
       kenderaan: selectedPlate,
+      jenisKenderaan: profile.jenisKenderaan || null,
       downtimeStart: downtimeStart,
       recoveryDate: recoveryDate,
       totalDays: totalDays,
+      sebab: profile.downtimeSebab || '',
       ringkasanPembaikan: ringkasanPembaikan,
       disahkanOleh: disahkanOleh,
       timestamp: serverTimestamp()
     });
 
-    const profileUpdate = { statusSemasa: 'berfungsi', downtimeStartDate: null };
+    const profileUpdate = { statusSemasa: 'berfungsi', downtimeStartDate: null, downtimeSebab: null };
     await updateDoc(doc(db, 'vehicleProfiles', selectedPlate), profileUpdate);
     Object.assign(profile, profileUpdate);
 
@@ -1183,7 +1185,8 @@ document.getElementById('btnSubmit').addEventListener('click', async function ()
     if (statusFungsi === 'rosak') {
       profileUpdate.statusSemasa = 'rosak';
       if (!vehicleProfiles[selectedPlate].downtimeStartDate) {
-        profileUpdate.downtimeStartDate = todayISO();
+        profileUpdate.downtimeStartDate = submission.tarikh;
+        profileUpdate.downtimeSebab = submission.ringkasan || '';
       }
     }
     if (Object.keys(profileUpdate).length) {
