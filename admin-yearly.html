@@ -512,7 +512,7 @@ const IFT_HISTORICAL = {
 // of the official 1 Aug go-live), so Jun/Jul already exist as live Firestore
 // data too -- IFT_2026_LIVE_CUTOFF below excludes them from the live count
 // to avoid double-counting against this baseline.
-const IFT_2026_PRE_VELOS_BASELINE = 815;
+const IFT_2026_PRE_VELOS_BASELINE = 812;
 const IFT_2026_LIVE_CUTOFF = '2026-08-01';
 
 const normPlat = s => (s || '').toString().trim().toUpperCase().replace(/\s+/g, ' ');
