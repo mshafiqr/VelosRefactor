@@ -130,6 +130,14 @@ service cloud.firestore {
       allow delete: if isAdmin() || isMaster();
     }
 
+    // ---- driverProfiles --------------------------------------------------------
+    // Driver reads it to populate the Nama Pemandu dropdown in Portal Kenderaan.
+    // Only admin creates/deletes drivers, via Module 4 (Profil Pemandu).
+    match /driverProfiles/{namaPemandu} {
+      allow read:   if isKenderaan() || isAdmin() || isMaster() || isViewer();
+      allow create, update, delete: if isAdmin() || isMaster();
+    }
+
     // ---- checklistSubmissions -------------------------------------------------
     // Driver creates one per checklist run. Only admin updates (resolving
     // urgent flags) or deletes.

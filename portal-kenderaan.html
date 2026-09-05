@@ -604,8 +604,6 @@ const ICON_MINUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 const ICON_ALERT_TRIANGLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>';
 const ICON_ALERT_OCTAGON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/><path d="M12 8v5M12 16h.01"/></svg>';
 
-const PEMANDU_LIST = ['Ahmad Agar', 'Masnin', 'Rafaie', 'Jilie', 'Mazni', 'Nurikram', 'Rosley', 'Affendy', 'SN Reno', 'PPK Franli', 'PKA Fikri', 'PPK Shan', 'PPK Armay', 'PPK James', 'CC Dell', 'PPP Shafiq'];
-
 const STATUS_LABEL = {
   berfungsi:        'Berfungsi (Di Hospital)',
   tidak_berfungsi:  'Tidak Berfungsi (Di Hospital)',
@@ -769,6 +767,7 @@ function getItemsFor(jenis) {
    STATE
 --------------------------------------------------------------------- */
 let vehicleProfiles = {};
+let driverProfiles = {};
 let selectedPlate = null;
 let selectedJenis = null;
 let currentItems = [];
@@ -788,6 +787,7 @@ function initApp() {
   if (appInitialized) return;
   appInitialized = true;
   loadVehicles();
+  loadDrivers();
 }
 
 async function loadVehicles() {
@@ -812,6 +812,20 @@ async function loadVehicles() {
   }
 }
 
+async function loadDrivers() {
+  try {
+    const snap = await getDocs(collection(db, 'driverProfiles'));
+    driverProfiles = {};
+    snap.forEach(d => { driverProfiles[d.id] = d.data(); });
+    const namaList = Object.keys(driverProfiles).sort((a, b) => a.localeCompare(b));
+    selPemandu.innerHTML = '<option value="">Pilih Nama Pemandu...</option>' +
+      namaList.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
+      '<option value="Lain-lain">Lain-lain</option>';
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal memuatkan senarai pemandu: ' + (err.message || err), 'error');
+  }
+}
+
 /* ---------------------------------------------------------------------
    STEP 1
 --------------------------------------------------------------------- */
@@ -821,9 +835,6 @@ document.getElementById('inpMasa').value = nowHM();
 const selPemandu = document.getElementById('selPemandu');
 const pemanduLainLainField = document.getElementById('pemanduLainLainField');
 const inpPemanduLainLain = document.getElementById('inpPemanduLainLain');
-selPemandu.innerHTML = '<option value="">Pilih Nama Pemandu...</option>' +
-  PEMANDU_LIST.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
-  '<option value="Lain-lain">Lain-lain</option>';
 
 selPemandu.addEventListener('change', function () {
   if (selPemandu.value === 'Lain-lain') {

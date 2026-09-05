@@ -269,6 +269,7 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
   <button class="vx-sidebar-link" data-section="sec-laporan">Laporan Bulanan</button>
   <button class="vx-sidebar-link" data-section="sec-insiden">Laporan Insiden Kenderaan</button>
   <button class="vx-sidebar-link" data-section="sec-profil">Profil Kenderaan</button>
+  <button class="vx-sidebar-link" data-section="sec-profil-pemandu">Profil Pemandu</button>
   <button class="vx-sidebar-link" data-section="sec-legacy">Rekod Lama</button>
   <hr class="vx-sidebar-divider">
   <button class="vx-sidebar-link" onclick="window.open('admin.html','_self')">← Kembali ke Admin</button>
@@ -489,6 +490,37 @@ tbody tr:hover { background-color: rgba(20, 125, 130, 0.08); }
       <div style="display:flex; gap:12px; margin-top:20px;">
         <button type="submit" class="vx-btn" id="btnProfilSave">Simpan</button>
         <button type="button" class="vx-btn danger" id="btnProfilDelete" style="display:none;">Padam Kenderaan</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ==================== SECTION 5: PROFIL PEMANDU ==================== -->
+<section id="sec-profil-pemandu" class="vx-page">
+  <div class="vx-eyebrow">Portal Kenderaan</div>
+  <div class="vx-page-title">Profil Pemandu</div>
+
+  <div class="vx-card">
+    <div class="vx-filter-row">
+      <div class="vx-filter-field" style="min-width:260px;">
+        <label>Pilih Pemandu</label>
+        <select id="profilSelectPemandu">
+          <option value="__new__">+ Tambah Pemandu Baru</option>
+        </select>
+      </div>
+    </div>
+
+    <form id="profilPemanduForm" novalidate>
+      <div class="vx-form-grid">
+        <div class="vx-field">
+          <label for="pfPemanduNama">Nama Pemandu</label>
+          <input type="text" id="pfPemanduNama" placeholder="Cth: Ahmad Agar">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button type="submit" class="vx-btn" id="btnProfilPemanduSave">Simpan</button>
+        <button type="button" class="vx-btn danger" id="btnProfilPemanduDelete" style="display:none;">Padam Pemandu</button>
       </div>
     </form>
   </div>
@@ -831,6 +863,7 @@ document.querySelectorAll('.vx-sidebar-link[data-section]').forEach(link => {
    DATA STATE
 --------------------------------------------------------------------- */
 let vehicleProfiles = {};      // plate -> profile data
+let driverProfiles = {};       // nama -> profile data
 let allSubmissions = [];       // sorted desc by timestamp, each carries _id, _date (JS Date)
 let latestByPlate = {};        // plate -> submission
 
@@ -850,6 +883,10 @@ async function loadAllData() {
     vehicleProfiles = {};
     vpSnap.forEach(d => { vehicleProfiles[d.id] = d.data(); });
 
+    const dpSnap = await getDocs(collection(db, 'driverProfiles'));
+    driverProfiles = {};
+    dpSnap.forEach(d => { driverProfiles[d.id] = d.data(); });
+
     const subSnap = await getDocs(query(collection(db, 'checklistSubmissions'), orderBy('timestamp', 'desc'), limit(200)));
     allSubmissions = subSnap.docs.map(d => {
       const data = d.data();
@@ -866,6 +903,7 @@ async function loadAllData() {
 
     renderStatusSection();
     renderProfilDropdown();
+    renderProfilPemanduDropdown();
     renderRekodKenderaanFilter();
     renderLegacyKenderaanFilter();
   } catch (err) {
@@ -1709,6 +1747,78 @@ btnProfilDelete.addEventListener('click', function () {
       delete vehicleProfiles[plate];
       await loadAllData();
       Swal.fire('Dipadam', `Profil kenderaan ${plate} telah dipadam.`, 'success');
+    } catch (err) {
+      Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
+    }
+  });
+});
+
+/* ---------------------------------------------------------------------
+   SECTION 5: PROFIL PEMANDU
+--------------------------------------------------------------------- */
+const profilSelectPemandu = document.getElementById('profilSelectPemandu');
+const pfPemanduNama = document.getElementById('pfPemanduNama');
+const btnProfilPemanduDelete = document.getElementById('btnProfilPemanduDelete');
+
+function renderProfilPemanduDropdown() {
+  const namaList = Object.keys(driverProfiles).sort((a, b) => a.localeCompare(b));
+  profilSelectPemandu.innerHTML = '<option value="__new__">+ Tambah Pemandu Baru</option>' +
+    namaList.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  loadProfilPemanduForm('__new__');
+}
+
+function loadProfilPemanduForm(nama) {
+  if (nama === '__new__') {
+    pfPemanduNama.value = '';
+    pfPemanduNama.disabled = false;
+    btnProfilPemanduDelete.style.display = 'none';
+  } else {
+    pfPemanduNama.value = nama;
+    pfPemanduNama.disabled = true;
+    btnProfilPemanduDelete.style.display = isViewer ? 'none' : 'inline-block';
+  }
+}
+
+profilSelectPemandu.addEventListener('change', function () { loadProfilPemanduForm(profilSelectPemandu.value); });
+
+document.getElementById('profilPemanduForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const isNew = profilSelectPemandu.value === '__new__';
+  const nama = (isNew ? pfPemanduNama.value : profilSelectPemandu.value).trim();
+
+  if (!nama) return Swal.fire('Perhatian', 'Sila masukkan nama pemandu.', 'warning');
+  if (isNew && driverProfiles[nama]) return Swal.fire('Perhatian', 'Pemandu dengan nama ini sudah wujud.', 'warning');
+
+  const btn = document.getElementById('btnProfilPemanduSave');
+  btn.disabled = true;
+  try {
+    await setDoc(doc(db, 'driverProfiles', nama), { nama: nama });
+    driverProfiles[nama] = { nama: nama };
+    await loadAllData();
+    profilSelectPemandu.value = nama;
+    loadProfilPemanduForm(nama);
+    Swal.fire('Disimpan!', `Profil pemandu ${nama} telah dikemaskini.`, 'success');
+  } catch (err) {
+    Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+btnProfilPemanduDelete.addEventListener('click', function () {
+  const nama = profilSelectPemandu.value;
+  if (nama === '__new__') return;
+  Swal.fire({
+    title: 'Padam Pemandu?',
+    text: `Rekod profil pemandu ${nama} akan dipadam secara kekal. Rekod senarai semak sedia ada tidak akan dipadam.`,
+    icon: 'warning', showCancelButton: true, confirmButtonText: 'Padam', cancelButtonText: 'Batal', confirmButtonColor: '#C62828'
+  }).then(async result => {
+    if (!result.isConfirmed) return;
+    try {
+      await deleteDoc(doc(db, 'driverProfiles', nama));
+      delete driverProfiles[nama];
+      await loadAllData();
+      Swal.fire('Dipadam', `Profil pemandu ${nama} telah dipadam.`, 'success');
     } catch (err) {
       Swal.fire('Ralat', 'Gagal memadam: ' + (err.message || err), 'error');
     }
