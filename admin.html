@@ -835,9 +835,33 @@ id="stepJabPagiTotal">0</td></tr>
 </div>
 <div class="vx-card">
 <div class="vx-card-hd">
-<div><div class="vx-section-title">Senarai Kenderaan Berdaftar</div><div class="vx-card-hds">Menambah/membuang kenderaan dari senarai ini memerlukan akses Firebase Console — belum tersedia dalam dashboard ini</div></div>
+<div><div class="vx-section-title">Senarai Kenderaan Berdaftar</div><div class="vx-card-hds">Tambah atau buang kenderaan daripada senarai Ambulans / Kenderaan Jabatan</div></div>
 </div>
 <div id="vxVehicleRoster" style="font-size:12px; color:var(--vx-text); line-height:1.8;"></div>
+<div style="display:flex; gap:10px; margin-top:14px;" class="vx-print-hide">
+<button class="vx-btn ghost vx-konfigurasi-editbtn" onclick="window.tambahKenderaanKonfigurasi('ambulans')">+ Tambah Ambulans</button>
+<button class="vx-btn ghost vx-konfigurasi-editbtn" onclick="window.tambahKenderaanKonfigurasi('jabatan')">+ Tambah Kenderaan Jabatan</button>
+</div>
+</div>
+
+<div class="vx-card" style="margin-top:14px;">
+<div class="vx-card-hd">
+<div><div class="vx-section-title">Senarai Pemandu</div><div class="vx-card-hds">Senarai nama pemandu untuk pemilihan semasa log pergerakan &amp; permohonan VCC</div></div>
+</div>
+<div id="vxPemanduRoster" style="font-size:12px; color:var(--vx-text); line-height:1.8;"></div>
+<div style="margin-top:14px;" class="vx-print-hide">
+<button class="vx-btn ghost vx-konfigurasi-editbtn" onclick="window.tambahPemandu()">+ Tambah Pemandu</button>
+</div>
+</div>
+
+<div class="vx-card" style="margin-top:14px;">
+<div class="vx-card-hd">
+<div><div class="vx-section-title">Senarai Pengiring</div><div class="vx-card-hds">Senarai nama pegawai pengiring untuk pemilihan semasa log pergerakan</div></div>
+</div>
+<div id="vxPengiringRoster" style="font-size:12px; color:var(--vx-text); line-height:1.8;"></div>
+<div style="margin-top:14px;" class="vx-print-hide">
+<button class="vx-btn ghost vx-konfigurasi-editbtn" onclick="window.tambahPengiring()">+ Tambah Pengiring</button>
+</div>
 </div>
 </div>
 
@@ -890,6 +914,8 @@ import {
   where,
   documentId,
   writeBatch,
+  arrayUnion,
+  arrayRemove,
   connectFirestoreEmulator
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
@@ -1001,6 +1027,8 @@ let isFullLogView = false;
 let _auditFillMap = {};
 let myChartPesakit = null, myChartPemandu = null;
 let configKenderaan = { ambulans: [], jabatan: [] };
+let configPemandu = { senarai: [] };
+let configPengiring = { senarai: [] };
 let ambulansList = [];
 const malayMonths = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
 
@@ -1033,6 +1061,108 @@ window.editCapacity = function (plat) {
     });
   });
 };
+
+/* ---------------------------------------------------------------------
+   KONFIGURASI CRUD -- kenderaan/pemandu/pengiring rosters, in-app
+   (Phase 1 of the Konfigurasi unification: these still write to the
+   existing konfigurasi/{kenderaan,pemandu,pengiring} docs that
+   log-pemandu.html and dispatch.html already read. Portal Kenderaan's
+   own vehicleProfiles/driverProfiles are untouched and unrelated.)
+--------------------------------------------------------------------- */
+window.tambahKenderaanKonfigurasi = function (jenis) {
+  const jenisLabel = jenis === 'ambulans' ? 'Ambulans' : 'Kenderaan Jabatan';
+  Swal.fire({
+    title: 'Tambah ' + jenisLabel,
+    text: 'Masukkan no. pendaftaran kenderaan:',
+    input: 'text', inputPlaceholder: 'Cth: BNU9974', showCancelButton: true,
+    confirmButtonColor: '#0056b3', confirmButtonText: 'Tambah', cancelButtonText: 'Batal',
+    inputValidator: function (value) {
+      const v = (value || '').trim().toUpperCase();
+      if (!v) return 'Sila masukkan no. pendaftaran.';
+      const existing = [...(configKenderaan.ambulans || []), ...(configKenderaan.jabatan || [])];
+      if (existing.includes(v)) return 'Kenderaan ini sudah wujud dalam senarai.';
+    }
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    const plat = result.value.trim().toUpperCase();
+    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    setDoc(doc(db, 'konfigurasi', 'kenderaan'), { [jenis]: arrayUnion(plat) }, { merge: true }).then(function () {
+      configKenderaan[jenis] = [...(configKenderaan[jenis] || []), plat];
+      window.updateUI();
+      Swal.fire('Ditambah!', plat + ' telah ditambah ke senarai ' + jenisLabel + '.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+    });
+  });
+};
+
+window.buangKenderaanKonfigurasi = function (jenis, plat) {
+  Swal.fire({
+    title: 'Buang Kenderaan?',
+    text: 'Buang ' + plat + ' daripada senarai konfigurasi? Rekod sejarah kenderaan ini tidak terjejas.',
+    icon: 'warning', showCancelButton: true,
+    confirmButtonColor: '#C62828', confirmButtonText: 'Buang', cancelButtonText: 'Batal'
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    setDoc(doc(db, 'konfigurasi', 'kenderaan'), { [jenis]: arrayRemove(plat) }, { merge: true }).then(function () {
+      configKenderaan[jenis] = (configKenderaan[jenis] || []).filter(function (p) { return p !== plat; });
+      window.updateUI();
+      Swal.fire('Dibuang!', plat + ' telah dibuang daripada senarai.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+    });
+  });
+};
+
+function tambahSenaraiKonfigurasi(docId, stateObj, label) {
+  Swal.fire({
+    title: 'Tambah ' + label,
+    text: 'Masukkan nama penuh:',
+    input: 'text', inputPlaceholder: 'Nama penuh', showCancelButton: true,
+    confirmButtonColor: '#0056b3', confirmButtonText: 'Tambah', cancelButtonText: 'Batal',
+    inputValidator: function (value) {
+      const v = (value || '').trim();
+      if (!v) return 'Sila masukkan nama.';
+      if ((stateObj.senarai || []).includes(v)) return 'Nama ini sudah wujud dalam senarai.';
+    }
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    const nama = result.value.trim();
+    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    setDoc(doc(db, 'konfigurasi', docId), { senarai: arrayUnion(nama) }, { merge: true }).then(function () {
+      stateObj.senarai = [...(stateObj.senarai || []), nama];
+      window.updateUI();
+      Swal.fire('Ditambah!', nama + ' telah ditambah ke senarai ' + label + '.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+    });
+  });
+}
+
+function buangSenaraiKonfigurasi(docId, stateObj, nama, label) {
+  Swal.fire({
+    title: 'Buang ' + label + '?',
+    text: 'Buang ' + nama + ' daripada senarai?',
+    icon: 'warning', showCancelButton: true,
+    confirmButtonColor: '#C62828', confirmButtonText: 'Buang', cancelButtonText: 'Batal'
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+    setDoc(doc(db, 'konfigurasi', docId), { senarai: arrayRemove(nama) }, { merge: true }).then(function () {
+      stateObj.senarai = (stateObj.senarai || []).filter(function (n) { return n !== nama; });
+      window.updateUI();
+      Swal.fire('Dibuang!', nama + ' telah dibuang daripada senarai.', 'success');
+    }).catch(function (err) {
+      Swal.fire('Ralat', 'Gagal menyimpan: ' + (err.message || err), 'error');
+    });
+  });
+}
+
+window.tambahPemandu = function () { tambahSenaraiKonfigurasi('pemandu', configPemandu, 'Pemandu'); };
+window.buangPemandu = function (nama) { buangSenaraiKonfigurasi('pemandu', configPemandu, nama, 'Pemandu'); };
+window.tambahPengiring = function () { tambahSenaraiKonfigurasi('pengiring', configPengiring, 'Pengiring'); };
+window.buangPengiring = function (nama) { buangSenaraiKonfigurasi('pengiring', configPengiring, nama, 'Pengiring'); };
 
 /* ---------------------------------------------------------------------
    STARTUP — three collections stay live via onSnapshot for the
@@ -1076,10 +1206,17 @@ function initDashboard() {
     Swal.close();
   }
 
-  // Hospital-specific vehicle list -- read-once, not onSnapshot. Admin
-  // edits this via Firebase Console; a dashboard reload picks up the change.
-  getDoc(doc(db, 'konfigurasi', 'kenderaan')).then(function (snap) {
-    if (snap.exists()) configKenderaan = snap.data();
+  // Hospital-specific lists (kenderaan/pemandu/pengiring) -- read-once,
+  // not onSnapshot. Editable in-app via the Konfigurasi tab; a dashboard
+  // reload picks up changes made elsewhere (e.g. Firebase Console).
+  Promise.all([
+    getDoc(doc(db, 'konfigurasi', 'kenderaan')),
+    getDoc(doc(db, 'konfigurasi', 'pemandu')),
+    getDoc(doc(db, 'konfigurasi', 'pengiring'))
+  ]).then(function (snaps) {
+    if (snaps[0].exists()) configKenderaan = snaps[0].data();
+    if (snaps[1].exists()) configPemandu = snaps[1].data();
+    if (snaps[2].exists()) configPengiring = snaps[2].data();
     ambulansList = configKenderaan.ambulans || [];
     configReady = true;
     if (firstSyncDone) window.updateUI();
@@ -1990,10 +2127,12 @@ window.updateUI = function () {
     }
   })();
 
-  // --- KONFIGURASI: kapasiti tangki + senarai kenderaan (read-only roster) ---
+  // --- KONFIGURASI: kapasiti tangki + senarai kenderaan/pemandu/pengiring ---
   (function renderKonfigurasi() {
     const capBody = document.getElementById('vxCapacityBody');
     const rosterEl = document.getElementById('vxVehicleRoster');
+    const pemanduEl = document.getElementById('vxPemanduRoster');
+    const pengiringEl = document.getElementById('vxPengiringRoster');
     if (!capBody || !rosterEl) return;
     const ambList = configKenderaan.ambulans || [];
     const jabList = configKenderaan.jabatan || [];
@@ -2010,8 +2149,32 @@ window.updateUI = function () {
           '<td>' + editBtn + '</td></tr>';
       }).join('');
     }
-    rosterEl.innerHTML = '<div><strong>Ambulans (' + ambList.length + '):</strong> ' + (ambList.join(', ') || '—') + '</div>' +
-      '<div><strong>Kenderaan Jabatan (' + jabList.length + '):</strong> ' + (jabList.join(', ') || '—') + '</div>';
+
+    function chipList(items, buildRemoveCall) {
+      if (!items.length) return '<span style="color:var(--vx-muted);">Tiada rekod.</span>';
+      return items.map(function (name) {
+        const safeName = String(name).replace(/'/g, "\\'");
+        const delBtn = isViewer ? '' : ' <button onclick="' + buildRemoveCall(safeName) + '" style="border:none;background:none;color:inherit;cursor:pointer;font-weight:800;margin-left:4px;padding:0;line-height:1;">&times;</button>';
+        return '<span class="vx-chip" style="margin:2px 4px 2px 0; display:inline-flex; align-items:center;">' + name + delBtn + '</span>';
+      }).join('');
+    }
+
+    rosterEl.innerHTML =
+      '<div style="margin-bottom:10px;"><strong>Ambulans (' + ambList.length + '):</strong><br>' +
+        chipList(ambList, function (p) { return "window.buangKenderaanKonfigurasi('ambulans','" + p + "')"; }) + '</div>' +
+      '<div><strong>Kenderaan Jabatan (' + jabList.length + '):</strong><br>' +
+        chipList(jabList, function (p) { return "window.buangKenderaanKonfigurasi('jabatan','" + p + "')"; }) + '</div>';
+
+    if (pemanduEl) {
+      const senaraiPemandu = (configPemandu.senarai || []).slice().sort();
+      pemanduEl.innerHTML = chipList(senaraiPemandu, function (n) { return "window.buangPemandu('" + n + "')"; });
+    }
+    if (pengiringEl) {
+      const senaraiPengiring = (configPengiring.senarai || []).slice().sort();
+      pengiringEl.innerHTML = chipList(senaraiPengiring, function (n) { return "window.buangPengiring('" + n + "')"; });
+    }
+
+    document.querySelectorAll('.vx-konfigurasi-editbtn').forEach(function (b) { b.style.display = isViewer ? 'none' : ''; });
   })();
 };
 
